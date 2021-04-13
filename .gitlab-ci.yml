@@ -12,8 +12,8 @@ venv:
   stage: build
   image: registry.gitlab.com/hashbangfr/docker_archlinux:python
   script:
-    - if [ ! -d $CACHE_PATH/venv38 ] ; then virtualenv --python=python3.8 $CACHE_PATH/venv38 ; fi
-    - $CACHE_PATH/venv38/bin/pip install -U -r requirements-tests.txt
+    - if [ ! -d $CACHE_PATH/venv39 ] ; then virtualenv --python=python3.8 $CACHE_PATH/venv39 ; fi
+    - $CACHE_PATH/venv39/bin/pip install -U -r requirements-tests.txt
 
 tests:
   stage: test
@@ -31,7 +31,7 @@ tests:
   dependencies:
     - venv
   script:
-    - source $CACHE_PATH/venv38/bin/activate
+    - source $CACHE_PATH/venv39/bin/activate
     - ./manage.py makemigrations --check --dry-run
     - black --diff --check decharges/
     - flake8 decharges/
