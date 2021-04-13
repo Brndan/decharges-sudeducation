@@ -2,7 +2,7 @@ FROM python:3.9-slim
 
 WORKDIR /srv/app/
 
-RUN apt-get update && apt-get install -y locales
+RUN apt-get update && apt-get install -y locales default-libmysqlclient-dev build-essential
 
 # Set the locale
 RUN sed -i '/fr_FR.UTF-8/s/^# //g' /etc/locale.gen && locale-gen
