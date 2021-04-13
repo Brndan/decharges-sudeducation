@@ -102,6 +102,7 @@ Variables d'environnement nécessaires au projet en production
 - **EMAIL_USE_TLS** : `True` si le serveur mail SMTP supporte le TLS, `False` sinon. Le défaut est `True`
 - **DJANGO_DEFAULT_FROM_EMAIL** : l'adresse mail envoyant les emails de l'application, si non spécifié `admin@sudeducation.hashbang.fr` est utilisé
 - **DJANGO_DEFAULT_FROM_EMAIL_NAME** : le nom de la personne envoyant les emails de l'application, si non spécifié `admin` est utilisé
+- **DJANGO_SETTINGS_MODULE** : les settings à utiliser, `decharges.settings`
 
 ## Import des données
 
