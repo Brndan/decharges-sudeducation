@@ -1,0 +1,16 @@
+from .base import *  # noqa: F401,F403
+
+SECRET_KEY = "Please_Change_Me"
+DEBUG = True
+ALLOWED_HOSTS = ["*"]
+
+BUILD_DIR = BASE_DIR / "build"  # noqa: F405
+MEDIA_ROOT = BASE_DIR / "media"  # noqa: F405
+
+BASE_URL = "http://127.0.0.1:8000"
+
+CSRF_COOKIE_SECURE = False
+SESSION_COOKIE_SECURE = False
+SECURE_HSTS_SECONDS = None
+SECURE_HSTS_PRELOAD = False
+SECURE_HSTS_INCLUDE_SUBDOMAINS = False

@@ -1,0 +1,88 @@
+stages:
+  - build
+  - test
+  - docker
+  - deploy
+
+before_script:
+  - export CACHE_PATH="/venvs/sudeducation/$(date +week-%V-%Y)"
+  - if [[ "$CI_COMMIT_BRANCH" == *"--no-cache"* ]] ; then export CACHE_PATH="/venvs/$CI_COMMIT_SHORT_SHA"; fi
+
+venv:
+  stage: build
+  image: registry.gitlab.com/hashbangfr/docker_archlinux:python
+  script:
+    - if [ ! -d $CACHE_PATH/venv38 ] ; then virtualenv --python=python3.8 $CACHE_PATH/venv38 ; fi
+    - $CACHE_PATH/venv38/bin/pip install -U -r requirements-tests.txt
+
+tests:
+  stage: test
+  image: registry.gitlab.com/hashbangfr/docker_archlinux:python
+  variables:
+    DJANGO_SETTINGS_MODULE: "decharges.settings"
+    MYSQL_ROOT_PASSWORD: "mariadb"
+    MYSQL_DATABASE: "decharges"
+    DB_HOST: "mariadb"
+    DB_NAME: "decharges"
+    DB_USER: "root"
+    DB_PASSWORD: "mariadb"
+  services:
+    - name: mariadb:10.5.8
+  dependencies:
+    - venv
+  script:
+    - source $CACHE_PATH/venv38/bin/activate
+    - ./manage.py makemigrations --check --dry-run
+    - black --diff --check decharges/
+    - flake8 decharges/
+    - isort --check-only --diff decharges/
+    - ./manage.py collectstatic --no-input
+    - pytest --ds=decharges.settings.tests --create-db -n $(( $(cat /proc/cpuinfo | grep processor | wc -l) / 2 - 1 )) decharges/
+    - if [ "$CI_COMMIT_REF_NAME" = 'master' ] ; then exit 0 ; fi
+    - git fetch origin master ; diff-cover coverage.xml --fail-under=90 --compare-branch origin/master
+
+build_docker:
+  stage: docker
+  image: docker:git
+  tags:
+    - dind
+  services:
+    - docker:dind
+  dependencies:
+    - venv
+  except:
+    - master
+  script:
+    - docker build -f docker/Dockerfile -t registry.gitlab.com/hashbangfr/sudeducation:latest .
+
+build_docker_and_publish:
+  stage: docker
+  only:
+    - master
+    - develop
+  image: docker:git
+  tags:
+    - dind
+  dependencies:
+    - venv
+  services:
+    - docker:dind
+  script:
+    - docker build --pull --no-cache -f docker/Dockerfile -t registry.gitlab.com/hashbangfr/sudeducation:latest .
+    - docker tag registry.gitlab.com/hashbangfr/sudeducation:latest registry.gitlab.com/hashbangfr/sudeducation:$CI_COMMIT_SHORT_SHA
+    - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN registry.gitlab.com
+    - docker push registry.gitlab.com/hashbangfr/sudeducation:latest
+    - docker push registry.gitlab.com/hashbangfr/sudeducation:$CI_COMMIT_SHORT_SHA
+
+ansible-preprod:
+  only:
+    refs:
+      - master
+  stage: deploy
+  image: registry.gitlab.com/hashbangfr/docker_archlinux:ansible
+  dependencies:
+    - build_docker_and_publish
+  tags:
+    - ansible
+  script:
+    - cd /srv/ansible/ && ansible-playbook ./playbooks/sudeducation/play.yml -vvv --extra-vars="tag=$CI_COMMIT_SHORT_SHA"
