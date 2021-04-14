@@ -8,6 +8,9 @@
   <form method="post">
     {% csrf_token %}
     {{ form|bulma }}
+    <p class="mb-2">
+      <a href="{% url 'password_reset' %}">Mot de passe oublié ?</a>
+    </p>
     <input type="submit" value="Connexion" class="button">
   </form>
 {% endblock content %}
