@@ -1,0 +1,9 @@
+/* Menu */
+.logo {
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+.logo img {
+    max-height: 2rem;
+}

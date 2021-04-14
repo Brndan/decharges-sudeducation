@@ -1,0 +1,33 @@
+{% load bulma_tags i18n %}
+
+{% if form.non_field_errors %}
+  <div class="notification is-danger">
+    <button class="delete remove-notification" aria-label="delete"></button>
+    <ul>
+    {% for non_field_error in form.non_field_errors %}
+      <li>{{ non_field_error }}</li>
+    {% endfor %}
+    </ul>
+  </div>
+{% endif %}
+
+{% for field in form.hidden_fields %}
+  {{ field }}
+{% endfor %}
+
+<section class="columns is-multiline">
+{% for field in form.visible_fields %}
+  {% if field.field.start_fieldset %}
+    <div class="column is-12 pt-1">
+      <fieldset class="fieldset">
+        <legend>{% translate field.field.start_fieldset %}</legend>
+        <div class="columns is-multiline pt-4">
+  {% endif %}
+  {{ field|bulma }}
+  {% if field.field.end_fieldset %}
+        </div>
+      </div>
+    </fieldset>
+  {% endif %}
+{% endfor %}
+</section>
