@@ -1,6 +1,7 @@
 import re
 
 from django.core.exceptions import ValidationError
+from django.core.validators import RegexValidator
 
 CHARSET_REGEX = re.compile("[^a-zàâçéèêëîïôûùüÿñæœ -]", flags=re.IGNORECASE)
 
@@ -69,3 +70,16 @@ def validate_last_name(last_name):
         raise ValidationError(
             f"Des caractères non-autorisés sont présents : {unknown_chars.group(0)}",
         )
+
+
+code_corps_validator = RegexValidator(
+    regex=r"^\d{3}$",
+    message="Doit être constitué de 3 chiffres",
+    code="invalid_code_corps",
+)
+
+rne_validator = RegexValidator(
+    regex=r"^\d{7}[A-Z]$",
+    message="Doit être constitué de 7 chiffres + une lettre majuscule",
+    code="invalid_rne",
+)

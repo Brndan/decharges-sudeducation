@@ -106,8 +106,57 @@ Variables d'environnement nécessaires au projet en production
 
 ## Import des données
 
+**Importer les Académies / Syndicats :**
+
+Attention, avant de lancer cette commande, vous pouvez modifier les emails des syndicats contenus dans le JSON,
+afin d'avoir directement des données correctes en base de données. Cependant vous pourrez faire la modification a posteriori si vous
+préférez.
+
+```bash
+$ ./manage.py loaddata decharges/user_manager/fixtures/academies_syndicats.json
+```
+
+Note : Le script d'import utilisé pour générer cette fixture se trouve dans `imports/academies`
+
+**Importer l'historique**
+
+TODO
+
+**Importer les Corps**
+
 TODO
 
 ## Organisation du code
 
-TODO
+### `decharges/settings/base.py` :
+
+Contient toutes les variables de l'application Django.
+
+- NB_HOURS_IN_A_YEAR : à changer si le nombre d'heure d'un temps plein en une année n'est plus 1607
+- TODO
+
+### `decharges/decharge`
+
+L'application django principale, où se trouvent les données d'attribution et d'utilisation des temps de décharges.
+
+Notamment :
+
+- validators.py : contient les validateurs des données côté backend
+- models.py : contient les modèles de données
+- TODO
+
+### `decharges/parametres`
+
+Une petite application permettant de gérer les paramètres de l'application via l'interface admin de django. Par exemple :
+
+- l'année en cours, pour savoir quelles données afficher
+- si oui ou non les syndicats peuvent accéder à l'édition des décharges
+
+### `decharges/user_manager`
+
+L'application permettant de gérer les utilisateurs. Vous y trouverez notamment :
+
+- le modèle de `Syndicat` (qui hérite du modèle User de django)
+- le modèle `Academie` qui regroupe les syndicats
+- les templates (decharges/user_manager/templates/registration) qui surchargent les templates de base de la gestion d'utilisateurs de django
+- TODO

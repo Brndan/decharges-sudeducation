@@ -4,7 +4,13 @@ from django.db import models
 
 
 class Academie(models.Model):
+    """
+    Une académie rassemble plusieurs syndicats via `academie.syndicats_membres`
+    """
     nom = models.CharField(verbose_name="Nom de l'académie", max_length=255)
+
+    def __str__(self):
+        return self.nom
 
 
 class CustomUserManager(BaseUserManager):
@@ -43,6 +49,15 @@ class CustomUserManager(BaseUserManager):
 
 
 class Syndicat(AbstractUser):
+    """
+    Un syndicat est un utilisateur django.
+
+    Son identifiant utilisé pour se connecter est l'email.
+    Un syndicat fait partie d'une académie.
+
+    La fédération est un syndicat comme les autres, sauf qu'elle est un administrateur django
+    et a donc accès à l'interface admin de django (https://decharges.org/admin)
+    """
     username = models.CharField(
         "Nom d'utilisateur", max_length=150, null=True, blank=True
     )
@@ -59,3 +74,16 @@ class Syndicat(AbstractUser):
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["first_name", "last_name"]
     objects = CustomUserManager()
+
+    def __str__(self):
+        if self.username:
+            return self.username
+        return self.email
+
+    @property
+    def is_federation(self):
+        return self.is_superuser
+
+    class Meta:
+        verbose_name = "Syndicat"
+        verbose_name_plural = "Syndicats"

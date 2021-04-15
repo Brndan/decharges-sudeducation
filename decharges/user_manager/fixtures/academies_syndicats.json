@@ -1,0 +1,1422 @@
+[
+{
+  "model": "user_manager.academie",
+  "pk": 29,
+  "fields": {
+    "nom": "Aix-Marseille"
+  }
+},
+{
+  "model": "user_manager.academie",
+  "pk": 30,
+  "fields": {
+    "nom": "Amiens"
+  }
+},
+{
+  "model": "user_manager.academie",
+  "pk": 31,
+  "fields": {
+    "nom": "Besançon"
+  }
+},
+{
+  "model": "user_manager.academie",
+  "pk": 32,
+  "fields": {
+    "nom": "Bordeaux"
+  }
+},
+{
+  "model": "user_manager.academie",
+  "pk": 33,
+  "fields": {
+    "nom": "Caen"
+  }
+},
+{
+  "model": "user_manager.academie",
+  "pk": 34,
+  "fields": {
+    "nom": "Clermont-Ferrand"
+  }
+},
+{
+  "model": "user_manager.academie",
+  "pk": 35,
+  "fields": {
+    "nom": "Créteil"
+  }
+},
+{
+  "model": "user_manager.academie",
+  "pk": 36,
+  "fields": {
+    "nom": "Dijon"
+  }
+},
+{
+  "model": "user_manager.academie",
+  "pk": 37,
+  "fields": {
+    "nom": "Grenoble"
+  }
+},
+{
+  "model": "user_manager.academie",
+  "pk": 38,
+  "fields": {
+    "nom": "Guyane"
+  }
+},
+{
+  "model": "user_manager.academie",
+  "pk": 39,
+  "fields": {
+    "nom": "Lille"
+  }
+},
+{
+  "model": "user_manager.academie",
+  "pk": 40,
+  "fields": {
+    "nom": "Limoges"
+  }
+},
+{
+  "model": "user_manager.academie",
+  "pk": 41,
+  "fields": {
+    "nom": "Lyon"
+  }
+},
+{
+  "model": "user_manager.academie",
+  "pk": 42,
+  "fields": {
+    "nom": "Mayotte"
+  }
+},
+{
+  "model": "user_manager.academie",
+  "pk": 43,
+  "fields": {
+    "nom": "Montpellier"
+  }
+},
+{
+  "model": "user_manager.academie",
+  "pk": 44,
+  "fields": {
+    "nom": "Nancy"
+  }
+},
+{
+  "model": "user_manager.academie",
+  "pk": 45,
+  "fields": {
+    "nom": "Nantes"
+  }
+},
+{
+  "model": "user_manager.academie",
+  "pk": 46,
+  "fields": {
+    "nom": "Nice"
+  }
+},
+{
+  "model": "user_manager.academie",
+  "pk": 47,
+  "fields": {
+    "nom": "Orléans-Tours"
+  }
+},
+{
+  "model": "user_manager.academie",
+  "pk": 48,
+  "fields": {
+    "nom": "Paris"
+  }
+},
+{
+  "model": "user_manager.academie",
+  "pk": 49,
+  "fields": {
+    "nom": "Poitiers"
+  }
+},
+{
+  "model": "user_manager.academie",
+  "pk": 50,
+  "fields": {
+    "nom": "Reims"
+  }
+},
+{
+  "model": "user_manager.academie",
+  "pk": 51,
+  "fields": {
+    "nom": "Rennes"
+  }
+},
+{
+  "model": "user_manager.academie",
+  "pk": 52,
+  "fields": {
+    "nom": "Réunion"
+  }
+},
+{
+  "model": "user_manager.academie",
+  "pk": 53,
+  "fields": {
+    "nom": "Rouen"
+  }
+},
+{
+  "model": "user_manager.academie",
+  "pk": 54,
+  "fields": {
+    "nom": "Strasbourg"
+  }
+},
+{
+  "model": "user_manager.academie",
+  "pk": 55,
+  "fields": {
+    "nom": "Toulouse"
+  }
+},
+{
+  "model": "user_manager.academie",
+  "pk": 56,
+  "fields": {
+    "nom": "Versailles"
+  }
+},
+{
+  "model": "user_manager.syndicat",
+  "fields": {
+    "password": "",
+    "last_login": null,
+    "is_superuser": false,
+    "first_name": "",
+    "last_name": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2021-04-15T12:50:33.448Z",
+    "username": "Alpes de Haute-Provence (04)",
+    "email": "changeme0@example.com",
+    "academie": 29,
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "user_manager.syndicat",
+  "fields": {
+    "password": "",
+    "last_login": null,
+    "is_superuser": false,
+    "first_name": "",
+    "last_name": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2021-04-15T12:50:33.466Z",
+    "username": "Bouches du Rhône (13)",
+    "email": "changeme1@example.com",
+    "academie": 29,
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "user_manager.syndicat",
+  "fields": {
+    "password": "",
+    "last_login": null,
+    "is_superuser": false,
+    "first_name": "",
+    "last_name": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2021-04-15T12:50:33.474Z",
+    "username": "Hautes-Alpes (05)",
+    "email": "changeme2@example.com",
+    "academie": 29,
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "user_manager.syndicat",
+  "fields": {
+    "password": "",
+    "last_login": null,
+    "is_superuser": false,
+    "first_name": "",
+    "last_name": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2021-04-15T12:50:33.483Z",
+    "username": "Vaucluse (84)",
+    "email": "changeme3@example.com",
+    "academie": 29,
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "user_manager.syndicat",
+  "fields": {
+    "password": "",
+    "last_login": null,
+    "is_superuser": false,
+    "first_name": "",
+    "last_name": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2021-04-15T12:50:33.497Z",
+    "username": "Aisne (02)",
+    "email": "changeme4@example.com",
+    "academie": 30,
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "user_manager.syndicat",
+  "fields": {
+    "password": "",
+    "last_login": null,
+    "is_superuser": false,
+    "first_name": "",
+    "last_name": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2021-04-15T12:50:33.508Z",
+    "username": "Oise (60)",
+    "email": "changeme5@example.com",
+    "academie": 30,
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "user_manager.syndicat",
+  "fields": {
+    "password": "",
+    "last_login": null,
+    "is_superuser": false,
+    "first_name": "",
+    "last_name": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2021-04-15T12:50:33.516Z",
+    "username": "Somme (80)",
+    "email": "changeme6@example.com",
+    "academie": 30,
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "user_manager.syndicat",
+  "fields": {
+    "password": "",
+    "last_login": null,
+    "is_superuser": false,
+    "first_name": "",
+    "last_name": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2021-04-15T12:50:33.530Z",
+    "username": "Franche-Comté (25+39+70+90)",
+    "email": "changeme7@example.com",
+    "academie": 31,
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "user_manager.syndicat",
+  "fields": {
+    "password": "",
+    "last_login": null,
+    "is_superuser": false,
+    "first_name": "",
+    "last_name": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2021-04-15T12:50:33.547Z",
+    "username": "Aquitaine (24+33+40+47+64)",
+    "email": "changeme8@example.com",
+    "academie": 32,
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "user_manager.syndicat",
+  "fields": {
+    "password": "",
+    "last_login": null,
+    "is_superuser": false,
+    "first_name": "",
+    "last_name": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2021-04-15T12:50:33.558Z",
+    "username": "Lot (46)",
+    "email": "changeme9@example.com",
+    "academie": 32,
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "user_manager.syndicat",
+  "fields": {
+    "password": "",
+    "last_login": null,
+    "is_superuser": false,
+    "first_name": "",
+    "last_name": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2021-04-15T12:50:33.572Z",
+    "username": "Calvados (14)",
+    "email": "changeme10@example.com",
+    "academie": 33,
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "user_manager.syndicat",
+  "fields": {
+    "password": "",
+    "last_login": null,
+    "is_superuser": false,
+    "first_name": "",
+    "last_name": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2021-04-15T12:50:33.582Z",
+    "username": "Manche (50)",
+    "email": "changeme11@example.com",
+    "academie": 33,
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "user_manager.syndicat",
+  "fields": {
+    "password": "",
+    "last_login": null,
+    "is_superuser": false,
+    "first_name": "",
+    "last_name": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2021-04-15T12:50:33.591Z",
+    "username": "Orne (61)",
+    "email": "changeme12@example.com",
+    "academie": 33,
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "user_manager.syndicat",
+  "fields": {
+    "password": "",
+    "last_login": null,
+    "is_superuser": false,
+    "first_name": "",
+    "last_name": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2021-04-15T12:50:33.606Z",
+    "username": "Cantal (15)",
+    "email": "changeme13@example.com",
+    "academie": 34,
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "user_manager.syndicat",
+  "fields": {
+    "password": "",
+    "last_login": null,
+    "is_superuser": false,
+    "first_name": "",
+    "last_name": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2021-04-15T12:50:33.616Z",
+    "username": "Haute-Loire (43)",
+    "email": "changeme14@example.com",
+    "academie": 34,
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "user_manager.syndicat",
+  "fields": {
+    "password": "",
+    "last_login": null,
+    "is_superuser": false,
+    "first_name": "",
+    "last_name": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2021-04-15T12:50:33.625Z",
+    "username": "Puy de Dôme - Allier (03+63)",
+    "email": "changeme15@example.com",
+    "academie": 34,
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "user_manager.syndicat",
+  "fields": {
+    "password": "",
+    "last_login": null,
+    "is_superuser": false,
+    "first_name": "",
+    "last_name": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2021-04-15T12:50:33.638Z",
+    "username": "Seine-et-Marne (77)",
+    "email": "changeme16@example.com",
+    "academie": 35,
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "user_manager.syndicat",
+  "fields": {
+    "password": "",
+    "last_login": null,
+    "is_superuser": false,
+    "first_name": "",
+    "last_name": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2021-04-15T12:50:33.649Z",
+    "username": "Seine-Saint-Denis (93)",
+    "email": "changeme17@example.com",
+    "academie": 35,
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "user_manager.syndicat",
+  "fields": {
+    "password": "",
+    "last_login": null,
+    "is_superuser": false,
+    "first_name": "",
+    "last_name": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2021-04-15T12:50:33.658Z",
+    "username": "Val de Marne (94)",
+    "email": "changeme18@example.com",
+    "academie": 35,
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "user_manager.syndicat",
+  "fields": {
+    "password": "",
+    "last_login": null,
+    "is_superuser": false,
+    "first_name": "",
+    "last_name": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2021-04-15T12:50:33.672Z",
+    "username": "Bourgogne (71+58+21)",
+    "email": "changeme19@example.com",
+    "academie": 36,
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "user_manager.syndicat",
+  "fields": {
+    "password": "",
+    "last_login": null,
+    "is_superuser": false,
+    "first_name": "",
+    "last_name": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2021-04-15T12:50:33.683Z",
+    "username": "Yonne (89)",
+    "email": "changeme20@example.com",
+    "academie": 36,
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "user_manager.syndicat",
+  "fields": {
+    "password": "",
+    "last_login": null,
+    "is_superuser": false,
+    "first_name": "",
+    "last_name": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2021-04-15T12:50:33.697Z",
+    "username": "Grenoble (07+26+38+73+74)",
+    "email": "changeme21@example.com",
+    "academie": 37,
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "user_manager.syndicat",
+  "fields": {
+    "password": "",
+    "last_login": null,
+    "is_superuser": false,
+    "first_name": "",
+    "last_name": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2021-04-15T12:50:33.713Z",
+    "username": "Guyane (973)",
+    "email": "changeme22@example.com",
+    "academie": 38,
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "user_manager.syndicat",
+  "fields": {
+    "password": "",
+    "last_login": null,
+    "is_superuser": false,
+    "first_name": "",
+    "last_name": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2021-04-15T12:50:33.755Z",
+    "username": "Nord (59)",
+    "email": "changeme23@example.com",
+    "academie": 39,
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "user_manager.syndicat",
+  "fields": {
+    "password": "",
+    "last_login": null,
+    "is_superuser": false,
+    "first_name": "",
+    "last_name": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2021-04-15T12:50:33.767Z",
+    "username": "Pas-de-Calais (62)",
+    "email": "changeme24@example.com",
+    "academie": 39,
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "user_manager.syndicat",
+  "fields": {
+    "password": "",
+    "last_login": null,
+    "is_superuser": false,
+    "first_name": "",
+    "last_name": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2021-04-15T12:50:33.789Z",
+    "username": "Limousin (19+23+87)",
+    "email": "changeme25@example.com",
+    "academie": 40,
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "user_manager.syndicat",
+  "fields": {
+    "password": "",
+    "last_login": null,
+    "is_superuser": false,
+    "first_name": "",
+    "last_name": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2021-04-15T12:50:33.805Z",
+    "username": "Ain (01)",
+    "email": "changeme26@example.com",
+    "academie": 41,
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "user_manager.syndicat",
+  "fields": {
+    "password": "",
+    "last_login": null,
+    "is_superuser": false,
+    "first_name": "",
+    "last_name": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2021-04-15T12:50:33.816Z",
+    "username": "Loire (42)",
+    "email": "changeme27@example.com",
+    "academie": 41,
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "user_manager.syndicat",
+  "fields": {
+    "password": "",
+    "last_login": null,
+    "is_superuser": false,
+    "first_name": "",
+    "last_name": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2021-04-15T12:50:33.825Z",
+    "username": "Rhône (69)",
+    "email": "changeme28@example.com",
+    "academie": 41,
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "user_manager.syndicat",
+  "fields": {
+    "password": "",
+    "last_login": null,
+    "is_superuser": false,
+    "first_name": "",
+    "last_name": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2021-04-15T12:50:33.839Z",
+    "username": "Mayotte (976)",
+    "email": "changeme29@example.com",
+    "academie": 42,
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "user_manager.syndicat",
+  "fields": {
+    "password": "",
+    "last_login": null,
+    "is_superuser": false,
+    "first_name": "",
+    "last_name": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2021-04-15T12:50:33.856Z",
+    "username": "Gard (30+48)",
+    "email": "changeme30@example.com",
+    "academie": 43,
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "user_manager.syndicat",
+  "fields": {
+    "password": "",
+    "last_login": null,
+    "is_superuser": false,
+    "first_name": "",
+    "last_name": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2021-04-15T12:50:33.866Z",
+    "username": "Hérault (34)",
+    "email": "changeme31@example.com",
+    "academie": 43,
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "user_manager.syndicat",
+  "fields": {
+    "password": "",
+    "last_login": null,
+    "is_superuser": false,
+    "first_name": "",
+    "last_name": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2021-04-15T12:50:33.875Z",
+    "username": "Pyrénées Orientales - Aude (66+11)",
+    "email": "changeme32@example.com",
+    "academie": 43,
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "user_manager.syndicat",
+  "fields": {
+    "password": "",
+    "last_login": null,
+    "is_superuser": false,
+    "first_name": "",
+    "last_name": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2021-04-15T12:50:33.889Z",
+    "username": "Lorraine (54+55+57+88)",
+    "email": "changeme33@example.com",
+    "academie": 44,
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "user_manager.syndicat",
+  "fields": {
+    "password": "",
+    "last_login": null,
+    "is_superuser": false,
+    "first_name": "",
+    "last_name": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2021-04-15T12:50:33.906Z",
+    "username": "Loire Atlantique (44)",
+    "email": "changeme34@example.com",
+    "academie": 45,
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "user_manager.syndicat",
+  "fields": {
+    "password": "",
+    "last_login": null,
+    "is_superuser": false,
+    "first_name": "",
+    "last_name": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2021-04-15T12:50:33.925Z",
+    "username": "Maine et Loire (49)",
+    "email": "changeme35@example.com",
+    "academie": 45,
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "user_manager.syndicat",
+  "fields": {
+    "password": "",
+    "last_login": null,
+    "is_superuser": false,
+    "first_name": "",
+    "last_name": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2021-04-15T12:50:33.933Z",
+    "username": "Mayenne (53)",
+    "email": "changeme36@example.com",
+    "academie": 45,
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "user_manager.syndicat",
+  "fields": {
+    "password": "",
+    "last_login": null,
+    "is_superuser": false,
+    "first_name": "",
+    "last_name": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2021-04-15T12:50:33.941Z",
+    "username": "Sarthe (72)",
+    "email": "changeme37@example.com",
+    "academie": 45,
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "user_manager.syndicat",
+  "fields": {
+    "password": "",
+    "last_login": null,
+    "is_superuser": false,
+    "first_name": "",
+    "last_name": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2021-04-15T12:50:33.949Z",
+    "username": "Vendée (85)",
+    "email": "changeme38@example.com",
+    "academie": 45,
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "user_manager.syndicat",
+  "fields": {
+    "password": "",
+    "last_login": null,
+    "is_superuser": false,
+    "first_name": "",
+    "last_name": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2021-04-15T12:50:33.964Z",
+    "username": "Alpes Maritimes (06)",
+    "email": "changeme39@example.com",
+    "academie": 46,
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "user_manager.syndicat",
+  "fields": {
+    "password": "",
+    "last_login": null,
+    "is_superuser": false,
+    "first_name": "",
+    "last_name": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2021-04-15T12:50:33.974Z",
+    "username": "Var (83)",
+    "email": "changeme40@example.com",
+    "academie": 46,
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "user_manager.syndicat",
+  "fields": {
+    "password": "",
+    "last_login": null,
+    "is_superuser": false,
+    "first_name": "",
+    "last_name": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2021-04-15T12:50:33.988Z",
+    "username": "Cher (18)",
+    "email": "changeme41@example.com",
+    "academie": 47,
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "user_manager.syndicat",
+  "fields": {
+    "password": "",
+    "last_login": null,
+    "is_superuser": false,
+    "first_name": "",
+    "last_name": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2021-04-15T12:50:33.999Z",
+    "username": "Indre (36)",
+    "email": "changeme42@example.com",
+    "academie": 47,
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "user_manager.syndicat",
+  "fields": {
+    "password": "",
+    "last_login": null,
+    "is_superuser": false,
+    "first_name": "",
+    "last_name": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2021-04-15T12:50:34.008Z",
+    "username": "Indre et Loire (37)",
+    "email": "changeme43@example.com",
+    "academie": 47,
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "user_manager.syndicat",
+  "fields": {
+    "password": "",
+    "last_login": null,
+    "is_superuser": false,
+    "first_name": "",
+    "last_name": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2021-04-15T12:50:34.034Z",
+    "username": "Loir et Cher (41)",
+    "email": "changeme44@example.com",
+    "academie": 47,
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "user_manager.syndicat",
+  "fields": {
+    "password": "",
+    "last_login": null,
+    "is_superuser": false,
+    "first_name": "",
+    "last_name": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2021-04-15T12:50:34.050Z",
+    "username": "Loiret (45+28)",
+    "email": "changeme45@example.com",
+    "academie": 47,
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "user_manager.syndicat",
+  "fields": {
+    "password": "",
+    "last_login": null,
+    "is_superuser": false,
+    "first_name": "",
+    "last_name": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2021-04-15T12:50:34.064Z",
+    "username": "Paris (75)",
+    "email": "changeme46@example.com",
+    "academie": 48,
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "user_manager.syndicat",
+  "fields": {
+    "password": "",
+    "last_login": null,
+    "is_superuser": false,
+    "first_name": "",
+    "last_name": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2021-04-15T12:50:34.081Z",
+    "username": "Charente (16)",
+    "email": "changeme47@example.com",
+    "academie": 49,
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "user_manager.syndicat",
+  "fields": {
+    "password": "",
+    "last_login": null,
+    "is_superuser": false,
+    "first_name": "",
+    "last_name": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2021-04-15T12:50:34.091Z",
+    "username": "Charente Maritime (17)",
+    "email": "changeme48@example.com",
+    "academie": 49,
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "user_manager.syndicat",
+  "fields": {
+    "password": "",
+    "last_login": null,
+    "is_superuser": false,
+    "first_name": "",
+    "last_name": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2021-04-15T12:50:34.100Z",
+    "username": "Deux-Sèvres (79)",
+    "email": "changeme49@example.com",
+    "academie": 49,
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "user_manager.syndicat",
+  "fields": {
+    "password": "",
+    "last_login": null,
+    "is_superuser": false,
+    "first_name": "",
+    "last_name": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2021-04-15T12:50:34.108Z",
+    "username": "Vienne (86)",
+    "email": "changeme50@example.com",
+    "academie": 49,
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "user_manager.syndicat",
+  "fields": {
+    "password": "",
+    "last_login": null,
+    "is_superuser": false,
+    "first_name": "",
+    "last_name": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2021-04-15T12:50:34.122Z",
+    "username": "Champagne-Ardennes (51+08+52+10)",
+    "email": "changeme51@example.com",
+    "academie": 50,
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "user_manager.syndicat",
+  "fields": {
+    "password": "",
+    "last_login": null,
+    "is_superuser": false,
+    "first_name": "",
+    "last_name": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2021-04-15T12:50:34.139Z",
+    "username": "Côtes d'Armor (22)",
+    "email": "changeme52@example.com",
+    "academie": 51,
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "user_manager.syndicat",
+  "fields": {
+    "password": "",
+    "last_login": null,
+    "is_superuser": false,
+    "first_name": "",
+    "last_name": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2021-04-15T12:50:34.149Z",
+    "username": "Finistère (29)",
+    "email": "changeme53@example.com",
+    "academie": 51,
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "user_manager.syndicat",
+  "fields": {
+    "password": "",
+    "last_login": null,
+    "is_superuser": false,
+    "first_name": "",
+    "last_name": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2021-04-15T12:50:34.158Z",
+    "username": "Ile et Vilaine (35)",
+    "email": "changeme54@example.com",
+    "academie": 51,
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "user_manager.syndicat",
+  "fields": {
+    "password": "",
+    "last_login": null,
+    "is_superuser": false,
+    "first_name": "",
+    "last_name": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2021-04-15T12:50:34.166Z",
+    "username": "Morbihan (56)",
+    "email": "changeme55@example.com",
+    "academie": 51,
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "user_manager.syndicat",
+  "fields": {
+    "password": "",
+    "last_login": null,
+    "is_superuser": false,
+    "first_name": "",
+    "last_name": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2021-04-15T12:50:34.181Z",
+    "username": "Réunion (974)",
+    "email": "changeme56@example.com",
+    "academie": 52,
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "user_manager.syndicat",
+  "fields": {
+    "password": "",
+    "last_login": null,
+    "is_superuser": false,
+    "first_name": "",
+    "last_name": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2021-04-15T12:50:34.197Z",
+    "username": "Haute-Normandie (27+76)",
+    "email": "changeme57@example.com",
+    "academie": 53,
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "user_manager.syndicat",
+  "fields": {
+    "password": "",
+    "last_login": null,
+    "is_superuser": false,
+    "first_name": "",
+    "last_name": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2021-04-15T12:50:34.214Z",
+    "username": "Alsace (67+68)",
+    "email": "changeme58@example.com",
+    "academie": 54,
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "user_manager.syndicat",
+  "fields": {
+    "password": "",
+    "last_login": null,
+    "is_superuser": false,
+    "first_name": "",
+    "last_name": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2021-04-15T12:50:34.230Z",
+    "username": "Ariège (09)",
+    "email": "changeme59@example.com",
+    "academie": 55,
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "user_manager.syndicat",
+  "fields": {
+    "password": "",
+    "last_login": null,
+    "is_superuser": false,
+    "first_name": "",
+    "last_name": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2021-04-15T12:50:34.241Z",
+    "username": "Aveyron (12)",
+    "email": "changeme60@example.com",
+    "academie": 55,
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "user_manager.syndicat",
+  "fields": {
+    "password": "",
+    "last_login": null,
+    "is_superuser": false,
+    "first_name": "",
+    "last_name": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2021-04-15T12:50:34.250Z",
+    "username": "Gers (32)",
+    "email": "changeme61@example.com",
+    "academie": 55,
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "user_manager.syndicat",
+  "fields": {
+    "password": "",
+    "last_login": null,
+    "is_superuser": false,
+    "first_name": "",
+    "last_name": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2021-04-15T12:50:34.258Z",
+    "username": "Haute-Garonne (31+65)",
+    "email": "changeme62@example.com",
+    "academie": 55,
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "user_manager.syndicat",
+  "fields": {
+    "password": "",
+    "last_login": null,
+    "is_superuser": false,
+    "first_name": "",
+    "last_name": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2021-04-15T12:50:34.266Z",
+    "username": "Tarn (81)",
+    "email": "changeme63@example.com",
+    "academie": 55,
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "user_manager.syndicat",
+  "fields": {
+    "password": "",
+    "last_login": null,
+    "is_superuser": false,
+    "first_name": "",
+    "last_name": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2021-04-15T12:50:34.280Z",
+    "username": "Essonne (91)",
+    "email": "changeme64@example.com",
+    "academie": 56,
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "user_manager.syndicat",
+  "fields": {
+    "password": "",
+    "last_login": null,
+    "is_superuser": false,
+    "first_name": "",
+    "last_name": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2021-04-15T12:50:34.291Z",
+    "username": "Hauts de Seine (92)",
+    "email": "changeme65@example.com",
+    "academie": 56,
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "user_manager.syndicat",
+  "fields": {
+    "password": "",
+    "last_login": null,
+    "is_superuser": false,
+    "first_name": "",
+    "last_name": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2021-04-15T12:50:34.318Z",
+    "username": "Val d'Oise (95)",
+    "email": "changeme66@example.com",
+    "academie": 56,
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "user_manager.syndicat",
+  "fields": {
+    "password": "",
+    "last_login": null,
+    "is_superuser": false,
+    "first_name": "",
+    "last_name": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2021-04-15T12:50:34.333Z",
+    "username": "Yvelines (78)",
+    "email": "changeme67@example.com",
+    "academie": 56,
+    "groups": [],
+    "user_permissions": []
+  }
+}
+]

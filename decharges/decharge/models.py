@@ -1,13 +1,27 @@
 import decimal
 
 from django.conf import settings
-from django.core.validators import RegexValidator
 from django.db import models
 
-from decharges.decharge.validators import validate_first_name, validate_last_name
+from decharges.decharge.validators import (
+    validate_first_name,
+    validate_last_name,
+    code_corps_validator,
+    rne_validator,
+)
 
 
 class TempsDeDecharge(models.Model):
+    """
+    Temps de décharge attribué à un syndicat en début d'année.
+
+    - Ce temps est exprimé en ETP
+    - Il est appliqué sur une année donnée (self.annee) et les calculs se basent sur
+      l'année dans `parametre.models.ParametresDApplication` pour filtrer
+    - Le syndicat donnateur peut être soit la fédération (c'est le défaut),
+      soit un autre syndicat (cas spécifique de don de décharge intra-académie)
+    """
+
     syndicat_beneficiaire = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         verbose_name="Syndicat bénéficiaire",
@@ -24,7 +38,7 @@ class TempsDeDecharge(models.Model):
         decimal_places=5,
         max_digits=8,
     )  # précision max: 999.99999
-    syndicat_donatrice = models.ForeignKey(
+    syndicat_donateur = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         verbose_name="Syndicat ayant fait don de temps "
         "(si vide, on considère que cela vient de la fédération)",
@@ -34,6 +48,10 @@ class TempsDeDecharge(models.Model):
         related_name="temps_de_decharges_donnes",
     )
 
+    def __str__(self):
+        return f"{self.temps_de_decharge_etp} ETP à {self.syndicat_beneficiaire.username} " \
+               f"en {self.annee}"
+
 
 class Corps(models.Model):
     code_corps = models.CharField(
@@ -41,14 +59,15 @@ class Corps(models.Model):
         unique=True,
         primary_key=True,
         verbose_name="Code corps",
-        validators=[
-            RegexValidator(
-                regex=r"^\d{3}$",
-                message="Doit être constitué de 7 lettres majuscules",
-                code="invalid_code_corps",
-            )
-        ],
-    )
+        validators=[code_corps_validator],
+    )  # example: 553, 615 etc..
+
+    def __str__(self):
+        return self.code_corps
+
+    class Meta:
+        verbose_name = "Corps"
+        verbose_name_plural = "Corps"
 
 
 M = "M."
@@ -61,6 +80,22 @@ choix_civilite = [
 
 
 class UtilisationTempsDecharge(models.Model):
+    """
+    Utilisation des temps de décharges par les syndiqués
+
+    - cette utilisation est historisé par année
+    - des validations sont appliquées sur les champs, cf **validators.py**
+    - cette utilisation de temps de décharge peut être exceptionnellement
+      modifiée/ajoutée/supprimée au cours de l'année par la fédération. Les champs
+        - `self.supprime_a`
+        - `self.cree_a`
+        - `self.modifie_a`
+        - `self.commentaire_de_mise_a_jour`
+      permettront à la fédération d'avoir le maximum d'information sur ces mises à jours
+    - L'utilisation de temps de décharge peut soit être une décharge locale, soit une décharge
+      fédérale et Solidaires. `self.syndicat` permet de différencier les deux cas
+    """
+
     civilite = models.CharField(
         verbose_name="Civilité",
         max_length=10,
@@ -96,13 +131,7 @@ class UtilisationTempsDecharge(models.Model):
     code_etablissement_rne = models.CharField(
         max_length=255,
         verbose_name="Code d'établissement (RNE)",
-        validators=[
-            RegexValidator(
-                regex=r"^\d{7}[A-Z]$",
-                message="Doit être constitué de 7 chiffres + une lettre majuscule",
-                code="invalid_rne",
-            )
-        ],
+        validators=[rne_validator],
     )
 
     # meta données
@@ -115,7 +144,7 @@ class UtilisationTempsDecharge(models.Model):
         verbose_name="Syndicat qui utilise ce temps",
         on_delete=models.CASCADE,
         related_name="utilisation_temps_de_decharges_par_annee",
-    )
+    )  # si le syndicat est la fédération, c'est donc une décharge fédérale
     supprime_a = models.DateTimeField(
         verbose_name="La date à laquelle cette débarge a été supprimée",
         null=True,
@@ -162,6 +191,10 @@ class UtilisationTempsDecharge(models.Model):
 
 
 class UtilisationCreditDeTempsSyndicalPonctuel(models.Model):
+    """
+    Utilisation des CTS (ou CHS), sur une année donnée, par syndicat
+    """
+
     demi_journees_de_decharges = models.IntegerField(
         verbose_name="Demi-journées de décahrges utilisées",
         default=0,
