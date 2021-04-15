@@ -1,20 +1,20 @@
 import pytest
 from django.core.management import call_command
 
-from decharges.user_manager.models import User
+from decharges.user_manager.models import Syndicat
 
 pytestmark = pytest.mark.django_db
 
 
 def test_instanciate():
-    user = User.objects.create(
+    user = Syndicat.objects.create(
         email="test@example.com", first_name="Test", last_name="tseT"
     )
     assert f"{user}" == "test@example.com"
 
 
 def test_management_create_superuser():
-    assert User.objects.count() == 0
+    assert Syndicat.objects.count() == 0
     call_command(
         "createsuperuser",
         email="test@test.com",
@@ -22,5 +22,5 @@ def test_management_create_superuser():
         last_name="test",
         interactive=False,
     )
-    admin = User.objects.first()
+    admin = Syndicat.objects.first()
     assert admin.is_superuser

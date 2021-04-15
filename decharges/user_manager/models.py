@@ -3,6 +3,10 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 
+class Academie(models.Model):
+    nom = models.CharField(verbose_name="Nom de l'académie", max_length=255)
+
+
 class CustomUserManager(BaseUserManager):
     """
     Custom user model manager where email is the unique identifiers
@@ -38,11 +42,19 @@ class CustomUserManager(BaseUserManager):
         return self.create_user(email, password, **extra_fields)
 
 
-class User(AbstractUser):
+class Syndicat(AbstractUser):
     username = models.CharField(
         "Nom d'utilisateur", max_length=150, null=True, blank=True
     )
     email = models.EmailField("Email principal", unique=True, db_index=True)
+    academie = models.ForeignKey(
+        Academie,
+        null=True,  # la fédération n'a pas d'académie liée
+        blank=True,
+        verbose_name="Académie dont le syndicat fait partie",
+        on_delete=models.SET_NULL,
+        related_name="syndicats_membres",
+    )
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["first_name", "last_name"]

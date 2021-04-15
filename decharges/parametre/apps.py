@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class UserManagerConfig(AppConfig):
+class ParametreConfig(AppConfig):
     default_auto_field = "django.db.models.BigAutoField"
-    name = "decharges.user_manager"
+    name = "decharges.parametre"

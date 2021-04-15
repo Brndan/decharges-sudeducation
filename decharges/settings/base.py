@@ -41,14 +41,15 @@ if not DEBUG and os.getenv("USE_HTTPS", "True") == "True":
 # Application definition
 
 INSTALLED_APPS = [
+    "decharges.user_manager",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "decharges.timesheet",
-    "decharges.user_manager",
+    "decharges.parametre",
+    "decharges.decharge",
     "decharges.bulma_templatetags",
 ]
 
@@ -118,7 +119,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-AUTH_USER_MODEL = "user_manager.User"
+AUTH_USER_MODEL = "user_manager.Syndicat"
 LOGIN_REDIRECT_URL = "/"
 
 # Internationalization
@@ -172,3 +173,6 @@ DEFAULT_FROM_EMAIL_NAME = os.getenv("DJANGO_DEFAULT_FROM_EMAIL_NAME", "admin")
 EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "admin@sudeducation.hashbang.fr")
 EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
 EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "True") == "True"
+
+# Configuration des logiques de l'application
+NB_HOURS_IN_A_YEAR = 1607  # utilisé pour les calculs d'ETP

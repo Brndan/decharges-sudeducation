@@ -18,7 +18,7 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
 
-from decharges.timesheet.views import index
+from decharges.decharge.views import index
 
 urlpatterns = [
     path("", index),
