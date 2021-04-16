@@ -128,7 +128,16 @@ $ ./manage.py shell <<< "from decharges.parametre.models import *; ParametresDAp
 
 **Importer l'historique**
 
-TODO
+Avant tout, générer un fichier historique en CSV et stockez-le dans `imports/historique/historique.csv`
+(un exemple d'un tel fichier est présent dans le dossier)
+
+Assurez-vous que la fédération a bien un compte sur le site avant de passer à la suite.
+
+Lancez cette commande :
+
+```bash
+$ ./manage.py import_historique --csv-file=imports/historique/historique.csv
+```
 
 **Importer les Corps**
 

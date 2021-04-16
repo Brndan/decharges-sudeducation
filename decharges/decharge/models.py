@@ -113,12 +113,16 @@ class UtilisationTempsDecharge(models.Model):
         default=MME,
     )
     prenom = models.CharField(
-        max_length=255, verbose_name="Prénom", validators=[validate_first_name]
+        max_length=255,
+        verbose_name="Prénom",
+        validators=[validate_first_name],
+        db_index=True,
     )
     nom = models.CharField(
         max_length=255,
         verbose_name="Nom en MAJUSCULES",
         validators=[validate_last_name],
+        db_index=True,
     )
     heures_de_decharges = models.DecimalField(
         verbose_name="Temps de décharge utilisées en heures",
@@ -142,12 +146,14 @@ class UtilisationTempsDecharge(models.Model):
         max_length=255,
         verbose_name="Code d'établissement (RNE)",
         validators=[rne_validator],
+        db_index=True,
     )
 
     # meta données
     annee = models.IntegerField(
         verbose_name="Année à laquelle le temps de décharge est utilisé",
         default=2021,
+        db_index=True,
     )
     syndicat = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -193,7 +199,7 @@ class UtilisationTempsDecharge(models.Model):
             decimal.Decimal(
                 self.heures_de_decharges / self.heures_d_obligation_de_service
             ),
-            5,
+            settings.PRECISION_ETP,
         )
 
     class Meta:
@@ -227,4 +233,7 @@ class UtilisationCreditDeTempsSyndicalPonctuel(models.Model):
     def etp_utilises(self) -> decimal.Decimal:
         nb_days = self.demi_journees_de_decharges / 2
         nb_hours = nb_days * 7
-        return round(decimal.Decimal(nb_hours / settings.NB_HOURS_IN_A_YEAR), 5)
+        return round(
+            decimal.Decimal(nb_hours / settings.NB_HOURS_IN_A_YEAR),
+            settings.PRECISION_ETP,
+        )

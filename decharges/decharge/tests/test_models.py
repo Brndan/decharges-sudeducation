@@ -48,12 +48,12 @@ def test_instanciate_utilisation_temps_decharge():
         syndicat=syndicat,
     )
     assert UtilisationTempsDecharge.objects.first().etp_utilises == round(
-        Decimal(10 / 35), 5
+        Decimal(10 / 35), settings.PRECISION_ETP
     )
     tps_decharge.etp = Decimal(7 / 35)
     tps_decharge.save()
     assert UtilisationTempsDecharge.objects.first().etp_utilises == round(
-        Decimal(7 / 35), 5
+        Decimal(7 / 35), settings.PRECISION_ETP
     )
 
     corps2 = Corps.objects.create(code_corps="456")
@@ -79,7 +79,9 @@ def test_instanciate_utilisation_cts():
     )
     assert (
         UtilisationCreditDeTempsSyndicalPonctuel.objects.first().etp_utilises
-        == round(Decimal(13 * 3.5 / settings.NB_HOURS_IN_A_YEAR), 5)
+        == round(
+            Decimal(13 * 3.5 / settings.NB_HOURS_IN_A_YEAR), settings.PRECISION_ETP
+        )
     )
 
     with pytest.raises(IntegrityError):

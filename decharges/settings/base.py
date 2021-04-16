@@ -176,3 +176,4 @@ EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "True") == "True"
 
 # Configuration des logiques de l'application
 NB_HOURS_IN_A_YEAR = 1607  # utilisé pour les calculs d'ETP
+PRECISION_ETP = 5
