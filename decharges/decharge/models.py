@@ -78,6 +78,7 @@ class Corps(models.Model):
     class Meta:
         verbose_name = "Corps"
         verbose_name_plural = "Corps"
+        ordering = ["code_corps"]
 
 
 M = "M."

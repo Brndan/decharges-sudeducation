@@ -13,6 +13,9 @@ class Academie(models.Model):
     def __str__(self):
         return self.nom
 
+    class Meta:
+        ordering = ["nom"]
+
 
 class CustomUserManager(BaseUserManager):
     """
