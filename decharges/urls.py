@@ -18,10 +18,8 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
 
-from decharges.decharge.views import index
-
 urlpatterns = [
-    path("", index),
+    path("", include("decharges.decharge.urls")),
     path("accounts/", include("decharges.user_manager.urls")),
     path("admin/", admin.site.urls),
 ]

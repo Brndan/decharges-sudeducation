@@ -57,7 +57,9 @@ class Command(BaseCommand):
             prenom = history_line[1].strip()
             nom = history_line[2].strip()
             rne = history_line[3].strip()
-            code_corps = history_line[4].strip()
+            code_corps = (
+                history_line[4].strip().zfill(3)
+            )  # zfill prepend zeros if needed
             corps, _ = Corps.objects.get_or_create(code_corps=code_corps)
             print(f"Création/mise à jour du temps syndical de {prenom} {nom}")
             for index_annee, annee in enumerate(annees):

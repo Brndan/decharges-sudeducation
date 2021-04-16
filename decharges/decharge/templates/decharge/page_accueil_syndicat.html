@@ -1,0 +1,97 @@
+{% extends "decharges/base.html" %}
+
+{% block title %}Accueil{% endblock title %}
+
+{% block maintitle %}Bienvenue !{% endblock maintitle %}
+{% block subtitle %}
+  Vous visualisez la structure <b>{{ user.username }}</b>, faisant partie de l'académie de {{ user.academie.nom }}
+{% endblock %}
+
+{% block content %}
+  <section class="container pb-6">
+    <div class="card pt-2">
+      <header class="card-header">
+        <h2 class="card-header-title">Récapitulatif des décharges</h2>
+      </header>
+      <div class="card-content">
+        <ul>
+          <li><b>Temps reçu de la fédération&nbsp;:</b> {{ temps_de_decharge_recus_par_la_federation|floatformat:3 }} ETP</li>
+          <li><b>Temps actuellement consommé&nbsp;:</b> {{ temps_de_decharges_utilises_total|floatformat:3 }} ETP</li>
+          <li><b>CTS ponctuel consommé&nbsp;:</b> {% if cts_consommes %}{{ cts_consommes.etp_utilises|floatformat:3 }}{% else %}0{% endif %} ETP</li>
+          {% if temps_de_decharge_recus_par_des_syndicats > 0 %}
+          <li><b>Temps reçu des syndicats de l'académie&nbsp;:</b> {{ temps_de_decharge_recus_par_des_syndicats|floatformat:3 }} ETP</li>
+          {% endif %}
+          {% if temps_de_decharge_donnes_total > 0 %}
+          <li><b>Temps donné aux syndicats de l'académie&nbsp;:</b> {% if cts_consommes %}{{ cts_consommes.etp_utilises|floatformat:3 }}{% else %}0{% endif %} ETP</li>
+          {% endif %}
+        </ul>
+        <hr>
+        Il vous reste <strong>{{ temps_restant|floatformat:3 }} ETP</strong> non utilisés
+      </div>
+    </div>
+
+    <div class="card mt-6">
+      <header class="card-header">
+        <h2 class="card-header-title">Bénéficiaires</h2>
+      </header>
+      <div class="card-content">
+        <table class="table is-bordered is-striped is-hoverable is-fullwidth">
+          <thead>
+            <tr>
+              <th>Civilité</th>
+              <th>Prénom</th>
+              <th>Nom</th>
+              <th>Heures de décharge</th>
+              <th><abbr title="Heures d'obligation de service">ORS</abbr></th>
+              <th><abbr title="Code Corps">Corps</abbr></th>
+              <th><abbr title="Code établissement">RNE</abbr></th>
+              <th>Décharge en ETP</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for temps_de_decharges_utilise in temps_de_decharges_utilises %}
+            <tr>
+              <td>{{ temps_de_decharges_utilise.civilite }}</td>
+              <td>{{ temps_de_decharges_utilise.prenom }}</td>
+              <td>{{ temps_de_decharges_utilise.nom }}</td>
+              <td>{{ temps_de_decharges_utilise.heures_de_decharges|floatformat:2 }}</td>
+              <td>{{ temps_de_decharges_utilise.heures_d_obligation_de_service }}</td>
+              <td>{{ temps_de_decharges_utilise.corps.code_corps }}</td>
+              <td>{{ temps_de_decharges_utilise.code_etablissement_rne }}</td>
+              <td>{{ temps_de_decharges_utilise.etp_utilises|floatformat:3 }}</td>
+              <td>TODO</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card mt-6">
+      <header class="card-header">
+        <h2 class="card-header-title">ETP donnés (mutualisation académique)</h2>
+      </header>
+      <div class="card-content">
+        <table class="table is-bordered is-striped is-hoverable is-fullwidth">
+          <thead>
+            <tr>
+              <th>Syndicat bénéficiaire</th>
+              <th>ETP donnés</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for temps_de_decharge_donne in temps_de_decharge_donnes %}
+            <tr>
+              <td>{{ temps_de_decharge_donne.syndicat_beneficiaire.username }}</td>
+              <td>{{ temps_de_decharge_donne.temps_de_decharge_etp }}</td>
+              <td>TODO</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+{% endblock content %}

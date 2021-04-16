@@ -187,6 +187,7 @@ class UtilisationTempsDecharge(models.Model):
         default=0,
         decimal_places=5,
         max_digits=6,
+        blank=True,
     )  # max: 9.99999
 
     @property
