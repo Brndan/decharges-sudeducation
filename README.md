@@ -118,6 +118,14 @@ $ ./manage.py loaddata decharges/user_manager/fixtures/academies_syndicats.json
 
 Note : Le script d'import utilisé pour générer cette fixture se trouve dans `imports/academies`
 
+**Créer un parametre d'application**
+
+Cette commande n'aura pas d'effet si une instance existe déjà, ce qui est l'effet escompté.
+
+```bash
+$ ./manage.py shell <<< "from decharges.parametre.models import *; ParametresDApplication.objects.get_or_create()"
+```
+
 **Importer l'historique**
 
 TODO

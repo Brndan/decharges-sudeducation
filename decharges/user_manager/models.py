@@ -7,6 +7,7 @@ class Academie(models.Model):
     """
     Une académie rassemble plusieurs syndicats via `academie.syndicats_membres`
     """
+
     nom = models.CharField(verbose_name="Nom de l'académie", max_length=255)
 
     def __str__(self):
@@ -58,9 +59,8 @@ class Syndicat(AbstractUser):
     La fédération est un syndicat comme les autres, sauf qu'elle est un administrateur django
     et a donc accès à l'interface admin de django (https://decharges.org/admin)
     """
-    username = models.CharField(
-        "Nom d'utilisateur", max_length=150, null=True, blank=True
-    )
+
+    username = models.CharField("Nom", max_length=150, null=True, blank=True)
     email = models.EmailField("Email principal", unique=True, db_index=True)
     academie = models.ForeignKey(
         Academie,

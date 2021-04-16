@@ -4,10 +4,10 @@ from django.conf import settings
 from django.db import models
 
 from decharges.decharge.validators import (
-    validate_first_name,
-    validate_last_name,
     code_corps_validator,
     rne_validator,
+    validate_first_name,
+    validate_last_name,
 )
 
 
@@ -49,8 +49,10 @@ class TempsDeDecharge(models.Model):
     )
 
     def __str__(self):
-        return f"{self.temps_de_decharge_etp} ETP à {self.syndicat_beneficiaire.username} " \
-               f"en {self.annee}"
+        return (
+            f"{self.temps_de_decharge_etp} ETP à {self.syndicat_beneficiaire.username} "
+            f"en {self.annee}"
+        )
 
 
 class Corps(models.Model):
@@ -61,8 +63,16 @@ class Corps(models.Model):
         verbose_name="Code corps",
         validators=[code_corps_validator],
     )  # example: 553, 615 etc..
+    description = models.CharField(
+        verbose_name="Description du Corps",
+        max_length=255,
+        null=True,
+        blank=True,
+    )
 
     def __str__(self):
+        if self.description:
+            return f"{self.code_corps} ({self.description})"
         return self.code_corps
 
     class Meta:
@@ -146,7 +156,7 @@ class UtilisationTempsDecharge(models.Model):
         related_name="utilisation_temps_de_decharges_par_annee",
     )  # si le syndicat est la fédération, c'est donc une décharge fédérale
     supprime_a = models.DateTimeField(
-        verbose_name="La date à laquelle cette débarge a été supprimée",
+        verbose_name="La date à laquelle cette décharge a été supprimée",
         null=True,
         blank=True,
     )
@@ -196,7 +206,7 @@ class UtilisationCreditDeTempsSyndicalPonctuel(models.Model):
     """
 
     demi_journees_de_decharges = models.IntegerField(
-        verbose_name="Demi-journées de décahrges utilisées",
+        verbose_name="Demi-journées de décharges utilisées",
         default=0,
     )
     annee = models.IntegerField(

@@ -18,16 +18,20 @@ pytestmark = pytest.mark.django_db
 
 
 def test_instanciate_temps_decharge():
-    syndicat = Syndicat.objects.create()
-    TempsDeDecharge.objects.create(
+    syndicat = Syndicat.objects.create(username="Syndic1")
+    tps_decharge = TempsDeDecharge.objects.create(
         syndicat_beneficiaire=syndicat, annee=2021, temps_de_decharge_etp=0.5
     )
     assert syndicat.temps_de_decharges_par_annee.filter(annee=2021).count() == 1
+    assert f"{tps_decharge}" == "0.5 ETP à Syndic1 en 2021"
 
 
 def test_instanciate_corps():
-    Corps.objects.create(code_corps="123")
-    assert Corps.objects.count() == 1
+    corps1 = Corps.objects.create(code_corps="123")
+    corps2 = Corps.objects.create(code_corps="456", description="Description")
+    assert Corps.objects.count() == 2
+    assert f"{corps1}" == "123"
+    assert f"{corps2}" == "456 (Description)"
 
 
 def test_instanciate_utilisation_temps_decharge():
