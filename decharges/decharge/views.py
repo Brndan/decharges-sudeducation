@@ -1,72 +1,77 @@
+from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import TemplateView
 
-from decharges.parametre.models import ParametresDApplication
-from decharges.user_manager.models import Syndicat
+from decharges.decharge.mixins import CheckConfigurationMixin
 
 
-class PageAccueilSyndicatView(LoginRequiredMixin, TemplateView):
+class PageAccueilSyndicatView(
+    CheckConfigurationMixin, LoginRequiredMixin, TemplateView
+):
     template_name = "decharge/page_accueil_syndicat.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data()
-        params = ParametresDApplication.objects.first()
-        federation = Syndicat.objects.filter(is_superuser=True).first()
-        annee_en_cours = params.annee_en_cours
-        temps_de_decharges_recus = (
-            self.request.user.temps_de_decharges_par_annee.filter(
+
+        annee_en_cours = self.params.annee_en_cours
+        temps_utilises = (
+            self.request.user.utilisation_temps_de_decharges_par_annee.filter(
                 annee=annee_en_cours,
+                supprime_a__isnull=True,
             )
         )
-        context[
-            "temps_de_decharges_utilises"
-        ] = self.request.user.utilisation_temps_de_decharges_par_annee.filter(
-            annee=annee_en_cours,
-            supprime_a__isnull=True,
+        temps_utilises_total = sum(
+            temps_consomme.etp_utilises for temps_consomme in temps_utilises
         )
-        context["temps_de_decharges_utilises_total"] = sum(
-            temps_consomme.etp_utilises
-            for temps_consomme in context["temps_de_decharges_utilises"]
-        )
-        context[
-            "temps_de_decharge_donnes"
-        ] = self.request.user.temps_de_decharges_donnes.filter(
+        temps_donnes = self.request.user.temps_de_decharges_donnes.filter(
             annee=annee_en_cours,
         )
-        context["temps_de_decharge_donnes_total"] = sum(
-            temps_donne.temps_de_decharge_etp
-            for temps_donne in context["temps_de_decharge_donnes"]
+        temps_donnes_total = sum(
+            temps_donne.temps_de_decharge_etp for temps_donne in temps_donnes
         )
-        context[
-            "cts_consommes"
-        ] = self.request.user.utilisation_cts_ponctuels_par_annee.filter(
-            annee=annee_en_cours
-        ).first()
 
-        context["temps_de_decharge_recus_par_la_federation"] = 0
-        context["temps_de_decharge_recus_par_des_syndicats"] = 0
-        for temps_recu in temps_de_decharges_recus:
+        temps_recus_par_la_federation = 0
+        temps_recus_par_des_syndicats = 0
+        for temps_recu in self.request.user.temps_de_decharges_par_annee.filter(
+            annee=annee_en_cours,
+        ):
             if (
                 temps_recu.syndicat_donateur is not None
-                and temps_recu.syndicat_donateur != federation
-            ):  # pragma: no cover
-                context[
-                    "temps_de_decharge_recus_par_des_syndicats"
-                ] += temps_recu.temps_de_decharge_etp  # pragma: no cover
-            else:  # pragma: no cover
-                context[
-                    "temps_de_decharge_recus_par_la_federation"
-                ] += temps_recu.temps_de_decharge_etp  # pragma: no cover
+                and temps_recu.syndicat_donateur != self.federation
+            ):
+                temps_recus_par_des_syndicats += temps_recu.temps_de_decharge_etp
+            else:
+                temps_recus_par_la_federation += temps_recu.temps_de_decharge_etp
 
-        context["temps_restant"] = (
-            context["temps_de_decharge_recus_par_la_federation"]
-            + context["temps_de_decharge_recus_par_des_syndicats"]
-            - context["temps_de_decharges_utilises_total"]
-            - context["temps_de_decharge_donnes_total"]
+        temps_restant = (
+            temps_recus_par_la_federation
+            + temps_recus_par_des_syndicats
+            - temps_utilises_total
+            - temps_donnes_total
         )
-        if context["cts_consommes"]:  # pragma: no cover
-            context["temps_restant"] -= context[
-                "cts_consommes"
-            ].etp_utilises  # pragma: no cover
+        cts_consommes = self.request.user.utilisation_cts_ponctuels_par_annee.filter(
+            annee=annee_en_cours
+        ).first()
+        if cts_consommes:
+            temps_restant -= cts_consommes.etp_utilises
+
+        context.update(
+            {
+                "temps_restant": round(temps_restant, settings.PRECISION_ETP),
+                "cts_consommes": cts_consommes,
+                "temps_donnes": temps_donnes,
+                "temps_utilises": temps_utilises,
+                "temps_recus_par_la_federation": round(
+                    temps_recus_par_la_federation, settings.PRECISION_ETP
+                ),
+                "temps_recus_par_des_syndicats": round(
+                    temps_recus_par_des_syndicats, settings.PRECISION_ETP
+                ),
+                "temps_utilises_total": round(
+                    temps_utilises_total, settings.PRECISION_ETP
+                ),
+                "temps_donnes_total": round(temps_donnes_total, settings.PRECISION_ETP),
+            }
+        )
 
         return context
