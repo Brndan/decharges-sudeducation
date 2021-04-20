@@ -34,12 +34,12 @@
           Accueil
         </a>
 
+        {% if request.user.is_federation %}
         <div class="navbar-item has-dropdown is-hoverable">
           <a class="navbar-link">
             Administration
           </a>
 
-          {% if request.user.is_federation %}
           <div class="navbar-dropdown">
             <a class="navbar-item" href="{% url 'decharge:import_temps' %}">
               Import des temps
@@ -61,8 +61,8 @@
               Configuration
             </a>
           </div>
-          {% endif %}
         </div>
+        {% endif %}
       </div>
 
 
