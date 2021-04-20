@@ -139,10 +139,6 @@ Lancez cette commande :
 $ ./manage.py import_historique --csv-file=imports/historique/historique.csv
 ```
 
-**Importer les Corps**
-
-TODO
-
 ## Organisation du code
 
 ### `decharges/settings/base.py` :
@@ -150,7 +146,7 @@ TODO
 Contient toutes les variables de l'application Django.
 
 - NB_HOURS_IN_A_YEAR : à changer si le nombre d'heure d'un temps plein en une année n'est plus 1607
-- TODO
+- CHOIX_ORS : les nombre d'heures d'obligation de services possibles dans le formulaire
 
 ### `decharges/decharge`
 
@@ -160,7 +156,10 @@ Notamment :
 
 - validators.py : contient les validateurs des données côté backend
 - models.py : contient les modèles de données
-- TODO
+- forms/ : contients les formualaires django, permettant de transformer les données utlisateur en objets python + de valider plus finement la validité des données
+- tests/ : les tests de l'application
+- templates/ : les fichiers HTML de l'application
+- views/ : les fonctions qui répondent aux appels HTTP du client
 
 ### `decharges/parametres`
 
