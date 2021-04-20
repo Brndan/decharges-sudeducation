@@ -41,7 +41,13 @@
           {% csrf_token %}
           {{ form|bulma }}
           <div class="field">
-            <button type="submit" class="button is-primary">Ajouter</button>
+            <button type="submit" class="button is-success">
+              {% if utilisation_temps_decharge %}
+              Modifier
+              {% else %}
+              Ajouter
+              {% endif %}
+            </button>
           </div>
         </form>
       </div>

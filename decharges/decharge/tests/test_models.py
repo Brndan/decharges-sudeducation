@@ -64,7 +64,7 @@ def test_instanciate_utilisation_temps_decharge():
             heures_de_decharges=2,
             heures_d_obligation_de_service=36,
             corps=corps2,
-            code_etablissement_rne="8912345B",
+            code_etablissement_rne="1234567A",
             annee=2021,
             syndicat=syndicat,
         )

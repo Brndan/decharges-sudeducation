@@ -2,6 +2,7 @@ from django.urls import path
 
 from decharges.decharge.views import (
     CreateUtilisationTempsDecharge,
+    ExportMinistere,
     ImportTempsSyndicats,
     PageAccueilSyndicatView,
     SuppressionUtilisationTempsDecharge,
@@ -28,4 +29,5 @@ urlpatterns = [
         SuppressionUtilisationTempsDecharge.as_view(),
         name="supprimer_beneficiaire",
     ),
+    path("export-ministere/", ExportMinistere.as_view(), name="export_ministere"),
 ]

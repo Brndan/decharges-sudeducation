@@ -89,6 +89,8 @@ choix_civilite = [
     (MME, "Mme"),
 ]
 
+CIVILITE_AFFICHEE = {key: value for key, value in choix_civilite}
+
 
 class UtilisationTempsDecharge(models.Model):
     """
@@ -205,7 +207,13 @@ class UtilisationTempsDecharge(models.Model):
         )
 
     class Meta:
-        unique_together = ("nom", "prenom", "annee", "syndicat")
+        unique_together = (
+            "nom",
+            "prenom",
+            "annee",
+            "code_etablissement_rne",
+            "syndicat",
+        )
 
 
 class UtilisationCreditDeTempsSyndicalPonctuel(models.Model):
