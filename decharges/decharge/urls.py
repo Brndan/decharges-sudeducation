@@ -1,6 +1,10 @@
 from django.urls import path
 
-from decharges.decharge.views import PageAccueilSyndicatView
+from decharges.decharge.views import ImportTempsSyndicats, PageAccueilSyndicatView
 
-namespace = "decharge"
-urlpatterns = [path("", PageAccueilSyndicatView.as_view())]
+app_name = "decharge"
+
+urlpatterns = [
+    path("", PageAccueilSyndicatView.as_view(), name="index"),
+    path("import/", ImportTempsSyndicats.as_view(), name="import_temps"),
+]

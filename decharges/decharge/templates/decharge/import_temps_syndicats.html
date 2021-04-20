@@ -1,0 +1,54 @@
+{% extends "decharges/base.html" %}
+{% load bulma_tags %}
+
+{% block title %}Import temps{% endblock title %}
+
+{% block maintitle %}Imports des temps{% endblock maintitle %}
+{% block subtitle %}
+  Cette page vous permet d'importer les temps de décharges attribués à chaque syndicat
+{% endblock %}
+
+{% block content %}
+  <section class="container pb-6">
+    <div class="card pt-2">
+      <header class="card-header">
+        <h2 class="card-header-title">Import des temps</h2>
+      </header>
+      <div class="card-content">
+        <form method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          {{ form|bulma }}
+          <div class="field">
+            <button type="submit" class="button is-primary">Importer</button>
+          </div>
+        </form>
+        <hr>
+        <div class="mt-4">
+          <h3 class="title is-6">Exemple de tableur à importer :</h3>
+          <table class="table is-bordered is-striped is-hoverable is-fullwidth">
+            <thead>
+              <tr>
+                <th>Nom du syndicat</th>
+                <th>ETP attribué au syndicat</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Ain (01)</td>
+                <td>0.5</td>
+              </tr>
+              <tr>
+                <td>Charente Maritime (17)</td>
+                <td>0.567</td>
+              </tr>
+              <tr>
+                <td>...</td>
+                <td>...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+{% endblock content %}

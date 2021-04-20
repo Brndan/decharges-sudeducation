@@ -6,11 +6,25 @@
 #
 asgiref==3.3.4
     # via django
+defusedxml==0.7.1
+    # via odfpy
 django==3.2
     # via sudeducation (setup.py)
 mysqlclient==2.0.3
     # via sudeducation (setup.py)
+numpy==1.20.2
+    # via pandas
+odfpy==1.4.1
+    # via sudeducation (setup.py)
+pandas==1.2.4
+    # via sudeducation (setup.py)
+python-dateutil==2.8.1
+    # via pandas
 pytz==2021.1
-    # via django
+    # via
+    #   django
+    #   pandas
+six==1.15.0
+    # via python-dateutil
 sqlparse==0.4.1
     # via django
