@@ -19,7 +19,7 @@ from django.contrib import admin
 from django.urls import include, path
 
 urlpatterns = [
-    path("", include("decharges.decharge.urls")),
+    path("", include("decharges.decharge.urls", namespace="decharge")),
     path("accounts/", include("decharges.user_manager.urls")),
     path("admin/", admin.site.urls),
 ]

@@ -1,4 +1,4 @@
-{% load static %}
+{% load static bulma_tags %}
 
 <!DOCTYPE html>
 <html lang="fr">
@@ -10,6 +10,7 @@
   {% block css %}
     <link rel="stylesheet" href="{% static 'css/bulma.min.css' %}">
     <link rel="stylesheet" href="{% static 'css/app.css' %}">
+    <link href="{% static 'fontawesome/css/all.css' %}" rel="stylesheet">
     {% block extra_css %}{% endblock extra_css %}
   {% endblock css %}
 </head>
@@ -32,7 +33,38 @@
         <a class="navbar-item" href="/">
           Accueil
         </a>
+
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link">
+            Administration
+          </a>
+
+          {% if request.user.is_federation %}
+          <div class="navbar-dropdown">
+            <a class="navbar-item" href="{% url 'decharge:import_temps' %}">
+              Import des temps
+            </a>
+            <a class="navbar-item" href="?TODO">
+              Historique
+            </a>
+            <a class="navbar-item" href="?TODO">
+              Export
+            </a>
+            <a class="navbar-item" href="?TODO">
+              Syndicats à relancer
+            </a>
+            <a class="navbar-item" href="?TODO">
+              CHS utilisés
+            </a>
+            <hr class="navbar-divider">
+            <a class="navbar-item" href="{% url 'admin:parametre_parametresdapplication_changelist' %}">
+              Configuration
+            </a>
+          </div>
+          {% endif %}
+        </div>
       </div>
+
 
       <div class="navbar-end">
         <div class="navbar-item">
@@ -52,6 +84,23 @@
       </div>
     </div>
   </nav>
+
+  {% block messages %}
+    {% if messages %}
+      <div class="container mt-4">
+        <div class="messages columns is-desktop">
+          <div class="column">
+            {% for message in messages %}
+              <div class="notification {% if message.tags %}is-{{ message.tags|bulma_message_tag }}{% endif %}">
+                <button class="delete remove-notification" aria-label="delete"></button>
+                {{ message }}
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    {% endif %}
+  {% endblock messages %}
 
   <section class="hero is-sud">
     <div class="hero-body">
