@@ -9,7 +9,7 @@ class CheckConfigurationMixin:
     params = None
     federation = None
 
-    def get(self, *args, **kwargs):
+    def dispatch(self, *args, **kwargs):
         self.params = ParametresDApplication.objects.first()
         self.federation = Syndicat.objects.filter(is_superuser=True).first()
         if not self.params or not self.federation:
@@ -17,7 +17,7 @@ class CheckConfigurationMixin:
                 "Veillez à ce que les ParametresDApplication "
                 "et la fédération soient présents en base de données"
             )
-        return super().get(*args, **kwargs)
+        return super().dispatch(*args, **kwargs)
 
 
 class FederationRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):

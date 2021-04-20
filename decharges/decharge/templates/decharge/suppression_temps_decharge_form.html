@@ -1,0 +1,35 @@
+{% extends "decharges/base.html" %}
+{% load bulma_tags %}
+
+{% block title %}Suppression d'un·e bénéficiaire{% endblock title %}
+
+{% block maintitle %}Suppression d'un·e bénéficiaire{% endblock maintitle %}
+{% block subtitle %}
+  Suppression de la décharge de {{ utilisation_temps_decharge.prenom }} {{ utilisation_temps_decharge.nom }} pour l'année {{ utilisation_temps_decharge.annee }}
+{% endblock %}
+
+{% block content %}
+  <section class="container pb-6">
+    <div class="card pt-2">
+      <header class="card-header">
+        <h2 class="card-header-title">
+          Suppression d'un·e bénéficiaire ?
+        </h2>
+      </header>
+      <div class="card-content">
+        <form method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          <p class="mb-4">
+            Êtes-vous certain·e de vouloir supprimer la décharge de
+            <b>{{ utilisation_temps_decharge.prenom }} {{ utilisation_temps_decharge.nom }}</b>
+            de <b>{{ utilisation_temps_decharge.etp_utilises|floatformat:3 }} ETP</b>
+            pour l'année <b>{{ utilisation_temps_decharge.annee }}</b> ?
+          </p>
+          <div class="field">
+            <button type="submit" class="button is-danger"><span class="fa fa-trash-alt mr-2"></span>Oui je suis sûr</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+{% endblock content %}

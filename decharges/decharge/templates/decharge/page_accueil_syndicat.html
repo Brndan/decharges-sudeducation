@@ -35,8 +35,11 @@
     </div>
 
     <div class="card mt-6">
-      <header class="card-header">
+      <header class="card-header is-align-items-center">
         <h2 class="card-header-title">Bénéficiaires</h2>
+        <a class="button is-small is-success mr-2" href="{% url 'decharge:ajouter_beneficiaire' %}">
+          <span class="fa fa-sm fa-plus mr-2"></span>Ajout d'un·e bénéficiaire
+        </a>
       </header>
       <div class="card-content">
         <table class="table is-bordered is-striped is-hoverable is-fullwidth">
@@ -59,12 +62,15 @@
               <td>{{ temps_utilise.civilite }}</td>
               <td>{{ temps_utilise.prenom }}</td>
               <td>{{ temps_utilise.nom }}</td>
-              <td>{{ temps_utilise.heuress|floatformat:2 }}</td>
+              <td>{{ temps_utilise.heures_de_decharges|floatformat:2 }}</td>
               <td>{{ temps_utilise.heures_d_obligation_de_service }}</td>
               <td>{{ temps_utilise.corps.code_corps }}</td>
               <td>{{ temps_utilise.code_etablissement_rne }}</td>
               <td>{{ temps_utilise.etp_utilises|floatformat:3 }}</td>
-              <td>TODO</td>
+              <td>
+                <a class="button is-info icon" href="{% url 'decharge:modifier_beneficiaire' temps_utilise.pk %}"><span class="fa fa-edit"></span></a>
+                <a class="button is-danger icon" href="{% url 'decharge:supprimer_beneficiaire' temps_utilise.pk %}"><span class="fa fa-trash-alt"></span></a>
+              </td>
             </tr>
             {% endfor %}
           </tbody>

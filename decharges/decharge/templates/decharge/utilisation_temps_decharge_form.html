@@ -1,0 +1,50 @@
+{% extends "decharges/base.html" %}
+{% load bulma_tags %}
+
+{% block title %}
+  {% if utilisation_temps_decharge %}
+  Modification d'un·e bénéficiaire
+  {% else %}
+  Ajout d'un·e bénéficiaire
+  {% endif %}
+{% endblock title %}
+
+{% block maintitle %}
+  {% if utilisation_temps_decharge %}
+  Modification d'un·e bénéficiaire
+  {% else %}
+  Ajout d'un·e bénéficiaire
+  {% endif %}
+{% endblock maintitle %}
+{% block subtitle %}
+  {% if utilisation_temps_decharge %}
+  Modification de la décharge de {{ utilisation_temps_decharge.prenom }} {{ utilisation_temps_decharge.nom }} pour l'année {{ utilisation_temps_decharge.annee }}
+  {% else %}
+  Sur cette page vous pouvez ajouter un·e bénéficiaire de temps de décharge
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+  <section class="container pb-6">
+    <div class="card pt-2">
+      <header class="card-header">
+        <h2 class="card-header-title">
+          {% if utilisation_temps_decharge %}
+          Modification d'un·e bénéficiaire
+          {% else %}
+          Ajout d'un·e bénéficiaire
+          {% endif %}
+        </h2>
+      </header>
+      <div class="card-content">
+        <form method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          {{ form|bulma }}
+          <div class="field">
+            <button type="submit" class="button is-primary">Ajouter</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+{% endblock content %}

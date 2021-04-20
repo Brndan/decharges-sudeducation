@@ -3,9 +3,7 @@ from django.db.models import Q
 from django.urls import reverse
 from django.views.generic import FormView
 
-from decharges.decharge.forms.import_temps_syndicats_form import (
-    ImportTempsSyndicatsForm,
-)
+from decharges.decharge.forms import ImportTempsSyndicatsForm
 from decharges.decharge.mixins import CheckConfigurationMixin, FederationRequiredMixin
 from decharges.decharge.models import TempsDeDecharge
 
