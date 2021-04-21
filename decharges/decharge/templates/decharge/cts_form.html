@@ -1,0 +1,56 @@
+{% extends "decharges/base.html" %}
+{% load bulma_tags %}
+
+{% block title %}
+  {% if cts %}
+  Mise à jour de la consommation en CTS ponctuel
+  {% else %}
+  Ajout de la consommation en CTS ponctuel
+  {% endif %}
+{% endblock title %}
+
+{% block maintitle %}
+  {% if cts %}
+  Mise à jour de la consommation en CTS ponctuel
+  {% else %}
+  Ajout de la consommation en CTS ponctuel
+  {% endif %}
+{% endblock maintitle %}
+{% block subtitle %}
+  {% if cts %}
+  Mise à jour de la consommation en CTS ponctuel de {{ request.user.username }} pour l'année {{ cts.annee }}
+  {% else %}
+  Ajout de la consommation en CTS ponctuel de {{ request.user.username }} pour l'année {{ cts.annee }}
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+  <section class="container pb-6">
+    <div class="card pt-2">
+      <header class="card-header">
+        <h2 class="card-header-title">
+          {% if cts %}
+          Mise à jour de la consommation en CTS ponctuel
+          {% else %}
+          Ajout de la consommation en CTS ponctuel
+          {% endif %}
+        </h2>
+      </header>
+      <div class="card-content">
+        <form method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          {{ form|bulma }}
+          <div class="field">
+            <button type="submit" class="button is-success">
+              {% if cts %}
+              Modifier
+              {% else %}
+              Créer
+              {% endif %}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+{% endblock content %}

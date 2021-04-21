@@ -19,7 +19,14 @@
           <li><b>Temps reçu de la fédération&nbsp;:</b> {{ temps_recus_par_la_federation|floatformat:3 }} ETP</li>
           {% endif %}
           <li><b>Temps actuellement consommé&nbsp;:</b> {{ temps_utilises_total|floatformat:3 }} ETP</li>
-          <li><b>CTS ponctuel consommé&nbsp;:</b> {% if cts_consommes %}{{ cts_consommes.etp_utilises|floatformat:3 }}{% else %}0{% endif %} ETP</li>
+          <li>
+            <b>CTS ponctuel consommé&nbsp;:</b> {% if cts_consommes %}{{ cts_consommes.etp_utilises|floatformat:3 }}{% else %}0{% endif %} ETP
+            {% if cts_consommes %}
+              <a href="{% url 'decharge:modifier_cts' cts_consommes.pk %}" class="button is-info icon"><span class="fa fa-edit"></span></a>
+            {% else %}
+              <a href="{% url 'decharge:ajouter_cts' %}" class="button is-info icon"><span class="fa fa-edit"></span></a>
+            {% endif %}
+          </li>
           {% if temps_recus_par_des_syndicats > 0 %}
           <li><b>Temps reçu des syndicats de l'académie&nbsp;:</b> {{ temps_recus_par_des_syndicats|floatformat:3 }} ETP</li>
           {% endif %}

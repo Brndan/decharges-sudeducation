@@ -579,3 +579,59 @@ def test_historique(client):
     assert response.context["beneficiaires_approchant_les_limites"][
         "Foo BAR (0234567A)"
     ] == {"annees_consecutives": 8, "etp_consecutifs": Decimal("4.57144")}
+
+
+def test_add_cts(client):
+    Syndicat.objects.create(
+        is_superuser=True, email="admin@example.com", username="Fédération"
+    )
+    ParametresDApplication.objects.create(annee_en_cours=2021)
+    syndicat = Syndicat.objects.create(
+        email="syndicat1@example.com", username="Syndicat 1"
+    )
+    client.force_login(syndicat)
+    response = client.get(reverse("decharge:ajouter_cts"))
+    assert response.status_code == 200
+    response = client.post(
+        reverse("decharge:ajouter_cts"), {"demi_journees_de_decharges": 5}
+    )
+    assert response.status_code == 302
+    assert UtilisationCreditDeTempsSyndicalPonctuel.objects.count() == 1
+    assert (
+        UtilisationCreditDeTempsSyndicalPonctuel.objects.first().demi_journees_de_decharges
+        == 5
+    )
+    assert UtilisationCreditDeTempsSyndicalPonctuel.objects.first().syndicat == syndicat
+
+
+def test_update_cts(client):
+    Syndicat.objects.create(
+        is_superuser=True, email="admin@example.com", username="Fédération"
+    )
+    ParametresDApplication.objects.create(annee_en_cours=2021)
+    syndicat = Syndicat.objects.create(
+        email="syndicat1@example.com", username="Syndicat 1"
+    )
+    syndicat2 = Syndicat.objects.create(
+        email="syndicat2@example.com", username="Syndicat 2"
+    )
+    client.force_login(syndicat2)
+    cts = UtilisationCreditDeTempsSyndicalPonctuel.objects.create(
+        demi_journees_de_decharges=5, syndicat=syndicat, annee=2021
+    )
+    response = client.get(reverse("decharge:modifier_cts", kwargs={"pk": cts.pk}))
+    assert response.status_code == 404
+    client.force_login(syndicat)
+    response = client.get(reverse("decharge:modifier_cts", kwargs={"pk": cts.pk}))
+    assert response.status_code == 200
+    response = client.post(
+        reverse("decharge:modifier_cts", kwargs={"pk": cts.pk}),
+        {"demi_journees_de_decharges": 8},
+    )
+    assert response.status_code == 302
+    assert UtilisationCreditDeTempsSyndicalPonctuel.objects.count() == 1
+    assert (
+        UtilisationCreditDeTempsSyndicalPonctuel.objects.first().demi_journees_de_decharges
+        == 8
+    )
+    assert UtilisationCreditDeTempsSyndicalPonctuel.objects.first().syndicat == syndicat
