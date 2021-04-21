@@ -1,5 +1,6 @@
 from decharges.decharge.views.accueil import PageAccueilSyndicatView
 from decharges.decharge.views.export_ministere import ExportMinistere
+from decharges.decharge.views.historique import HistoriquePage
 from decharges.decharge.views.import_temps_syndicats import ImportTempsSyndicats
 from decharges.decharge.views.utilisation_temps_decharge import (
     CreateUtilisationTempsDecharge,
@@ -10,6 +11,7 @@ from decharges.decharge.views.utilisation_temps_decharge import (
 __all__ = [
     "CreateUtilisationTempsDecharge",
     "ExportMinistere",
+    "HistoriquePage",
     "ImportTempsSyndicats",
     "PageAccueilSyndicatView",
     "SuppressionUtilisationTempsDecharge",
