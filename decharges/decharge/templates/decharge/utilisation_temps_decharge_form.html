@@ -18,7 +18,7 @@
 {% endblock maintitle %}
 {% block subtitle %}
   {% if utilisation_temps_decharge %}
-  Modification de la décharge de {{ utilisation_temps_decharge.prenom }} {{ utilisation_temps_decharge.nom }} pour l'année {{ utilisation_temps_decharge.annee }}
+  Modification de la décharge de {{ utilisation_temps_decharge.prenom }} {{ utilisation_temps_decharge.nom }} pour l'année {{ utilisation_temps_decharge.annee }}-{{ utilisation_temps_decharge.annee|add:1 }}
   {% else %}
   Sur cette page vous pouvez ajouter un·e bénéficiaire de temps de décharge
   {% endif %}

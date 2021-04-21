@@ -18,7 +18,7 @@
           {% if not request.user.is_federation %}
           <li><b>Temps reçu de la fédération&nbsp;:</b> {{ temps_recus_par_la_federation|floatformat:3 }} ETP</li>
           {% endif %}
-          <li><b>Temps actuellement consommé&nbsp;:</b> {{ temps_utilises_total|floatformat:3 }} ETP</li>
+          <li><b>Temps de décharge consommé&nbsp;:</b> {{ temps_utilises_total|floatformat:3 }} ETP</li>
           <li>
             <b>CTS ponctuel consommé&nbsp;:</b> {% if cts_consommes %}{{ cts_consommes.etp_utilises|floatformat:3 }}{% else %}0{% endif %} ETP
             {% if cts_consommes %}

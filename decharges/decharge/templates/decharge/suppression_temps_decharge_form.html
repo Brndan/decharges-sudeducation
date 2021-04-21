@@ -5,7 +5,7 @@
 
 {% block maintitle %}Suppression d'un·e bénéficiaire{% endblock maintitle %}
 {% block subtitle %}
-  Suppression de la décharge de {{ utilisation_temps_decharge.prenom }} {{ utilisation_temps_decharge.nom }} pour l'année {{ utilisation_temps_decharge.annee }}
+  Suppression de la décharge de {{ utilisation_temps_decharge.prenom }} {{ utilisation_temps_decharge.nom }} pour l'année {{ utilisation_temps_decharge.annee }}-{{ utilisation_temps_decharge.annee|add:1 }}
 {% endblock %}
 
 {% block content %}
@@ -23,7 +23,7 @@
             Êtes-vous certain·e de vouloir supprimer la décharge de
             <b>{{ utilisation_temps_decharge.prenom }} {{ utilisation_temps_decharge.nom }}</b>
             de <b>{{ utilisation_temps_decharge.etp_utilises|floatformat:3 }} ETP</b>
-            pour l'année <b>{{ utilisation_temps_decharge.annee }}</b> ?
+            pour l'année <b>{{ utilisation_temps_decharge.annee }}-{{ utilisation_temps_decharge.annee|add:1 }}</b> ?
           </p>
           <div class="field">
             <button type="submit" class="button is-danger"><span class="fa fa-trash-alt mr-2"></span>Oui je suis sûr·e</button>

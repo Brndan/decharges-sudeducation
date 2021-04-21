@@ -1,0 +1,54 @@
+{% extends "decharges/base.html" %}
+{% load bulma_tags %}
+
+{% block title %}Synthèse des consommations{% endblock title %}
+
+{% block maintitle %}Synthèse des consommations ({{ annee_en_cours }}-{{ annee_en_cours|add:1 }}){% endblock maintitle %}
+
+{% block content %}
+  <section class="container pb-6">
+    <div class="card pt-2">
+      <header class="card-header">
+        <h2 class="card-header-title">CTS consommés par académie</h2>
+      </header>
+      <div class="card-content">
+        <p class="mb-2">
+          Le tableau ci-dessous regroupe les consommations de CTS par académie pour l'année {{ annee_en_cours }}-{{ annee_en_cours|add:1 }}
+        </p>
+        <table class="table is-bordered is-striped is-hoverable is-fullwidth">
+          <thead>
+            <tr>
+              <th>Académie</th>
+              <th>ETP en CTS</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for academie, cts_consommes in cts_par_academie.items %}
+            <tr>
+              <td>{{ academie }}</td>
+              <td>{{ cts_consommes|floatformat:3 }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        <hr>
+        La <b>Fédération</b> a également consommé
+        {% if cts_federation %}
+        {{ cts_federation.etp_utilises|floatformat:3 }}
+        {% else %}
+          0
+        {% endif %}
+        ETP en CTS pour l'année {{ annee_en_cours }}-{{ annee_en_cours|add:1 }}
+      </div>
+    </div>
+    <div class="card mt-5">
+      <header class="card-header">
+        <h2 class="card-header-title">Temps restant total</h2>
+      </header>
+      <div class="card-content">
+        TODO : <br>
+        Les syndicats et la fédération ont au total <b>{{ total_etp_non_consommes }}</b> ETP non consommés sur l'année {{ annee_en_cours }}-{{ annee_en_cours|add:1 }}
+      </div>
+    </div>
+  </section>
+{% endblock content %}

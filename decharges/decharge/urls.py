@@ -9,6 +9,7 @@ from decharges.decharge.views import (
     ImportTempsSyndicats,
     PageAccueilSyndicatView,
     SuppressionUtilisationTempsDecharge,
+    SyntheseCTS,
     UpdateUtilisationTempsDecharge,
 )
 
@@ -36,4 +37,5 @@ urlpatterns = [
     path("historique/", HistoriquePage.as_view(), name="historique"),
     path("ajouter-cts/", CTSCreate.as_view(), name="ajouter_cts"),
     path("modifier-cts/<int:pk>/", CTSUpdate.as_view(), name="modifier_cts"),
+    path("synthese-cts/", SyntheseCTS.as_view(), name="synthese_cts"),
 ]

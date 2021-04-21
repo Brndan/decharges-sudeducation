@@ -3,6 +3,7 @@ from decharges.decharge.views.cts import CTSCreate, CTSUpdate
 from decharges.decharge.views.export_ministere import ExportMinistere
 from decharges.decharge.views.historique import HistoriquePage
 from decharges.decharge.views.import_temps_syndicats import ImportTempsSyndicats
+from decharges.decharge.views.synthese_cts import SyntheseCTS
 from decharges.decharge.views.utilisation_temps_decharge import (
     CreateUtilisationTempsDecharge,
     SuppressionUtilisationTempsDecharge,
@@ -18,5 +19,6 @@ __all__ = [
     "ImportTempsSyndicats",
     "PageAccueilSyndicatView",
     "SuppressionUtilisationTempsDecharge",
+    "SyntheseCTS",
     "UpdateUtilisationTempsDecharge",
 ]

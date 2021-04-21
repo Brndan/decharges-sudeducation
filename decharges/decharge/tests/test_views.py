@@ -15,7 +15,10 @@ from decharges.decharge.models import (
     UtilisationTempsDecharge,
 )
 from decharges.parametre.models import ParametresDApplication
-from decharges.user_manager.models import Syndicat
+from decharges.user_manager.models import (
+    Syndicat,
+    Academie,
+)
 
 pytestmark = pytest.mark.django_db
 
@@ -635,3 +638,23 @@ def test_update_cts(client):
         == 8
     )
     assert UtilisationCreditDeTempsSyndicalPonctuel.objects.first().syndicat == syndicat
+
+
+def test_synthese_cts(client):
+    federation = Syndicat.objects.create(
+        is_superuser=True, email="admin@example.com", username="Fédération"
+    )
+    ParametresDApplication.objects.create(annee_en_cours=2021)
+    academie = Academie.objects.create(nom="Academie1")
+    syndicat = Syndicat.objects.create(
+        email="syndicat1@example.com", username="Syndicat 1", academie=academie
+    )
+    syndicat2 = Syndicat.objects.create(
+        email="syndicat2@example.com", username="Syndicat 2", academie=academie
+    )
+    UtilisationCreditDeTempsSyndicalPonctuel.objects.create(demi_journees_de_decharges=5, syndicat=syndicat, annee=2021)
+    UtilisationCreditDeTempsSyndicalPonctuel.objects.create(demi_journees_de_decharges=12, syndicat=syndicat2, annee=2021)
+    client.force_login(federation)
+    response = client.get(reverse("decharge:synthese_cts"))
+    assert response.status_code == 200
+    assert response.context["cts_par_academie"]["Academie1"] == round(Decimal(17)*Decimal(3.5) / settings.NB_HOURS_IN_A_YEAR, settings.PRECISION_ETP)
