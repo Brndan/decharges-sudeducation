@@ -33,6 +33,7 @@ class ImportTempsSyndicats(CheckConfigurationMixin, FederationRequiredMixin, For
                     syndicat_donateur=federation,
                     annee=form.cleaned_data["annee"],
                     syndicat_beneficiaire=syndicat,
+                    temps_de_decharge_etp=etp,
                 )
                 created += 1
 
