@@ -3,7 +3,8 @@ import re
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
 
-CHARSET_REGEX = re.compile("[^a-zàâçéèêëîïôûùüÿñæœ -]", flags=re.IGNORECASE)
+CHARSET_PRENOM_REGEX = re.compile("[^a-zàâçéèêëîïôûùüÿñæœ -]", flags=re.IGNORECASE)
+CHARSET_NOM_REGEX = re.compile("[^a-z'àâçéèêëîïôûùüÿñæœ -]", flags=re.IGNORECASE)
 
 
 def validate_first_name(first_name):
@@ -32,7 +33,7 @@ def validate_first_name(first_name):
         raise ValidationError(
             "Le prénom ne doit pas se terminer par un espace",
         )
-    unknown_chars = CHARSET_REGEX.search(first_name)
+    unknown_chars = CHARSET_PRENOM_REGEX.search(first_name)
     if unknown_chars:
         raise ValidationError(
             f"Des caractères non-autorisés sont présents : {unknown_chars.group(0)}",
@@ -65,7 +66,7 @@ def validate_last_name(last_name):
         raise ValidationError(
             "Le nom ne doit pas se terminer par un espace",
         )
-    unknown_chars = CHARSET_REGEX.search(last_name)
+    unknown_chars = CHARSET_NOM_REGEX.search(last_name)
     if unknown_chars:
         raise ValidationError(
             f"Des caractères non-autorisés sont présents : {unknown_chars.group(0)}",
