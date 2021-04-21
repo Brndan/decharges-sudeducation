@@ -1,0 +1,92 @@
+{% extends "decharges/base.html" %}
+{% load data_manipulation %}
+
+{% block title %}Historique des décharges{% endblock title %}
+
+{% block maintitle %}Historique des décharges{% endblock maintitle %}
+{% block subtitle %}
+  Sur cette page vous pouvez visualiser l'historique des décharges des syndiqués à SUD éducation
+{% endblock %}
+
+{% block content %}
+  <section class="container pb-6">
+    <div class="card pt-2">
+      <header class="card-header">
+        <h2 class="card-header-title">Historique</h2>
+      </header>
+      <div class="card-content">
+        <form method="get" class="mb-4">
+          <div class="field is-horizontal">
+            <div class="field-label is-normal">
+              <label class="label" for="id_annee">Visualisation pour l'année</label>
+            </div>
+            <div class="field-body">
+              <div class="control {{ classes.value }}">
+                <input class="input" type="number" value="{{ annee_en_cours }}" name="annee" id="id_annee">
+              </div>
+              <input type="submit" value="Changer l'année" class="button ml-4">
+            </div>
+          </div>
+        </form>
+
+        <hr>
+
+        {% if beneficiaires_approchant_les_limites %}
+        <section class="mb-4">
+          <h3 class="title is-6">Bénéficiaires approchant les limites</h3>
+          <ul>
+          {% for beneficiaire, limites in beneficiaires_approchant_les_limites.items %}
+            <li>
+              <b>{{ beneficiaire }} :</b>
+              {% if limites.annees_consecutives %}
+                Cumule {{ limites.annees_consecutives }} années de décharges consecutives.
+              {% endif %}
+              {% if limites.etp_consecutifs %}
+                Cumule {{ limites.etp_consecutifs|floatformat:3 }} ETPs consecutifs
+              {% endif %}
+            </li>
+          {% endfor %}
+          </ul>
+        </section>
+        {% endif %}
+
+        <section class="table-container">
+          <table class="table is-bordered is-striped is-hoverable is-fullwidth">
+            <thead>
+              <tr>
+                <th>Civilité</th>
+                <th>Prénom</th>
+                <th>Nom</th>
+                <th><abbr title="Code établissement">RNE</abbr></th>
+                <th><abbr title="Code Corps">Corps</abbr></th>
+              {% for annee in columns.etps_par_annee.0 %}
+                <th>{{ annee }}-{{ annee|add:1 }}</th>
+              {% endfor %}
+              </tr>
+            </thead>
+            <tbody>
+            {% for row_number in row_iterator %}
+              <tr>
+                <td>{{ columns.m_mmes|index:row_number }}</td>
+                <td>{{ columns.prenoms|index:row_number }}</td>
+                <td>{{ columns.noms|index:row_number }}</td>
+                <td>{{ columns.rnes|index:row_number }}</td>
+                <td>{{ columns.corps|index:row_number }}</td>
+                {% with columns.etps_par_annee|index:row_number as etp_par_annee %}
+                {% for etp in etp_par_annee.values %}
+                  <td>
+                    {% if etp > 0 %}
+                    {{ etp|floatformat:3 }}
+                    {% endif %}
+                  </td>
+                {% endfor %}
+                {% endwith %}
+              </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+        </section>
+      </div>
+    </div>
+  </section>
+{% endblock content %}

@@ -3,6 +3,7 @@ from django.urls import path
 from decharges.decharge.views import (
     CreateUtilisationTempsDecharge,
     ExportMinistere,
+    HistoriquePage,
     ImportTempsSyndicats,
     PageAccueilSyndicatView,
     SuppressionUtilisationTempsDecharge,
@@ -30,4 +31,5 @@ urlpatterns = [
         name="supprimer_beneficiaire",
     ),
     path("export-ministere/", ExportMinistere.as_view(), name="export_ministere"),
+    path("historique/", HistoriquePage.as_view(), name="historique"),
 ]
