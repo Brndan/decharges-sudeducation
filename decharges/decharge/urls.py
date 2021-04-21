@@ -1,6 +1,7 @@
 from django.urls import path
 
 from decharges.decharge.views import (
+    CreateTempsDeDecharge,
     CreateUtilisationTempsDecharge,
     CTSCreate,
     CTSUpdate,
@@ -8,8 +9,10 @@ from decharges.decharge.views import (
     HistoriquePage,
     ImportTempsSyndicats,
     PageAccueilSyndicatView,
+    SuppressionTempsDeDecharge,
     SuppressionUtilisationTempsDecharge,
     SyntheseCTS,
+    UpdateTempsDeDecharge,
     UpdateUtilisationTempsDecharge,
 )
 
@@ -38,4 +41,19 @@ urlpatterns = [
     path("ajouter-cts/", CTSCreate.as_view(), name="ajouter_cts"),
     path("modifier-cts/<int:pk>/", CTSUpdate.as_view(), name="modifier_cts"),
     path("synthese-cts/", SyntheseCTS.as_view(), name="synthese_cts"),
+    path(
+        "ajouter-mutualisation-academique/",
+        CreateTempsDeDecharge.as_view(),
+        name="ajouter_mutualisation_academique",
+    ),
+    path(
+        "modifier-mutualisation-academique/<int:pk>/",
+        UpdateTempsDeDecharge.as_view(),
+        name="modifier_mutualisation_academique",
+    ),
+    path(
+        "supprimer-mutualisation-academique/<int:pk>/",
+        SuppressionTempsDeDecharge.as_view(),
+        name="supprimer_mutualisation_academique",
+    ),
 ]

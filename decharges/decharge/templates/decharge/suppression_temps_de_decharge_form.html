@@ -1,0 +1,35 @@
+{% extends "decharges/base.html" %}
+{% load bulma_tags %}
+
+{% block title %}Suppression d'une mutualisation{% endblock title %}
+
+{% block maintitle %}Suppression d'une mutualisation{% endblock maintitle %}
+{% block subtitle %}
+  Suppression de la mutualisation de temps avec {{ temps_de_decharge.syndicat_beneficiaire.username }}
+{% endblock %}
+
+{% block content %}
+  <section class="container pb-6">
+    <div class="card pt-2">
+      <header class="card-header">
+        <h2 class="card-header-title">
+          Suppression de la mutualisation de temps ?
+        </h2>
+      </header>
+      <div class="card-content">
+        <form method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          <p class="mb-4">
+            Êtes-vous certain·e de vouloir supprimer la mutualisation de temps avec
+            <b>{{ temps_de_decharge.syndicat_beneficiaire.username }}</b>
+            de <b>{{ temps_de_decharge.temps_de_decharge_etp|floatformat:3 }} ETP</b>
+            pour l'année <b>{{ temps_de_decharge.annee }}-{{ temps_de_decharge.annee|add:1 }}</b> ?
+          </p>
+          <div class="field">
+            <button type="submit" class="button is-danger"><span class="fa fa-trash-alt mr-2"></span>Oui je suis sûr·e</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+{% endblock content %}

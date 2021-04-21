@@ -58,7 +58,7 @@ class UpdateUtilisationTempsDecharge(
 class SuppressionUtilisationTempsDecharge(
     CheckConfigurationMixin, LoginRequiredMixin, DeleteView
 ):
-    template_name = "decharge/suppression_temps_decharge_form.html"
+    template_name = "decharge/suppression_utilisation_temps_decharge_form.html"
     model = UtilisationTempsDecharge
     context_object_name = "utilisation_temps_decharge"
 

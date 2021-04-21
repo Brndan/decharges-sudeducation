@@ -1,0 +1,56 @@
+{% extends "decharges/base.html" %}
+{% load bulma_tags %}
+
+{% block title %}
+  {% if temps_de_decharge %}
+  Modification d'une mutualisation académique
+  {% else %}
+  Mutualisation académique
+  {% endif %}
+{% endblock title %}
+
+{% block maintitle %}
+  {% if temps_de_decharge %}
+  Modification d'une mutualisation académique
+  {% else %}
+  Mutualisation académique
+  {% endif %}
+{% endblock maintitle %}
+{% block subtitle %}
+  {% if temps_de_decharge %}
+  Modification d'une mutualisation pour l'année {{ temps_de_decharge.annee }}-{{ temps_de_decharge.annee|add:1 }}
+  {% else %}
+  Sur cette page vous pouvez partager votre temps de décharge {% if not request.user.is_federation %}avec une autre structure de votre académie{% endif %}
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+  <section class="container pb-6">
+    <div class="card pt-2">
+      <header class="card-header">
+        <h2 class="card-header-title">
+          {% if temps_de_decharge %}
+          Modification d'une mutualisation académique
+          {% else %}
+          Mutualisation académique
+          {% endif %}
+        </h2>
+      </header>
+      <div class="card-content">
+        <form method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          {{ form|bulma }}
+          <div class="field">
+            <button type="submit" class="button is-success">
+              {% if temps_de_decharge %}
+              Modifier
+              {% else %}
+              Ajouter
+              {% endif %}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+{% endblock content %}

@@ -86,8 +86,11 @@
     </div>
 
     <div class="card mt-6">
-      <header class="card-header">
+      <header class="card-header is-align-items-center">
         <h2 class="card-header-title">ETP donnés {% if not request.user.is_federation %}(mutualisation académique){% endif %}</h2>
+        <a class="button is-small is-success mr-2" href="{% url 'decharge:ajouter_mutualisation_academique' %}">
+          <span class="fa fa-sm fa-plus mr-2"></span>Partager mon temps
+        </a>
       </header>
       <div class="card-content">
         <table class="table is-bordered is-striped is-hoverable is-fullwidth">
@@ -103,7 +106,10 @@
             <tr>
               <td>{{ temps_donne.syndicat_beneficiaire.username }}</td>
               <td>{{ temps_donne.temps_de_decharge_etp|floatformat:3 }}</td>
-              <td>TODO</td>
+              <td>
+                <a class="button is-info icon" href="{% url 'decharge:modifier_mutualisation_academique' temps_donne.pk %}"><span class="fa fa-edit"></span></a>
+                <a class="button is-danger icon" href="{% url 'decharge:supprimer_mutualisation_academique' temps_donne.pk %}"><span class="fa fa-trash-alt"></span></a>
+              </td>
             </tr>
             {% endfor %}
           </tbody>
