@@ -147,6 +147,11 @@ Contient toutes les variables de l'application Django.
 
 - NB_HOURS_IN_A_YEAR : à changer si le nombre d'heure d'un temps plein en une année n'est plus 1607
 - CHOIX_ORS : les nombre d'heures d'obligation de services possibles dans le formulaire
+- MAX_ETP_CONSECUTIFS : le nombre maximum d'ETP consécutifs dans les statuts (3 ETP au moment d'écriture de cette doc)
+- ALERT_ETP_CONSECUTIFS : le nombre d'ETP consécutif à partir duquel on alerte que cette personne approche les limites
+- MAX_ANNEES_CONSECUTIVES : le nombre maximum d'années de délégation consécutives dans les statuts (8 ans au moment d'écriture de cette doc)
+- ALERT_ANNEES_CONSECUTIVES : le nombre d'années de délégation consécutives à partir duquel on alerte que cette personne approche les limites
+- NB_ANNEES_POUR_REINITIALISER_LES_COMPTEURS : le nombre d'années nécessaires pour réinitialiser les compteurs ci-dessus (ETPs cumulés + années de décharge consécutives)
 
 ### `decharges/decharge`
 
@@ -175,4 +180,3 @@ L'application permettant de gérer les utilisateurs. Vous y trouverez notamment 
 - le modèle de `Syndicat` (qui hérite du modèle User de django)
 - le modèle `Academie` qui regroupe les syndicats
 - les templates (decharges/user_manager/templates/registration) qui surchargent les templates de base de la gestion d'utilisateurs de django
-- TODO
