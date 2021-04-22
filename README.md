@@ -147,6 +147,11 @@ Contient toutes les variables de l'application Django.
 
 - NB_HOURS_IN_A_YEAR : à changer si le nombre d'heure d'un temps plein en une année n'est plus 1607
 - CHOIX_ORS : les nombre d'heures d'obligation de services possibles dans le formulaire
+- MAX_ETP_CONSECUTIFS : le nombre maximum d'ETP consécutifs dans les statuts (3 ETP au moment d'écriture de cette doc)
+- ALERT_ETP_CONSECUTIFS : le nombre d'ETP consécutif à partir duquel on alerte que cette personne approche les limites
+- MAX_ANNEES_CONSECUTIVES : le nombre maximum d'années de délégation consécutives dans les statuts (8 ans au moment d'écriture de cette doc)
+- ALERT_ANNEES_CONSECUTIVES : le nombre d'années de délégation consécutives à partir duquel on alerte que cette personne approche les limites
+- NB_ANNEES_POUR_REINITIALISER_LES_COMPTEURS : le nombre d'années nécessaires pour réinitialiser les compteurs ci-dessus (ETPs cumulés + années de décharge consécutives)
 
 ### `decharges/decharge`
 
@@ -156,14 +161,15 @@ Notamment :
 
 - validators.py : contient les validateurs des données côté backend
 - models.py : contient les modèles de données
-- forms/ : contients les formualaires django, permettant de transformer les données utlisateur en objets python + de valider plus finement la validité des données
+- forms/ : contients les formulaires django, permettant de transformer les données utlisateur en objets python et de valider plus finement les données utilisateur
 - tests/ : les tests de l'application
-- templates/ : les fichiers HTML de l'application
-- views/ : les fonctions qui répondent aux appels HTTP du client
+- templates/ : les fichiers HTML de l'application, écrits en django-template
+- views/ : les fonctions qui répondent aux appels HTTP du client. Pour organiser au maximum le code, il y a un fichier par page (ex: `accueil.py`) ou par modèle de données (ex: `temps_de_decharge.py`)
+- urls.py : permet de faire la liaison entre les URLs de l'application et les views (ci-dessus) appelées
 
 ### `decharges/parametres`
 
-Une petite application permettant de gérer les paramètres de l'application via l'interface admin de django. Par exemple :
+Une petite application permettant de gérer les paramètres du site via l'interface admin de django. Par exemple :
 
 - l'année en cours, pour savoir quelles données afficher
 - si oui ou non les syndicats peuvent accéder à l'édition des décharges
@@ -175,4 +181,3 @@ L'application permettant de gérer les utilisateurs. Vous y trouverez notamment 
 - le modèle de `Syndicat` (qui hérite du modèle User de django)
 - le modèle `Academie` qui regroupe les syndicats
 - les templates (decharges/user_manager/templates/registration) qui surchargent les templates de base de la gestion d'utilisateurs de django
-- TODO

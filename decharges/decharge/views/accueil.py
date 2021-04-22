@@ -30,6 +30,7 @@ class PageAccueilSyndicatView(
             temps_donne.temps_de_decharge_etp for temps_donne in temps_donnes
         )
 
+        temps_decharge_federation = None
         temps_recus_par_la_federation = 0
         temps_recus_par_des_syndicats = 0
         for temps_recu in self.request.user.temps_de_decharges_par_annee.filter(
@@ -42,6 +43,7 @@ class PageAccueilSyndicatView(
                 temps_recus_par_des_syndicats += temps_recu.temps_de_decharge_etp
             else:
                 temps_recus_par_la_federation += temps_recu.temps_de_decharge_etp
+                temps_decharge_federation = temps_recu
 
         temps_restant = (
             temps_recus_par_la_federation
@@ -57,6 +59,7 @@ class PageAccueilSyndicatView(
 
         context.update(
             {
+                "temps_decharge_federation": temps_decharge_federation,
                 "temps_restant": round(temps_restant, settings.PRECISION_ETP),
                 "cts_consommes": cts_consommes,
                 "temps_donnes": temps_donnes,

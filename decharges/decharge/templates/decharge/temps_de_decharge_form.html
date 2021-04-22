@@ -2,25 +2,25 @@
 {% load bulma_tags %}
 
 {% block title %}
-  {% if utilisation_temps_decharge %}
-  Modification d'un·e bénéficiaire
+  {% if temps_de_decharge %}
+  Modification d'une mutualisation académique
   {% else %}
-  Ajout d'un·e bénéficiaire
+  Mutualisation académique
   {% endif %}
 {% endblock title %}
 
 {% block maintitle %}
-  {% if utilisation_temps_decharge %}
-  Modification d'un·e bénéficiaire
+  {% if temps_de_decharge %}
+  Modification d'une mutualisation académique
   {% else %}
-  Ajout d'un·e bénéficiaire
+  Mutualisation académique
   {% endif %}
 {% endblock maintitle %}
 {% block subtitle %}
-  {% if utilisation_temps_decharge %}
-  Modification de la décharge de {{ utilisation_temps_decharge.prenom }} {{ utilisation_temps_decharge.nom }} pour l'année {{ utilisation_temps_decharge.annee }}-{{ utilisation_temps_decharge.annee|add:1 }}
+  {% if temps_de_decharge %}
+  Modification d'une mutualisation pour l'année {{ temps_de_decharge.annee }}-{{ temps_de_decharge.annee|add:1 }}
   {% else %}
-  Sur cette page vous pouvez ajouter un·e bénéficiaire de temps de décharge
+  Sur cette page vous pouvez partager votre temps de décharge {% if not request.user.is_federation %}avec une autre structure de votre académie{% endif %}
   {% endif %}
 {% endblock %}
 
@@ -29,10 +29,10 @@
     <div class="card pt-2">
       <header class="card-header">
         <h2 class="card-header-title">
-          {% if utilisation_temps_decharge %}
-          Modification d'un·e bénéficiaire
+          {% if temps_de_decharge %}
+          Modification d'une mutualisation académique
           {% else %}
-          Ajout d'un·e bénéficiaire
+          Mutualisation académique
           {% endif %}
         </h2>
       </header>
@@ -42,7 +42,7 @@
           {{ form|bulma }}
           <div class="field">
             <button type="submit" class="button is-success">
-              {% if utilisation_temps_decharge %}
+              {% if temps_de_decharge %}
               Modifier
               {% else %}
               Ajouter

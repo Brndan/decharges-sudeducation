@@ -42,7 +42,7 @@
                 Cumule {{ limites.annees_consecutives }} années de décharges consecutives.
               {% endif %}
               {% if limites.etp_consecutifs %}
-                Cumule {{ limites.etp_consecutifs|floatformat:3 }} ETPs consecutifs
+                Cumule {{ limites.etp_consecutifs|floatformat:3 }} ETPs consécutifs
               {% endif %}
             </li>
           {% endfor %}
@@ -51,6 +51,10 @@
         {% endif %}
 
         <section class="table-container">
+          <a class="button is-info mb-2" href="{% url 'decharge:telecharger_historique' %}?annee={{ annee_en_cours }}">
+            <span class="fa fa-download mr-2"></span>
+            Historique pour l'année {{ annee_en_cours }}-{{ annee_en_cours|add:1 }}
+          </a>
           <table class="table is-bordered is-striped is-hoverable is-fullwidth">
             <thead>
               <tr>

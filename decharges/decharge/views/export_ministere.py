@@ -16,7 +16,7 @@ class ExportMinistere(CheckConfigurationMixin, FederationRequiredMixin, View):
         columns = aggregation_par_beneficiaire(
             UtilisationTempsDecharge.objects.filter(
                 annee=annee, supprime_a__isnull=True
-            )
+            ).order_by("nom", "prenom")
         )
 
         data_frame = pandas.DataFrame(

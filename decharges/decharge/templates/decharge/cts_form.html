@@ -2,25 +2,25 @@
 {% load bulma_tags %}
 
 {% block title %}
-  {% if utilisation_temps_decharge %}
-  Modification d'un·e bénéficiaire
+  {% if cts %}
+  Mise à jour de la consommation en CTS ponctuel
   {% else %}
-  Ajout d'un·e bénéficiaire
+  Ajout de la consommation en CTS ponctuel
   {% endif %}
 {% endblock title %}
 
 {% block maintitle %}
-  {% if utilisation_temps_decharge %}
-  Modification d'un·e bénéficiaire
+  {% if cts %}
+  Mise à jour de la consommation en CTS ponctuel
   {% else %}
-  Ajout d'un·e bénéficiaire
+  Ajout de la consommation en CTS ponctuel
   {% endif %}
 {% endblock maintitle %}
 {% block subtitle %}
-  {% if utilisation_temps_decharge %}
-  Modification de la décharge de {{ utilisation_temps_decharge.prenom }} {{ utilisation_temps_decharge.nom }} pour l'année {{ utilisation_temps_decharge.annee }}-{{ utilisation_temps_decharge.annee|add:1 }}
+  {% if cts %}
+  Mise à jour de la consommation en CTS ponctuel de {{ request.user.username }} pour l'année {{ cts.annee }}-{{ cts.annee|add:1 }}
   {% else %}
-  Sur cette page vous pouvez ajouter un·e bénéficiaire de temps de décharge
+  Ajout de la consommation en CTS ponctuel de {{ request.user.username }} pour l'année {{ cts.annee }}-{{ cts.annee|add:1 }}
   {% endif %}
 {% endblock %}
 
@@ -29,10 +29,10 @@
     <div class="card pt-2">
       <header class="card-header">
         <h2 class="card-header-title">
-          {% if utilisation_temps_decharge %}
-          Modification d'un·e bénéficiaire
+          {% if cts %}
+          Mise à jour de la consommation en CTS ponctuel
           {% else %}
-          Ajout d'un·e bénéficiaire
+          Ajout de la consommation en CTS ponctuel
           {% endif %}
         </h2>
       </header>
@@ -42,10 +42,10 @@
           {{ form|bulma }}
           <div class="field">
             <button type="submit" class="button is-success">
-              {% if utilisation_temps_decharge %}
+              {% if cts %}
               Modifier
               {% else %}
-              Ajouter
+              Créer
               {% endif %}
             </button>
           </div>

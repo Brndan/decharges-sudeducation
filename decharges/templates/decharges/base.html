@@ -50,11 +50,11 @@
             <a class="navbar-item" href="{% url 'decharge:export_ministere' %}">
               Export ministère
             </a>
-            <a class="navbar-item" href="?TODO">
-              Syndicats à relancer (TODO)
+            <a class="navbar-item" href="{% url 'decharge:syndicats_en_retard' %}">
+              Syndicats à relancer
             </a>
-            <a class="navbar-item" href="?TODO">
-              CHS utilisés (TODO)
+            <a class="navbar-item" href="{% url 'decharge:synthese_cts' %}">
+              CTS utilisés
             </a>
             <hr class="navbar-divider">
             <a class="navbar-item" href="{% url 'admin:parametre_parametresdapplication_changelist' %}">
@@ -63,6 +63,9 @@
           </div>
         </div>
         {% endif %}
+        <a class="navbar-item" href="mailto:decharges@sudeducation.org">
+          Besoin d'aide ?
+        </a>
       </div>
 
 

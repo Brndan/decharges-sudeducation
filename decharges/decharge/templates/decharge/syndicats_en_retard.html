@@ -1,0 +1,42 @@
+{% extends "decharges/base.html" %}
+
+{% block title %}Syndicats à relancer{% endblock title %}
+
+{% block maintitle %}Syndicats à relancer{% endblock maintitle %}
+{% block subtitle %}Sur cette page vous trouverez la liste des syndicats qui n'ont remplis aucun champ sur la plateforme pour l'année {{ annee }}-{{ annee|add:1 }}{% endblock subtitle %}
+
+{% block content %}
+  <section class="container pb-6">
+    <div class="card pt-2">
+      <header class="card-header">
+        <h2 class="card-header-title">Syndicats à relancer</h2>
+      </header>
+      <div class="card-content">
+        <table class="table is-bordered is-striped is-hoverable is-fullwidth">
+          <thead>
+            <tr>
+              <th>Nom</th>
+              <th>Courriel</th>
+              <th>Dernière connexion</th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for syndicat in syndicats_a_relancer %}
+            <tr>
+              <td>{{ syndicat.username }}</td>
+              <td>{{ syndicat.email }}</td>
+              <td>
+                {% if syndicat.last_login %}
+                {{ syndicat.last_login }}
+                {% else %}
+                Jamais
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+{% endblock %}

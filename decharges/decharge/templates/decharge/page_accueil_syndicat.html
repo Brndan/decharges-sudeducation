@@ -1,4 +1,5 @@
 {% extends "decharges/base.html" %}
+{% load data_manipulation %}
 
 {% block title %}Accueil{% endblock title %}
 
@@ -15,11 +16,25 @@
       </header>
       <div class="card-content">
         <ul>
-          {% if not request.user.is_federation %}
-          <li><b>Temps reçu de la fédération&nbsp;:</b> {{ temps_recus_par_la_federation|floatformat:3 }} ETP</li>
-          {% endif %}
-          <li><b>Temps actuellement consommé&nbsp;:</b> {{ temps_utilises_total|floatformat:3 }} ETP</li>
-          <li><b>CTS ponctuel consommé&nbsp;:</b> {% if cts_consommes %}{{ cts_consommes.etp_utilises|floatformat:3 }}{% else %}0{% endif %} ETP</li>
+          <li>
+            <b>Temps reçu de la fédération&nbsp;:</b> {{ temps_recus_par_la_federation|floatformat:3 }} ETP
+            {% if request.user.is_federation %}
+              {% if temps_decharge_federation %}
+              <a href="{% url 'decharge:modifier_quota_federation' temps_decharge_federation.pk %}" class="button is-info icon"><span class="fa fa-edit"></span></a>
+              {% else %}
+              <a href="{% url 'decharge:ajouter_quota_federation' %}" class="button is-info icon"><span class="fa fa-edit"></span></a>
+              {% endif %}
+            {% endif %}
+          </li>
+          <li><b>Temps de décharge consommé&nbsp;:</b> {{ temps_utilises_total|floatformat:3 }} ETP</li>
+          <li>
+            <b>CTS ponctuel consommé&nbsp;:</b> {% if cts_consommes %}{{ cts_consommes.etp_utilises|floatformat:3 }}{% else %}0{% endif %} ETP
+            {% if cts_consommes %}
+              <a href="{% url 'decharge:modifier_cts' cts_consommes.pk %}" class="button is-info icon"><span class="fa fa-edit"></span></a>
+            {% else %}
+              <a href="{% url 'decharge:ajouter_cts' %}" class="button is-info icon"><span class="fa fa-edit"></span></a>
+            {% endif %}
+          </li>
           {% if temps_recus_par_des_syndicats > 0 %}
           <li><b>Temps reçu des syndicats de l'académie&nbsp;:</b> {{ temps_recus_par_des_syndicats|floatformat:3 }} ETP</li>
           {% endif %}
@@ -27,9 +42,13 @@
           <li><b>Temps donné aux syndicats {% if not request.user.is_federation %}de l'académie{% endif %}&nbsp;:</b> {{ temps_donnes_total|floatformat:3 }} ETP</li>
           {% endif %}
         </ul>
-        {% if not request.user.is_federation %}
         <hr>
+        {% if temps_restant > 0 %}
         Il vous reste <strong>{{ temps_restant|floatformat:3 }} ETP</strong> non utilisés
+        {% else %}
+        <p class="has-text-danger">
+          Vous dépassez votre quota de <strong class="has-text-danger">{{ temps_restant|abs|floatformat:3 }} ETP</strong>
+        </p>
         {% endif %}
       </div>
     </div>
@@ -79,8 +98,11 @@
     </div>
 
     <div class="card mt-6">
-      <header class="card-header">
+      <header class="card-header is-align-items-center">
         <h2 class="card-header-title">ETP donnés {% if not request.user.is_federation %}(mutualisation académique){% endif %}</h2>
+        <a class="button is-small is-success mr-2" href="{% url 'decharge:ajouter_mutualisation_academique' %}">
+          <span class="fa fa-sm fa-plus mr-2"></span>Partager mon temps
+        </a>
       </header>
       <div class="card-content">
         <table class="table is-bordered is-striped is-hoverable is-fullwidth">
@@ -96,11 +118,24 @@
             <tr>
               <td>{{ temps_donne.syndicat_beneficiaire.username }}</td>
               <td>{{ temps_donne.temps_de_decharge_etp|floatformat:3 }}</td>
-              <td>TODO</td>
+              <td>
+                <a class="button is-info icon" href="{% url 'decharge:modifier_mutualisation_academique' temps_donne.pk %}"><span class="fa fa-edit"></span></a>
+                <a class="button is-danger icon" href="{% url 'decharge:supprimer_mutualisation_academique' temps_donne.pk %}"><span class="fa fa-trash-alt"></span></a>
+              </td>
             </tr>
             {% endfor %}
           </tbody>
         </table>
+      </div>
+    </div>
+    <div class="card mt-6">
+      <header class="card-header is-align-items-center">
+        <h2 class="card-header-title">Besoin d'aide ?</h2>
+      </header>
+      <div class="card-content">
+        <p>
+          Pour toute question, n'hésitez pas nous envoyer un mail à <a href="mailto:decharges@sudeducation.org">decharges@sudeducation.org</a>. On se fera un plaisir de vous répondre !
+        </p>
       </div>
     </div>
   </section>
