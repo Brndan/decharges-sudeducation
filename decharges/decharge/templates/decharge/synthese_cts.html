@@ -46,8 +46,7 @@
         <h2 class="card-header-title">Temps restant total</h2>
       </header>
       <div class="card-content">
-        TODO : <br>
-        Les syndicats et la fédération ont au total <b>{{ total_etp_non_consommes }}</b> ETP non consommés sur l'année {{ annee_en_cours }}-{{ annee_en_cours|add:1 }}
+        Les syndicats et la fédération ont au total <b>{{ total_etp_non_consommes|floatformat:3 }}</b> ETP non consommés sur l'année {{ annee_en_cours }}-{{ annee_en_cours|add:1 }}
       </div>
     </div>
   </section>
