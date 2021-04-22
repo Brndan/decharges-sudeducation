@@ -4,9 +4,45 @@ from django.http import Http404
 from django.urls import reverse
 from django.views.generic import CreateView, DeleteView, UpdateView
 
-from decharges.decharge.forms import TempsDeDechargeForm
-from decharges.decharge.mixins import CheckConfigurationMixin
+from decharges.decharge.forms import QuotaETPFederationForm, TempsDeDechargeForm
+from decharges.decharge.mixins import CheckConfigurationMixin, FederationRequiredMixin
 from decharges.decharge.models import TempsDeDecharge
+
+
+class CreateQuotaETPFederation(
+    CheckConfigurationMixin, FederationRequiredMixin, CreateView
+):
+    template_name = "decharge/quota_etp_federation_form.html"
+    form_class = QuotaETPFederationForm
+
+    def get_success_url(self):
+        messages.success(self.request, "Quota créé avec succès !")
+        return reverse("decharge:index")
+
+    def get_form_kwargs(self):
+        form_kwargs = super().get_form_kwargs()
+        form_kwargs["federation"] = self.request.user
+        form_kwargs["annee"] = self.params.annee_en_cours
+        return form_kwargs
+
+
+class UpdateQuotaETPFederation(
+    CheckConfigurationMixin, FederationRequiredMixin, UpdateView
+):
+    template_name = "decharge/quota_etp_federation_form.html"
+    form_class = QuotaETPFederationForm
+    model = TempsDeDecharge
+    context_object_name = "temps_de_decharge"
+
+    def get_success_url(self):
+        messages.success(self.request, "Quota mis à jour avec succès !")
+        return reverse("decharge:index")
+
+    def get_form_kwargs(self):
+        form_kwargs = super().get_form_kwargs()
+        form_kwargs["federation"] = self.request.user
+        form_kwargs["annee"] = self.object.annee
+        return form_kwargs
 
 
 class CreateTempsDeDecharge(CheckConfigurationMixin, LoginRequiredMixin, CreateView):

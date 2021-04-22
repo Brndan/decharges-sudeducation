@@ -168,3 +168,64 @@ def test_suppression_mutualisation_academique(client):
     )
     assert response.status_code == 302
     assert TempsDeDecharge.objects.count() == 0
+
+
+def test_ajouter_quota_federation(client):
+    federation = Syndicat.objects.create(
+        is_superuser=True, email="admin@example.com", username="Fédération"
+    )
+    ParametresDApplication.objects.create(annee_en_cours=2020)
+    client.force_login(federation)
+    response = client.get(reverse("decharge:ajouter_quota_federation"))
+    assert response.status_code == 200
+    response = client.post(
+        reverse("decharge:ajouter_quota_federation"),
+        {
+            "temps_de_decharge_etp": 0.1,
+        },
+    )
+    assert response.status_code == 302
+    assert TempsDeDecharge.objects.count() == 1
+    utilisation_tps = TempsDeDecharge.objects.first()
+    assert utilisation_tps.syndicat_beneficiaire == federation
+    assert utilisation_tps.syndicat_donateur is None
+    assert utilisation_tps.annee == 2020
+    assert utilisation_tps.temps_de_decharge_etp == round(
+        Decimal(0.1), settings.PRECISION_ETP
+    )
+
+
+def test_maj_quota_federation(client):
+    federation = Syndicat.objects.create(
+        is_superuser=True, email="admin@example.com", username="Fédération"
+    )
+    ParametresDApplication.objects.create(annee_en_cours=2021)
+    client.force_login(federation)
+    utilisation_tps = TempsDeDecharge.objects.create(
+        syndicat_beneficiaire=federation,
+        temps_de_decharge_etp=0.1,
+        annee=2020,
+    )
+    response = client.get(
+        reverse(
+            "decharge:modifier_quota_federation",
+            kwargs={"pk": utilisation_tps.pk},
+        )
+    )
+    assert response.status_code == 200
+    response = client.post(
+        reverse(
+            "decharge:modifier_quota_federation",
+            kwargs={"pk": utilisation_tps.pk},
+        ),
+        {
+            "temps_de_decharge_etp": 0.5,
+        },
+    )
+    assert response.status_code == 302
+
+    utilisation_tps.refresh_from_db()
+    assert utilisation_tps.syndicat_beneficiaire == federation
+    assert utilisation_tps.syndicat_donateur is None
+    assert utilisation_tps.annee == 2020
+    assert utilisation_tps.temps_de_decharge_etp == 0.5

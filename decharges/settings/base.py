@@ -179,7 +179,10 @@ NB_HOURS_IN_A_YEAR = 1607  # utilisé pour les calculs d'ETP
 PRECISION_ETP = 5
 CHOIX_ORS = [
     (15, "15h"),
+    (17, "17h"),
     (18, "18h"),
+    (20, "20h"),
+    (21, "21h"),
     (27, "27h"),
     (35, "35h"),
     (36, "36h"),

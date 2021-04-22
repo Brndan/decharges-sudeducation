@@ -1,6 +1,7 @@
 from django.urls import path
 
 from decharges.decharge.views import (
+    CreateQuotaETPFederation,
     CreateTempsDeDecharge,
     CreateUtilisationTempsDecharge,
     CTSCreate,
@@ -12,6 +13,7 @@ from decharges.decharge.views import (
     SuppressionTempsDeDecharge,
     SuppressionUtilisationTempsDecharge,
     SyntheseCTS,
+    UpdateQuotaETPFederation,
     UpdateTempsDeDecharge,
     UpdateUtilisationTempsDecharge,
 )
@@ -55,5 +57,15 @@ urlpatterns = [
         "supprimer-mutualisation-academique/<int:pk>/",
         SuppressionTempsDeDecharge.as_view(),
         name="supprimer_mutualisation_academique",
+    ),
+    path(
+        "ajouter-quota-federation/",
+        CreateQuotaETPFederation.as_view(),
+        name="ajouter_quota_federation",
+    ),
+    path(
+        "modifier-quota-federation/<int:pk>/",
+        UpdateQuotaETPFederation.as_view(),
+        name="modifier_quota_federation",
     ),
 ]

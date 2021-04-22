@@ -1,4 +1,5 @@
 {% extends "decharges/base.html" %}
+{% load data_manipulation %}
 
 {% block title %}Accueil{% endblock title %}
 
@@ -15,9 +16,16 @@
       </header>
       <div class="card-content">
         <ul>
-          {% if not request.user.is_federation %}
-          <li><b>Temps reçu de la fédération&nbsp;:</b> {{ temps_recus_par_la_federation|floatformat:3 }} ETP</li>
-          {% endif %}
+          <li>
+            <b>Temps reçu de la fédération&nbsp;:</b> {{ temps_recus_par_la_federation|floatformat:3 }} ETP
+            {% if request.user.is_federation %}
+              {% if temps_decharge_federation %}
+              <a href="{% url 'decharge:modifier_quota_federation' temps_decharge_federation.pk %}" class="button is-info icon"><span class="fa fa-edit"></span></a>
+              {% else %}
+              <a href="{% url 'decharge:ajouter_quota_federation' %}" class="button is-info icon"><span class="fa fa-edit"></span></a>
+              {% endif %}
+            {% endif %}
+          </li>
           <li><b>Temps de décharge consommé&nbsp;:</b> {{ temps_utilises_total|floatformat:3 }} ETP</li>
           <li>
             <b>CTS ponctuel consommé&nbsp;:</b> {% if cts_consommes %}{{ cts_consommes.etp_utilises|floatformat:3 }}{% else %}0{% endif %} ETP
@@ -34,9 +42,13 @@
           <li><b>Temps donné aux syndicats {% if not request.user.is_federation %}de l'académie{% endif %}&nbsp;:</b> {{ temps_donnes_total|floatformat:3 }} ETP</li>
           {% endif %}
         </ul>
-        {% if not request.user.is_federation %}
         <hr>
+        {% if temps_restant > 0 %}
         Il vous reste <strong>{{ temps_restant|floatformat:3 }} ETP</strong> non utilisés
+        {% else %}
+        <p class="has-text-danger">
+          Vous dépassez votre quota de <strong class="has-text-danger">{{ temps_restant|abs|floatformat:3 }} ETP</strong>
+        </p>
         {% endif %}
       </div>
     </div>

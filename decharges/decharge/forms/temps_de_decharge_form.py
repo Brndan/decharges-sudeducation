@@ -35,3 +35,21 @@ class TempsDeDechargeForm(forms.ModelForm):
             "syndicat_beneficiaire",
             "temps_de_decharge_etp",
         ]
+
+
+class QuotaETPFederationForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        self.federation = kwargs.pop("federation")
+        self.annee = kwargs.pop("annee")
+        super().__init__(*args, **kwargs)
+
+    def save(self, commit=True):
+        self.instance.syndicat_beneficiaire = self.federation
+        self.instance.annee = self.annee
+        return super().save(commit=commit)
+
+    class Meta:
+        model = TempsDeDecharge
+        fields = [
+            "temps_de_decharge_etp",
+        ]

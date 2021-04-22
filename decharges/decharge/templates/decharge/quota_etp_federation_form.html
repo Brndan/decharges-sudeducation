@@ -1,0 +1,36 @@
+{% extends "decharges/base.html" %}
+{% load bulma_tags %}
+
+{% block title %}
+  Quota de la fédération
+{% endblock title %}
+
+{% block maintitle %}
+Quota de la fédération
+{% endblock maintitle %}
+{% block subtitle %}
+  Modification du quota en ETP de la fédération
+{% endblock %}
+
+{% block content %}
+  <section class="container pb-6">
+    <div class="card pt-2">
+      <header class="card-header">
+        <h2 class="card-header-title">
+          Quota de la fédération
+        </h2>
+      </header>
+      <div class="card-content">
+        <form method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          {{ form|bulma }}
+          <div class="field">
+            <button type="submit" class="button is-success">
+              Mettre à jour
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+{% endblock content %}
