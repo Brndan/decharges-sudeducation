@@ -30,6 +30,7 @@ def test_ajouter_beneficiaire(client):
             "prenom": "Michelle",
             "nom": "MARTIN",
             "heures_de_decharges": 10,
+            "minutes_de_decharges": 14,
             "heures_d_obligation_de_service": 35,
             "corps": corps.pk,
             "code_etablissement_rne": "1234567A",
@@ -42,7 +43,7 @@ def test_ajouter_beneficiaire(client):
     assert utilisation_tps.annee == 2020
     assert utilisation_tps.nom == "MARTIN"
     assert utilisation_tps.etp_utilises == round(
-        Decimal(10) / Decimal(35), settings.PRECISION_ETP
+        (Decimal(10) + Decimal(14 / 60)) / Decimal(35), settings.PRECISION_ETP
     )
 
 
@@ -86,6 +87,7 @@ def test_maj_beneficiaire(client):
             "prenom": "Michelle",
             "nom": "MARTIN",
             "heures_de_decharges": 20,
+            "minutes_de_decharges": 14,
             "heures_d_obligation_de_service": 35,
             "corps": corps.pk,
             "code_etablissement_rne": "1234567A",
@@ -98,7 +100,7 @@ def test_maj_beneficiaire(client):
     assert utilisation_tps.annee == 2020
     assert utilisation_tps.nom == "MARTIN"
     assert utilisation_tps.etp_utilises == round(
-        Decimal(20) / Decimal(35), settings.PRECISION_ETP
+        (Decimal(20) + Decimal(14 / 60)) / Decimal(35), settings.PRECISION_ETP
     )
 
 
