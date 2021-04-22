@@ -161,14 +161,15 @@ Notamment :
 
 - validators.py : contient les validateurs des données côté backend
 - models.py : contient les modèles de données
-- forms/ : contients les formualaires django, permettant de transformer les données utlisateur en objets python + de valider plus finement la validité des données
+- forms/ : contients les formulaires django, permettant de transformer les données utlisateur en objets python et de valider plus finement les données utilisateur
 - tests/ : les tests de l'application
-- templates/ : les fichiers HTML de l'application
-- views/ : les fonctions qui répondent aux appels HTTP du client
+- templates/ : les fichiers HTML de l'application, écrits en django-template
+- views/ : les fonctions qui répondent aux appels HTTP du client. Pour organiser au maximum le code, il y a un fichier par page (ex: `accueil.py`) ou par modèle de données (ex: `temps_de_decharge.py`)
+- urls.py : permet de faire la liaison entre les URLs de l'application et les views (ci-dessus) appelées
 
 ### `decharges/parametres`
 
-Une petite application permettant de gérer les paramètres de l'application via l'interface admin de django. Par exemple :
+Une petite application permettant de gérer les paramètres du site via l'interface admin de django. Par exemple :
 
 - l'année en cours, pour savoir quelles données afficher
 - si oui ou non les syndicats peuvent accéder à l'édition des décharges
