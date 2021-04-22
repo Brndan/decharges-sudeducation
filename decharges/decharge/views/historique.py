@@ -1,4 +1,9 @@
+from datetime import date
+
+import pandas
 from django.conf import settings
+from django.http import HttpResponse
+from django.views import View
 from django.views.generic import TemplateView
 
 from decharges.decharge.mixins import CheckConfigurationMixin, FederationRequiredMixin
@@ -21,7 +26,7 @@ class HistoriquePage(CheckConfigurationMixin, FederationRequiredMixin, TemplateV
         columns = aggregation_par_beneficiaire(
             UtilisationTempsDecharge.objects.filter(
                 supprime_a__isnull=True, annee__gte=annee_min, annee__lte=annee_max
-            ).order_by("nom")
+            ).order_by("nom", "prenom")
         )
         row_iterator = list(range(len(columns["noms"])))
         beneficiaires_approchant_les_limites = {}
@@ -67,3 +72,42 @@ class HistoriquePage(CheckConfigurationMixin, FederationRequiredMixin, TemplateV
         ] = beneficiaires_approchant_les_limites
 
         return context
+
+
+class HistoriqueTelecharger(CheckConfigurationMixin, FederationRequiredMixin, View):
+    def get(self, request, *args, **kwargs):
+        annee_max = int(self.request.GET.get("annee", self.params.annee_en_cours))
+        annee_min = (
+            annee_max
+            - settings.MAX_ANNEES_CONSECUTIVES
+            * settings.NB_ANNEES_POUR_REINITIALISER_LES_COMPTEURS
+        )
+        columns = aggregation_par_beneficiaire(
+            UtilisationTempsDecharge.objects.filter(
+                supprime_a__isnull=True, annee__gte=annee_min, annee__lte=annee_max
+            ).order_by("nom", "prenom")
+        )
+
+        etps_par_annee = {}
+        for ligne_etp in columns["etps_par_annee"]:
+            for annee, etp in ligne_etp.items():
+                etps_par_annee[annee] = etps_par_annee.get(annee, []) + [etp]
+
+        columns_to_give_to_pandas = {
+            "Civilité": pandas.Series(columns["m_mmes"], dtype="string"),
+            "Prénom": pandas.Series(columns["prenoms"], dtype="string"),
+            "Nom": pandas.Series(columns["noms"], dtype="string"),
+            "RNE": pandas.Series(columns["rnes"], dtype="string"),
+            "Corps": pandas.Series(columns["corps"], dtype="string"),
+        }
+        columns_to_give_to_pandas.update(etps_par_annee)
+
+        data_frame = pandas.DataFrame(columns_to_give_to_pandas)
+        response = HttpResponse("", content_type="application/force-download")
+        data_frame.to_excel(response, engine="odf", index=False)
+        today = date.today()
+        response["Content-Disposition"] = (
+            "attachment; filename=Historique des décharges "
+            f"{annee_max}-{annee_max + 1} - {today}.ods"
+        )
+        return response

@@ -1,7 +1,7 @@
 from decharges.decharge.views.accueil import PageAccueilSyndicatView
 from decharges.decharge.views.cts import CTSCreate, CTSUpdate
 from decharges.decharge.views.export_ministere import ExportMinistere
-from decharges.decharge.views.historique import HistoriquePage
+from decharges.decharge.views.historique import HistoriquePage, HistoriqueTelecharger
 from decharges.decharge.views.import_temps_syndicats import ImportTempsSyndicats
 from decharges.decharge.views.syndicats_en_retard import SyndicatsEnRetard
 from decharges.decharge.views.synthese_cts import SyntheseCTS
@@ -26,6 +26,7 @@ __all__ = [
     "CreateUtilisationTempsDecharge",
     "ExportMinistere",
     "HistoriquePage",
+    "HistoriqueTelecharger",
     "ImportTempsSyndicats",
     "PageAccueilSyndicatView",
     "SuppressionTempsDeDecharge",

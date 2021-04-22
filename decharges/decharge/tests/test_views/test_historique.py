@@ -1,5 +1,6 @@
 from decimal import Decimal
 
+import pandas
 import pytest
 from django.urls import reverse
 
@@ -64,3 +65,14 @@ def test_historique(client):
     assert response.context["beneficiaires_approchant_les_limites"][
         "Foo BAR (0234567A)"
     ] == {"annees_consecutives": 8, "etp_consecutifs": Decimal("4.57144")}
+
+    # download history
+    response = client.get(reverse("decharge:telecharger_historique"))
+    document = pandas.read_excel(response.content, dtype="string")
+    assert len(list(document.iterrows())) == 2
+    assert list(document.iterrows())[0][1]["Civilité"] == "M."
+    assert list(document.iterrows())[0][1]["Prénom"] == "Foo"
+    assert list(document.iterrows())[0][1][2021] == "0.57143"
+    assert list(document.iterrows())[1][1]["Civilité"] == "M."
+    assert list(document.iterrows())[1][1]["Prénom"] == "Foo2"
+    assert list(document.iterrows())[1][1][2021] == "0.57143"
