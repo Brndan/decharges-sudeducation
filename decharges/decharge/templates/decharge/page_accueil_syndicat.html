@@ -17,7 +17,12 @@
       <div class="card-content">
         <ul>
           <li>
-            <b>Temps reçu de la fédération&nbsp;:</b> {{ temps_recus_par_la_federation|floatformat:3 }} ETP
+            {% if request.user.is_federation %}
+            <b>Temps total alloué à la fédération&nbsp;:</b>
+            {% else %}
+            <b>Temps reçu de la fédération&nbsp;:</b>
+            {% endif %}
+            {{ temps_recus_par_la_federation|floatformat:3 }} ETP
             {% if request.user.is_federation %}
               {% if temps_decharge_federation %}
               <a href="{% url 'decharge:modifier_quota_federation' temps_decharge_federation.pk %}" class="button is-info icon"><span class="fa fa-edit"></span></a>
