@@ -5,7 +5,11 @@ from django.urls import reverse
 from django.views.generic import CreateView, DeleteView, UpdateView
 
 from decharges.decharge.forms import QuotaETPFederationForm, TempsDeDechargeForm
-from decharges.decharge.mixins import CheckConfigurationMixin, FederationRequiredMixin
+from decharges.decharge.mixins import (
+    CheckConfigurationMixin,
+    CheckTempsEditableMixin,
+    FederationRequiredMixin,
+)
 from decharges.decharge.models import TempsDeDecharge
 
 
@@ -45,7 +49,9 @@ class UpdateQuotaETPFederation(
         return form_kwargs
 
 
-class CreateTempsDeDecharge(CheckConfigurationMixin, LoginRequiredMixin, CreateView):
+class CreateTempsDeDecharge(
+    CheckConfigurationMixin, LoginRequiredMixin, CheckTempsEditableMixin, CreateView
+):
     template_name = "decharge/temps_de_decharge_form.html"
     form_class = TempsDeDechargeForm
 
@@ -60,7 +66,9 @@ class CreateTempsDeDecharge(CheckConfigurationMixin, LoginRequiredMixin, CreateV
         return form_kwargs
 
 
-class UpdateTempsDeDecharge(CheckConfigurationMixin, LoginRequiredMixin, UpdateView):
+class UpdateTempsDeDecharge(
+    CheckConfigurationMixin, LoginRequiredMixin, CheckTempsEditableMixin, UpdateView
+):
     template_name = "decharge/temps_de_decharge_form.html"
     form_class = TempsDeDechargeForm
     model = TempsDeDecharge
@@ -88,7 +96,7 @@ class UpdateTempsDeDecharge(CheckConfigurationMixin, LoginRequiredMixin, UpdateV
 
 
 class SuppressionTempsDeDecharge(
-    CheckConfigurationMixin, LoginRequiredMixin, DeleteView
+    CheckConfigurationMixin, LoginRequiredMixin, CheckTempsEditableMixin, DeleteView
 ):
     template_name = "decharge/suppression_temps_de_decharge_form.html"
     model = TempsDeDecharge

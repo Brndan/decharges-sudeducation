@@ -142,3 +142,18 @@ def test_suppression_beneficiaire(client):
     )
     assert response.status_code == 302
     assert UtilisationTempsDecharge.objects.count() == 0
+
+
+def test_beneficiaire_non_editable(client):
+    Syndicat.objects.create(
+        is_superuser=True, email="admin@example.com", username="Fédération"
+    )
+    ParametresDApplication.objects.create(
+        annee_en_cours=2020, decharges_editables=False
+    )
+    syndicat = Syndicat.objects.create(
+        email="syndicat1@example.com", username="Syndicat 1"
+    )
+    client.force_login(syndicat)
+    response = client.get(reverse("decharge:ajouter_beneficiaire"))
+    assert response.status_code == 404

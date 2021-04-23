@@ -5,12 +5,12 @@ from django.urls import reverse
 from django.views.generic import CreateView, DeleteView, UpdateView
 
 from decharges.decharge.forms import UtilisationTempsDechargeForm
-from decharges.decharge.mixins import CheckConfigurationMixin
+from decharges.decharge.mixins import CheckConfigurationMixin, CheckTempsEditableMixin
 from decharges.decharge.models import UtilisationTempsDecharge
 
 
 class CreateUtilisationTempsDecharge(
-    CheckConfigurationMixin, LoginRequiredMixin, CreateView
+    CheckConfigurationMixin, LoginRequiredMixin, CheckTempsEditableMixin, CreateView
 ):
     template_name = "decharge/utilisation_temps_decharge_form.html"
     form_class = UtilisationTempsDechargeForm
@@ -27,7 +27,7 @@ class CreateUtilisationTempsDecharge(
 
 
 class UpdateUtilisationTempsDecharge(
-    CheckConfigurationMixin, LoginRequiredMixin, UpdateView
+    CheckConfigurationMixin, LoginRequiredMixin, CheckTempsEditableMixin, UpdateView
 ):
     template_name = "decharge/utilisation_temps_decharge_form.html"
     form_class = UtilisationTempsDechargeForm
@@ -56,7 +56,7 @@ class UpdateUtilisationTempsDecharge(
 
 
 class SuppressionUtilisationTempsDecharge(
-    CheckConfigurationMixin, LoginRequiredMixin, DeleteView
+    CheckConfigurationMixin, LoginRequiredMixin, CheckTempsEditableMixin, DeleteView
 ):
     template_name = "decharge/suppression_utilisation_temps_decharge_form.html"
     model = UtilisationTempsDecharge

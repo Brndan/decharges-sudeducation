@@ -68,11 +68,11 @@ def test_historique(client):
 
     # download history
     response = client.get(reverse("decharge:telecharger_historique"))
-    document = pandas.read_excel(response.content, dtype="string")
+    document = pandas.read_excel(response.content)
     assert len(list(document.iterrows())) == 2
     assert list(document.iterrows())[0][1]["Civilité"] == "M."
     assert list(document.iterrows())[0][1]["Prénom"] == "Foo"
-    assert list(document.iterrows())[0][1][2021] == "0.57143"
+    assert list(document.iterrows())[0][1][2021] == 0.57143
     assert list(document.iterrows())[1][1]["Civilité"] == "M."
     assert list(document.iterrows())[1][1]["Prénom"] == "Foo2"
-    assert list(document.iterrows())[1][1][2021] == "0.57143"
+    assert list(document.iterrows())[1][1][2021] == 0.57143

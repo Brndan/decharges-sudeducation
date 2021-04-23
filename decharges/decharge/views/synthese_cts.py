@@ -24,12 +24,18 @@ class SyntheseCTS(CheckConfigurationMixin, FederationRequiredMixin, TemplateView
         ).first()
 
         for academie in Academie.objects.all():
-            context["cts_par_academie"][academie.nom] = 0
+            context["cts_par_academie"][academie.nom] = {
+                "etp": 0,
+                "demi_journees": 0,
+            }
             for cts in UtilisationCreditDeTempsSyndicalPonctuel.objects.filter(
                 annee=self.params.annee_en_cours,
                 syndicat__in=academie.syndicats_membres.all(),
             ):
-                context["cts_par_academie"][academie.nom] += cts.etp_utilises
+                context["cts_par_academie"][academie.nom]["etp"] += cts.etp_utilises
+                context["cts_par_academie"][academie.nom][
+                    "demi_journees"
+                ] += cts.demi_journees_de_decharges
 
         temps_de_decharge_federation = TempsDeDecharge.objects.filter(
             syndicat_beneficiaire=self.federation,

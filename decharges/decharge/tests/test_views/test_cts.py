@@ -108,7 +108,11 @@ def test_synthese_cts(client):
         Decimal(17) * Decimal(3.5) / settings.NB_HOURS_IN_A_YEAR, settings.PRECISION_ETP
     )
     temps_consomme_syndicat1 = Decimal(10) / Decimal(35)
-    assert response.context["cts_par_academie"]["Academie1"] == cts_consomme_academie
+    assert (
+        response.context["cts_par_academie"]["Academie1"]["etp"]
+        == cts_consomme_academie
+    )
+    assert response.context["cts_par_academie"]["Academie1"]["demi_journees"] == 17
     assert response.context["total_etp_non_consommes"] == round(
         Decimal(10) - cts_consomme_academie - temps_consomme_syndicat1,
         settings.PRECISION_ETP,

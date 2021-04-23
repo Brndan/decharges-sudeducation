@@ -19,6 +19,7 @@
           <thead>
             <tr>
               <th>Académie</th>
+              <th>Demi-journées</th>
               <th>ETP en CTS</th>
             </tr>
           </thead>
@@ -26,7 +27,8 @@
             {% for academie, cts_consommes in cts_par_academie.items %}
             <tr>
               <td>{{ academie }}</td>
-              <td>{{ cts_consommes|floatformat:3 }}</td>
+              <td>{{ cts_consommes.demi_journees }}</td>
+              <td>{{ cts_consommes.etp|floatformat:3 }}</td>
             </tr>
             {% endfor %}
           </tbody>
@@ -34,11 +36,11 @@
         <hr>
         La <b>Fédération</b> a également consommé
         {% if cts_federation %}
-        {{ cts_federation.etp_utilises|floatformat:3 }}
+        {{ cts_federation.etp_utilises|floatformat:3 }} ETP ({{ cts_federation.demi_journees_de_decharges }} demi-journées)
         {% else %}
-          0
+          0 ETP
         {% endif %}
-        ETP en CTS pour l'année {{ annee_en_cours }}-{{ annee_en_cours|add:1 }}
+        en CTS pour l'année {{ annee_en_cours }}-{{ annee_en_cours|add:1 }}
       </div>
     </div>
     <div class="card mt-5">

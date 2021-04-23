@@ -1,5 +1,6 @@
 from django import http
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.http import Http404
 
 from decharges.parametre.models import ParametresDApplication
 from decharges.user_manager.models import Syndicat
@@ -10,8 +11,10 @@ class CheckConfigurationMixin:
     federation = None
 
     def dispatch(self, *args, **kwargs):
-        self.params = ParametresDApplication.objects.first()
-        self.federation = Syndicat.objects.filter(is_superuser=True).first()
+        if not self.params:
+            self.params = ParametresDApplication.objects.first()
+        if not self.federation:
+            self.federation = Syndicat.objects.filter(is_superuser=True).first()
         if not self.params or not self.federation:
             return http.HttpResponseBadRequest(
                 "Veillez à ce que les ParametresDApplication "
@@ -23,3 +26,19 @@ class CheckConfigurationMixin:
 class FederationRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
     def test_func(self):
         return self.request.user.is_federation
+
+
+class CheckTempsEditableMixin:
+    params = None
+    federation = None
+
+    def dispatch(self, *args, **kwargs):
+        if not self.params:
+            self.params = ParametresDApplication.objects.first()  # pragma: no cover
+        if not self.federation:
+            self.federation = Syndicat.objects.filter(
+                is_superuser=True
+            ).first()  # pragma: no cover
+        if self.request.user != self.federation and not self.params.decharges_editables:
+            raise Http404()
+        return super().dispatch(*args, **kwargs)
