@@ -156,7 +156,12 @@
         <h2 class="card-header-title">ETP donnés {% if not request.user.is_federation %}(mutualisation académique){% endif %}</h2>
         {% if decharges_editables or request.user.is_federation %}
         <a class="button is-small is-success mr-2" href="{% url 'decharge:ajouter_mutualisation_academique' %}">
-          <span class="fa fa-sm fa-plus mr-2"></span>Partager mon temps
+          <span class="fa fa-sm fa-plus mr-2"></span>
+          {% if request.user.is_federation %}
+          Attribuer du temps
+          {% else %}
+          Partager mon temps
+          {% endif %}
         </a>
         {% endif %}
       </header>
