@@ -50,7 +50,7 @@ def aggregation_par_beneficiaire(utilisation_temps_decharges):
         etps_par_annee.append(etp_par_annee)
         heures_decharges.append(int(total_heures_decharges))
         minutes_decharges.append(
-            int((total_heures_decharges - int(total_heures_decharges)) * 60)
+            round((total_heures_decharges - int(total_heures_decharges)) * 60)
         )
         heures_ors.append(
             temps_de_decharges_par_beneficiare[0].heures_d_obligation_de_service

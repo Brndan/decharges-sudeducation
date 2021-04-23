@@ -3,6 +3,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import TemplateView
 
 from decharges.decharge.mixins import CheckConfigurationMixin
+from decharges.decharge.models import UtilisationTempsDecharge
 
 
 class PageAccueilSyndicatView(
@@ -56,6 +57,22 @@ class PageAccueilSyndicatView(
         ).first()
         if cts_consommes:
             temps_restant -= cts_consommes.etp_utilises
+
+        if self.request.user.is_federation and not self.params.decharges_editables:
+            # Si on est en cours d'année, la fédé peut éditer les décharges des syndicats
+            temps_utilises_par_syndicat = {}
+            for temps_utilise in UtilisationTempsDecharge.objects.filter(
+                annee=annee_en_cours,
+                supprime_a__isnull=True,
+            ).exclude(syndicat=self.federation):
+                temps_utilises_par_syndicat[
+                    temps_utilise.syndicat.username
+                ] = temps_utilises_par_syndicat.get(
+                    temps_utilise.syndicat.username, []
+                ) + [
+                    temps_utilise
+                ]
+            context["temps_utilises_par_syndicat"] = temps_utilises_par_syndicat
 
         context.update(
             {

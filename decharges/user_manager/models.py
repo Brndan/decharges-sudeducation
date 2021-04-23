@@ -63,7 +63,9 @@ class Syndicat(AbstractUser):
     et a donc accès à l'interface admin de django (https://decharges.org/admin)
     """
 
-    username = models.CharField("Nom", max_length=150, null=True, blank=True)
+    username = models.CharField(
+        "Nom", max_length=150, null=True, blank=True, unique=True
+    )
     email = models.EmailField("Email principal", unique=True, db_index=True)
     academie = models.ForeignKey(
         Academie,
