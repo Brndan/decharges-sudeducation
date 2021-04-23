@@ -100,7 +100,12 @@ class HistoriqueTelecharger(CheckConfigurationMixin, FederationRequiredMixin, Vi
             "RNE": pandas.Series(columns["rnes"], dtype="string"),
             "Corps": pandas.Series(columns["corps"], dtype="string"),
         }
-        columns_to_give_to_pandas.update(etps_par_annee)
+        columns_to_give_to_pandas.update(
+            {
+                annee: pandas.Series(etps, dtype="float")
+                for annee, etps in etps_par_annee.items()
+            }
+        )
 
         data_frame = pandas.DataFrame(columns_to_give_to_pandas)
         response = HttpResponse("", content_type="application/force-download")
