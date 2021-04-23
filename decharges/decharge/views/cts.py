@@ -5,11 +5,13 @@ from django.urls import reverse
 from django.views.generic import CreateView, UpdateView
 
 from decharges.decharge.forms import UtilisationCreditDeTempsSyndicalPonctuelForm
-from decharges.decharge.mixins import CheckConfigurationMixin
+from decharges.decharge.mixins import CheckConfigurationMixin, CheckTempsEditableMixin
 from decharges.decharge.models import UtilisationCreditDeTempsSyndicalPonctuel
 
 
-class CTSCreate(CheckConfigurationMixin, LoginRequiredMixin, CreateView):
+class CTSCreate(
+    CheckConfigurationMixin, LoginRequiredMixin, CheckTempsEditableMixin, CreateView
+):
     template_name = "decharge/cts_form.html"
     form_class = UtilisationCreditDeTempsSyndicalPonctuelForm
 
@@ -24,7 +26,9 @@ class CTSCreate(CheckConfigurationMixin, LoginRequiredMixin, CreateView):
         return form_kwargs
 
 
-class CTSUpdate(CheckConfigurationMixin, LoginRequiredMixin, UpdateView):
+class CTSUpdate(
+    CheckConfigurationMixin, LoginRequiredMixin, CheckTempsEditableMixin, UpdateView
+):
     template_name = "decharge/cts_form.html"
     form_class = UtilisationCreditDeTempsSyndicalPonctuelForm
     model = UtilisationCreditDeTempsSyndicalPonctuel

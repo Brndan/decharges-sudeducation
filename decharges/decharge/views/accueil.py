@@ -74,6 +74,7 @@ class PageAccueilSyndicatView(
                     temps_utilises_total, settings.PRECISION_ETP
                 ),
                 "temps_donnes_total": round(temps_donnes_total, settings.PRECISION_ETP),
+                "decharges_editables": self.params.decharges_editables,
             }
         )
 
