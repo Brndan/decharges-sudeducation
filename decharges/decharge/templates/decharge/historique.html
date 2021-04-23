@@ -39,7 +39,7 @@
             <li>
               <b>{{ beneficiaire }} :</b>
               {% if limites.annees_consecutives %}
-                Cumule {{ limites.annees_consecutives }} années de décharges consecutives.
+                Cumule {{ limites.annees_consecutives }} années de décharges consécutives.
               {% endif %}
               {% if limites.etp_consecutifs %}
                 Cumule {{ limites.etp_consecutifs|floatformat:3 }} ETPs consécutifs
@@ -50,11 +50,22 @@
         </section>
         {% endif %}
 
-        <section class="table-container">
-          <a class="button is-info mb-2" href="{% url 'decharge:telecharger_historique' %}?annee={{ annee_en_cours }}">
-            <span class="fa fa-download mr-2"></span>
-            Historique pour l'année {{ annee_en_cours }}-{{ annee_en_cours|add:1 }}
+        <div class="mb-2">
+          <hr>
+          <h3 class="title is-6 mb-2">Pour l'année {{ annee_en_cours }}-{{ annee_en_cours|add:1 }} :</h3>
+          <a class="button is-info" id="toggle-history">
+            <span class="fa fa-eye mr-2"></span> Voir l'historique
           </a>
+          <a class="button is-info" href="{% url 'decharge:telecharger_historique' %}?annee={{ annee_en_cours }}">
+            <span class="fa fa-download mr-2"></span>
+            Télécharger l'historique
+          </a>
+          <a class="button is-info" href="{% url 'decharge:telecharger_regles' %}?annee={{ annee_en_cours }}">
+            <span class="fa fa-download mr-2"></span>
+            Télécharger les bénéficiaires approchant des limites
+          </a>
+        </div>
+        <section class="table-container is-hidden" id="history-table">
           <table class="table is-bordered is-striped is-hoverable is-fullwidth">
             <thead>
               <tr>

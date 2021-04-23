@@ -10,9 +10,7 @@ def aggregation_par_beneficiaire(utilisation_temps_decharges):
     :return: Un dictionnaire représentant un tableau avec les noms des colonnes
     """
     beneficiaires = {}
-    annees = sorted(
-        set(utilisation_temps_decharges.values_list("annee", flat=True)), reverse=True
-    )
+    annees = set()
 
     for utilisation_temps_decharge in utilisation_temps_decharges:
         key = (
@@ -21,6 +19,9 @@ def aggregation_par_beneficiaire(utilisation_temps_decharges):
             f"{utilisation_temps_decharge.code_etablissement_rne}"
         )
         beneficiaires[key] = beneficiaires.get(key, []) + [utilisation_temps_decharge]
+        annees.add(utilisation_temps_decharge.annee)
+
+    annees = sorted(annees, reverse=True)
 
     code_organisations = []
     m_mmes = []
@@ -50,7 +51,7 @@ def aggregation_par_beneficiaire(utilisation_temps_decharges):
         etps_par_annee.append(etp_par_annee)
         heures_decharges.append(int(total_heures_decharges))
         minutes_decharges.append(
-            int((total_heures_decharges - int(total_heures_decharges)) * 60)
+            round((total_heures_decharges - int(total_heures_decharges)) * 60)
         )
         heures_ors.append(
             temps_de_decharges_par_beneficiare[0].heures_d_obligation_de_service

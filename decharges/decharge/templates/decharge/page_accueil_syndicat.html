@@ -17,7 +17,12 @@
       <div class="card-content">
         <ul>
           <li>
-            <b>Temps reçu de la fédération&nbsp;:</b> {{ temps_recus_par_la_federation|floatformat:3 }} ETP
+            {% if request.user.is_federation %}
+            <b>Temps total alloué à la fédération&nbsp;:</b>
+            {% else %}
+            <b>Temps reçu de la fédération&nbsp;:</b>
+            {% endif %}
+            {{ temps_recus_par_la_federation|floatformat:3 }} ETP
             {% if request.user.is_federation %}
               {% if temps_decharge_federation %}
               <a href="{% url 'decharge:modifier_quota_federation' temps_decharge_federation.pk %}" class="button is-info icon"><span class="fa fa-edit"></span></a>
@@ -57,7 +62,7 @@
 
     <div class="card mt-6">
       <header class="card-header is-align-items-center">
-        <h2 class="card-header-title">Bénéficiaires</h2>
+        <h2 class="card-header-title">Bénéficiaires {% if request.user.is_federation %}de décharges fédérales{% endif %}</h2>
         {% if decharges_editables or request.user.is_federation %}
         <a class="button is-small is-success mr-2" href="{% url 'decharge:ajouter_beneficiaire' %}">
           <span class="fa fa-sm fa-plus mr-2"></span>Ajout d'un·e bénéficiaire
@@ -105,12 +110,63 @@
       </div>
     </div>
 
+    {% for syndicat, temps_utilises_syndicat in temps_utilises_par_syndicat.items %}
+    <div class="card mt-6">
+      <header class="card-header is-align-items-center">
+        <h2 class="card-header-title">Bénéficiaires dun syndicat : {{ syndicat }}</h2>
+        <a class="button is-small is-success mr-2" href="{% url 'decharge:ajouter_beneficiaire' %}?syndicat={{ syndicat }}">
+          <span class="fa fa-sm fa-plus mr-2"></span>Ajout d'un·e bénéficiaire
+        </a>
+      </header>
+      <div class="card-content">
+        <table class="table is-bordered is-striped is-hoverable is-fullwidth">
+          <thead>
+            <tr>
+              <th>Civilité</th>
+              <th>Prénom</th>
+              <th>Nom</th>
+              <th>Heures de décharge</th>
+              <th><abbr title="Heures d'obligation de service">ORS</abbr></th>
+              <th><abbr title="Code Corps">Corps</abbr></th>
+              <th><abbr title="Code établissement">RNE</abbr></th>
+              <th>Décharge en ETP</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for temps_utilise in temps_utilises_syndicat %}
+            <tr>
+              <td>{{ temps_utilise.civilite }}</td>
+              <td>{{ temps_utilise.prenom }}</td>
+              <td>{{ temps_utilise.nom }}</td>
+              <td>{{ temps_utilise.heures_de_decharges|floatformat:2 }}</td>
+              <td>{{ temps_utilise.heures_d_obligation_de_service }}</td>
+              <td>{{ temps_utilise.corps.code_corps }}</td>
+              <td>{{ temps_utilise.code_etablissement_rne }}</td>
+              <td>{{ temps_utilise.etp_utilises|floatformat:3 }}</td>
+              <td>
+                <a class="button is-info icon" href="{% url 'decharge:modifier_beneficiaire' temps_utilise.pk %}"><span class="fa fa-edit"></span></a>
+                <a class="button is-danger icon" href="{% url 'decharge:supprimer_beneficiaire' temps_utilise.pk %}"><span class="fa fa-trash-alt"></span></a>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    {% endfor %}
+
     <div class="card mt-6">
       <header class="card-header is-align-items-center">
         <h2 class="card-header-title">ETP donnés {% if not request.user.is_federation %}(mutualisation académique){% endif %}</h2>
         {% if decharges_editables or request.user.is_federation %}
         <a class="button is-small is-success mr-2" href="{% url 'decharge:ajouter_mutualisation_academique' %}">
-          <span class="fa fa-sm fa-plus mr-2"></span>Partager mon temps
+          <span class="fa fa-sm fa-plus mr-2"></span>
+          {% if request.user.is_federation %}
+          Attribuer du temps
+          {% else %}
+          Partager mon temps
+          {% endif %}
         </a>
         {% endif %}
       </header>

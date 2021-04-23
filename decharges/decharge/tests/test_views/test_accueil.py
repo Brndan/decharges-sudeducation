@@ -167,3 +167,30 @@ def test_accueil__temps_utilises(client):
     assert res.context["temps_donnes_total"] == round(
         Decimal(0.2), settings.PRECISION_ETP
     )
+
+
+def test_accueil_federation_en_cours_d_annee(client):
+    syndicat = Syndicat.objects.create(
+        email="syndicat@example.com", username="Syndicat"
+    )
+    federation = Syndicat.objects.create(
+        is_superuser=True, email="admin@example.com", username="Fédération"
+    )
+    ParametresDApplication.objects.create(
+        annee_en_cours=2021, decharges_editables=False
+    )
+    client.force_login(federation)
+    temps_utilises = UtilisationTempsDecharge.objects.create(
+        civilite="M.",
+        prenom="Foo",
+        nom="BAR",
+        heures_de_decharges=40,
+        heures_d_obligation_de_service=1607,
+        code_etablissement_rne="1234567A",
+        annee=2021,
+        syndicat=syndicat,
+    )
+
+    res = client.get("/")
+    assert res.status_code == 200
+    assert res.context["temps_utilises_par_syndicat"]["Syndicat"] == [temps_utilises]
