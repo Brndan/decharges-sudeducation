@@ -30,13 +30,17 @@ class CreateUtilisationTempsDecharge(
         # dans ce cas, la fédération est en train de créer une décharge en cours d'année
         #     on doit donc faire télécharger un fichier ods contenant cet ajout
         annee = self.params.annee_en_cours
-        temps_du_beneficiaire = UtilisationTempsDecharge.objects.filter(
-            annee=annee,
-            nom=form.instance.nom,
-            prenom=form.instance.prenom,
-            code_etablissement_rne=form.instance.code_etablissement_rne,
-            supprime_a__isnull=True,
-        ).order_by("nom", "prenom")
+        temps_du_beneficiaire = (
+            UtilisationTempsDecharge.objects.filter(
+                annee=annee,
+                nom=form.instance.nom,
+                prenom=form.instance.prenom,
+                code_etablissement_rne=form.instance.code_etablissement_rne,
+                supprime_a__isnull=True,
+            )
+            .prefetch_related("corps")
+            .order_by("nom", "prenom")
+        )
         nom_fichier = "ajout"
         if temps_du_beneficiaire.exists():
             nom_fichier = "modification"
@@ -90,13 +94,17 @@ class UpdateUtilisationTempsDecharge(
         annee = self.params.annee_en_cours
         super().form_valid(form)
         response = HttpResponse("", content_type="application/force-download")
-        temps_du_beneficiaire = UtilisationTempsDecharge.objects.filter(
-            annee=annee,
-            nom=form.instance.nom,
-            prenom=form.instance.prenom,
-            code_etablissement_rne=form.instance.code_etablissement_rne,
-            supprime_a__isnull=True,
-        ).order_by("nom", "prenom")
+        temps_du_beneficiaire = (
+            UtilisationTempsDecharge.objects.filter(
+                annee=annee,
+                nom=form.instance.nom,
+                prenom=form.instance.prenom,
+                code_etablissement_rne=form.instance.code_etablissement_rne,
+                supprime_a__isnull=True,
+            )
+            .prefetch_related("corps")
+            .order_by("nom", "prenom")
+        )
         data_frame = get_data_frame_ministere(temps_du_beneficiaire)
         data_frame.to_excel(response, engine="odf", index=False)
         today = date.today()
@@ -149,7 +157,9 @@ class SuppressionUtilisationTempsDecharge(
                 prenom=self.object.prenom,
                 code_etablissement_rne=self.object.code_etablissement_rne,
                 supprime_a__isnull=True,
-            ).order_by("nom", "prenom")
+            )
+            .prefetch_related("corps")
+            .order_by("nom", "prenom")
         )
         nom_fichier = "suppression"
         data_frame = get_data_frame_ministere(temps_du_beneficiaire_avant_suppression)
@@ -161,7 +171,9 @@ class SuppressionUtilisationTempsDecharge(
                 prenom=self.object.prenom,
                 code_etablissement_rne=self.object.code_etablissement_rne,
                 supprime_a__isnull=True,
-            ).order_by("nom", "prenom")
+            )
+            .prefetch_related("corps")
+            .order_by("nom", "prenom")
         )
         response = HttpResponse("", content_type="application/force-download")
         if temps_du_beneficiaire_apres_suppression.exists():

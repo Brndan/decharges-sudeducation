@@ -1,6 +1,7 @@
 from django.urls import path
 
 from decharges.decharge.views import (
+    ApprocheDesReglesTelecharger,
     CreateQuotaETPFederation,
     CreateTempsDeDecharge,
     CreateUtilisationTempsDecharge,
@@ -46,6 +47,11 @@ urlpatterns = [
         "historique/telecharger/",
         HistoriqueTelecharger.as_view(),
         name="telecharger_historique",
+    ),
+    path(
+        "regles/telecharger/",
+        ApprocheDesReglesTelecharger.as_view(),
+        name="telecharger_regles",
     ),
     path("ajouter-cts/", CTSCreate.as_view(), name="ajouter_cts"),
     path("modifier-cts/<int:pk>/", CTSUpdate.as_view(), name="modifier_cts"),

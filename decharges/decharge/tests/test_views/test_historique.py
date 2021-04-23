@@ -1,5 +1,3 @@
-from decimal import Decimal
-
 import pandas
 import pytest
 from django.urls import reverse
@@ -64,7 +62,7 @@ def test_historique(client):
     assert len(response.context["beneficiaires_approchant_les_limites"]) == 1
     assert response.context["beneficiaires_approchant_les_limites"][
         "Foo BAR (0234567A)"
-    ] == {"annees_consecutives": 8, "etp_consecutifs": Decimal("4.57144")}
+    ] == {"annees_consecutives": 8, "etp_consecutifs": 4.571}
 
     # download history
     response = client.get(reverse("decharge:telecharger_historique"))
@@ -76,3 +74,11 @@ def test_historique(client):
     assert list(document.iterrows())[1][1]["Civilité"] == "M."
     assert list(document.iterrows())[1][1]["Prénom"] == "Foo2"
     assert list(document.iterrows())[1][1][2021] == 0.57143
+
+    # download limites règles
+    response = client.get(reverse("decharge:telecharger_regles"))
+    document = pandas.read_excel(response.content)
+    assert len(list(document.iterrows())) == 1
+    assert list(document.iterrows())[0][1]["Identifiant"] == "Foo BAR (0234567A)"
+    assert list(document.iterrows())[0][1]["Années consecutives"] == 8
+    assert list(document.iterrows())[0][1]["Cumul d'ETP"] == 4.571

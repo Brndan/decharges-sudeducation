@@ -40,7 +40,9 @@ class ExportMinistere(CheckConfigurationMixin, FederationRequiredMixin, View):
         data_frame = get_data_frame_ministere(
             UtilisationTempsDecharge.objects.filter(
                 annee=annee, supprime_a__isnull=True
-            ).order_by("nom", "prenom")
+            )
+            .prefetch_related("corps")
+            .order_by("nom", "prenom")
         )
         response = HttpResponse("", content_type="application/force-download")
         data_frame.to_excel(response, engine="odf", index=False)
