@@ -3,6 +3,7 @@ from decimal import Decimal
 import pandas
 import pytest
 from django.conf import settings
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 
 from decharges.decharge.models import Corps, UtilisationTempsDecharge
@@ -16,7 +17,10 @@ def test_ajouter_beneficiaire(client):
     Syndicat.objects.create(
         is_superuser=True, email="admin@example.com", username="Fédération"
     )
-    ParametresDApplication.objects.create(annee_en_cours=2020)
+    ParametresDApplication.objects.create(
+        annee_en_cours=2020,
+        corps_annexe=SimpleUploadedFile("file.pdf", b"random data"),
+    )
     syndicat = Syndicat.objects.create(
         email="syndicat1@example.com", username="Syndicat 1"
     )
@@ -24,6 +28,7 @@ def test_ajouter_beneficiaire(client):
     corps = Corps.objects.create(code_corps="123")
     response = client.get(reverse("decharge:ajouter_beneficiaire"))
     assert response.status_code == 200
+    assert response.context["form"].fields["corps"].help_text is not None
     response = client.post(
         reverse("decharge:ajouter_beneficiaire"),
         {
