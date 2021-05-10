@@ -34,6 +34,8 @@
           <li><b>Temps de décharge consommé&nbsp;:</b> {{ temps_utilises_total|floatformat:3 }} ETP</li>
           <li>
             <b>CTS ponctuel consommé&nbsp;:</b> {% if cts_consommes %}{{ cts_consommes.etp_utilises|floatformat:3 }}{% else %}0{% endif %} ETP
+            {% if cts_consommes %}({{ cts_consommes.demi_journees_de_decharges }} demi-journées){% endif %}
+
             {% if decharges_editables or request.user.is_federation %}
             {% if cts_consommes %}
               <a href="{% url 'decharge:modifier_cts' cts_consommes.pk %}" class="button is-info icon"><span class="fa fa-edit"></span></a>
