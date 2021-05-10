@@ -133,8 +133,6 @@ class UtilisationTempsDecharge(models.Model):
         decimal_places=5,
         max_digits=8,
     )  # précision max: 999.99999
-    # TODO: dans le formulaire, faire en sorte de réduire les choix
-    #       de heures_d_obligation_de_service à 15, 18, 27, 35, 36, 1607 (configurable)
     heures_d_obligation_de_service = models.IntegerField(
         verbose_name="Heures d'obligations de service",
         default=0,

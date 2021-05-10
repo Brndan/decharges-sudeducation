@@ -64,6 +64,7 @@ class CreateUtilisationTempsDecharge(
         form_kwargs["syndicat"] = default_syndicat or self.request.user
         form_kwargs["annee"] = self.params.annee_en_cours
         form_kwargs["decharges_editables"] = self.params.decharges_editables
+        form_kwargs["corps_annexe"] = self.params.corps_annexe
         return form_kwargs
 
 
@@ -122,6 +123,7 @@ class UpdateUtilisationTempsDecharge(
         form_kwargs["syndicat"] = self.object.syndicat
         form_kwargs["annee"] = self.object.annee
         form_kwargs["decharges_editables"] = self.params.decharges_editables
+        form_kwargs["corps_annexe"] = self.params.corps_annexe
         return form_kwargs
 
 

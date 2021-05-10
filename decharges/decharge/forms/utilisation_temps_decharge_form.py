@@ -1,3 +1,5 @@
+import os
+
 from django import forms
 from django.conf import settings
 
@@ -24,6 +26,7 @@ class UtilisationTempsDechargeForm(forms.ModelForm):
         self.syndicat = kwargs.pop("syndicat")
         self.annee = kwargs.pop("annee")
         self.decharges_editables = kwargs.pop("decharges_editables")
+        self.corps_annexe = kwargs.pop("corps_annexe")
         super().__init__(*args, **kwargs)
         self.fields["prenom"].label = "Prénom (commençant par une majuscule)"
         self.fields["prenom"].widget.attrs["placeholder"] = "ex : Michelle"
@@ -53,6 +56,14 @@ class UtilisationTempsDechargeForm(forms.ModelForm):
                 label="Pourquoi cette mise à jour en cours d'année ?",
                 widget=forms.Textarea(),
                 initial=self.instance.commentaire_de_mise_a_jour,
+            )
+
+        if self.corps_annexe:
+            self.fields["corps"].help_text = (
+                f"Voir <a href='{self.corps_annexe.url}' target='_blank'>"
+                f"{os.path.basename(self.corps_annexe.name)} "
+                f"<span class='fa fa-external-link-alt fa-xs'></span>"
+                f"</a> "
             )
 
         self.fields["heures_de_decharges"].initial = int(

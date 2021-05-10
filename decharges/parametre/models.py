@@ -18,6 +18,7 @@ class ParametresDApplication(models.Model):
         default=True,
         verbose_name="Les syndicats peuvent-ils accéder à l'édition des décharges ?",
     )
+    corps_annexe = models.FileField(upload_to="uploads", null=True)
 
     def __str__(self):
         return "Paramètres de l'application"
