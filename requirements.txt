@@ -24,7 +24,7 @@ pytz==2021.1
     # via
     #   django
     #   pandas
-six==1.15.0
+six==1.16.0
     # via python-dateutil
 sqlparse==0.4.1
     # via django
