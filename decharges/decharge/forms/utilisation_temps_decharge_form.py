@@ -28,10 +28,22 @@ class UtilisationTempsDechargeForm(forms.ModelForm):
         self.decharges_editables = kwargs.pop("decharges_editables")
         self.corps_annexe = kwargs.pop("corps_annexe")
         super().__init__(*args, **kwargs)
-        self.fields["prenom"].label = "Prénom (commençant par une majuscule)"
+        self.fields["prenom"].label = "Prénom"
+        self.fields["prenom"].help_text = (
+            "- Doit commencer par une Majuscule <br>"
+            "- Ne doit pas commencer ou finir par un espace <br>"
+            "- Ne doit pas contenir 2 espaces consécutifs <br>"
+            "- Ne doit pas contenir de caractères spéciaux"
+        )
         self.fields["prenom"].widget.attrs["placeholder"] = "ex : Michelle"
-        self.fields["nom"].label = "Nom (en MAJUSCULE)"
+        self.fields["nom"].label = "Nom"
         self.fields["nom"].widget.attrs["placeholder"] = "ex : MARTIN"
+        self.fields["nom"].help_text = (
+            "- Doit être en MAJUSCULE <br>"
+            "- Ne doit pas commencer ou finir par un espace <br>"
+            "- Ne doit pas contenir 2 espaces consécutifs <br>"
+            "- Ne doit pas contenir de caractères spéciaux"
+        )
         self.fields[
             "code_etablissement_rne"
         ].help_text = (
