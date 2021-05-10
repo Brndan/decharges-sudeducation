@@ -204,6 +204,16 @@ class UtilisationTempsDecharge(models.Model):
             settings.PRECISION_ETP,
         )
 
+    @property
+    def heures_pleines_de_decharges(self) -> int:
+        return int(self.heures_de_decharges)
+
+    @property
+    def minutes_de_decharges(self) -> int:
+        return int(
+            round((self.heures_de_decharges - self.heures_pleines_de_decharges) * 60)
+        )
+
     class Meta:
         unique_together = (
             "nom",
