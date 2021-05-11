@@ -148,6 +148,7 @@ class UtilisationTempsDechargeForm(forms.ModelForm):
             excluded_utilisation_temps_de_decharge_pk=self.instance.pk,
         )
 
+        # vérification si la décharge ne fait pas dépasser le quota de décharge du syndicat
         if (
             not self.instance.est_une_decharge_solidaires
             and temps_restant - self.instance.etp_utilises < 0
@@ -157,6 +158,69 @@ class UtilisationTempsDechargeForm(forms.ModelForm):
                 None,
                 f"Vous dépassez le quota du syndicat, il reste {temps_restant:.3f} ETP "
                 f"attribuable et vous essayez d'ajouter {self.instance.etp_utilises:.3f} ETP",
+            )
+
+        # vérification si la décharge ne fait pas dépasser le quota de décharge du bénéficiaire
+
+        # 0.5 ETP dans l'année courante ?
+        decharges_annee_en_cours = UtilisationTempsDecharge.objects.filter(
+            nom=self.instance.nom,
+            prenom=self.instance.prenom,
+            annee=self.instance.annee,
+            code_etablissement_rne=self.instance.code_etablissement_rne,
+        ).exclude(pk=self.instance.pk)
+        etp_consommes = sum(
+            decharge.etp_utilises for decharge in decharges_annee_en_cours
+        )
+        temps_restant_beneficiaire = settings.MAX_ETP_EN_UNE_ANNEE - etp_consommes
+        if temps_restant_beneficiaire < self.instance.etp_utilises:
+            self.add_error(
+                None,
+                "Vous dépassez le quota du bénéficiaire, il lui reste au maximum "
+                f"{temps_restant_beneficiaire:.3f} ETP à consommer "
+                f"et vous essayez de lui ajouter {self.instance.etp_utilises:.3f} ETP",
+            )
+
+        historique_decharges_beneficiaire = (
+            UtilisationTempsDecharge.objects.filter(
+                nom=self.instance.nom,
+                prenom=self.instance.prenom,
+                code_etablissement_rne=self.instance.code_etablissement_rne,
+            )
+            .exclude(pk=self.instance.pk)
+            .order_by("-annee")
+        )
+        etp_consecutifs = 0
+        annees_consecutives = 0
+        annee_courante = self.instance.annee
+        for decharge in historique_decharges_beneficiaire:
+            if (
+                annee_courante - decharge.annee
+                > settings.NB_ANNEES_POUR_REINITIALISER_LES_COMPTEURS
+            ):
+                break
+            l_annee_a_changee = decharge.annee != annee_courante
+            annee_courante = decharge.annee
+            if l_annee_a_changee:
+                annees_consecutives += 1
+            etp_consecutifs += decharge.etp_utilises
+
+        # 8 années consécutives ?
+        if annees_consecutives >= settings.MAX_ANNEES_CONSECUTIVES:
+            self.add_error(
+                None,
+                f"La ou le bénéficiaire cumule déjà {settings.MAX_ANNEES_CONSECUTIVES} "
+                "années consécutives de décharges, il ou elle ne peut donc pas bénéficier de "
+                "décharges cette année",
+            )
+
+        # 3 ETP consécutifs ?
+        if etp_consecutifs + self.instance.etp_utilises >= settings.MAX_ETP_CONSECUTIFS:
+            self.add_error(
+                None,
+                f"La ou le bénéficiaire cumule déjà {etp_consecutifs:.3f}ETP "
+                "consécutifs de décharges sur les dernières années (+l'année en cours) et vous"
+                f" essayez de rajouter {self.instance.etp_utilises:.3f}ETP",
             )
 
     def clean(self):

@@ -149,6 +149,7 @@ Contient toutes les variables de l'application Django.
 - `MAX_ANNEES_CONSECUTIVES` : le nombre maximum d'années de délégation consécutives dans les statuts (8 ans au moment d'écriture de cette doc)
 - `ALERT_ANNEES_CONSECUTIVES` : le nombre d'années de délégation consécutives à partir duquel on alerte que cette personne approche les limites
 - `NB_ANNEES_POUR_REINITIALISER_LES_COMPTEURS` : le nombre d'années nécessaires pour réinitialiser les compteurs ci-dessus (ETPs cumulés et années de décharge consécutives)
+- `MAX_ETP_EN_UNE_ANNEE` : le nombre d'ETP maximum pour un·e bénéficiaire en une année (0.5 à l'heure d'ecriture de la documentation)
 
 ### `decharges/decharge`
 

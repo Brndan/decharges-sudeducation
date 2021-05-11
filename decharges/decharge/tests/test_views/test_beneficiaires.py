@@ -230,7 +230,7 @@ def test_maj_beneficiaire(client):
             "civilite": "MME",
             "prenom": "Michelle",
             "nom": "MARTIN",
-            "heures_de_decharges": 20,
+            "heures_de_decharges": 15,
             "minutes_de_decharges": 14,
             "heures_d_obligation_de_service": 35,
             "corps": corps.pk,
@@ -244,7 +244,7 @@ def test_maj_beneficiaire(client):
     assert utilisation_tps.annee == 2020
     assert utilisation_tps.nom == "MARTIN"
     assert utilisation_tps.etp_utilises == round(
-        (Decimal(20) + Decimal(14 / 60)) / Decimal(35), settings.PRECISION_ETP
+        (Decimal(15) + Decimal(14 / 60)) / Decimal(35), settings.PRECISION_ETP
     )
 
 
@@ -381,7 +381,7 @@ def test_ajouter_beneficiaire__en_cours_d_annee(client):
             "civilite": "MME",
             "prenom": "Michelle",
             "nom": "MARTIN",
-            "heures_de_decharges": 10,
+            "heures_de_decharges": 5,
             "minutes_de_decharges": 14,
             "heures_d_obligation_de_service": 35,
             "corps": corps.pk,
@@ -400,7 +400,7 @@ def test_ajouter_beneficiaire__en_cours_d_annee(client):
     assert utilisation_tps.nom == "MARTIN"
     assert utilisation_tps.commentaire_de_mise_a_jour == "Parce que"
     assert utilisation_tps.etp_utilises == round(
-        (Decimal(10) + Decimal(14 / 60)) / Decimal(35), settings.PRECISION_ETP
+        (Decimal(5) + Decimal(14 / 60)) / Decimal(35), settings.PRECISION_ETP
     )
     document = pandas.read_excel(response.content, dtype="string")
     assert len(list(document.iterrows())) == 1
@@ -408,7 +408,7 @@ def test_ajouter_beneficiaire__en_cours_d_annee(client):
     assert list(document.iterrows())[0][1]["M. Mme"] == "Mme"
     assert list(document.iterrows())[0][1]["Prénom"] == "Michelle"
     assert list(document.iterrows())[0][1]["Nom"] == "MARTIN"
-    assert list(document.iterrows())[0][1]["Heures décharges"] == "20"
+    assert list(document.iterrows())[0][1]["Heures décharges"] == "15"
     assert list(document.iterrows())[0][1]["Minutes décharges"] == "14"
     assert list(document.iterrows())[0][1]["Heures ORS"] == "35"
     assert list(document.iterrows())[0][1]["Minutes ORS"] == "0"
@@ -456,7 +456,7 @@ def test_maj_beneficiaire__en_cours_d_annee(client):
             "civilite": "MME",
             "prenom": "Michelle",
             "nom": "MARTIN",
-            "heures_de_decharges": 20,
+            "heures_de_decharges": 15,
             "minutes_de_decharges": 14,
             "heures_d_obligation_de_service": 35,
             "corps": corps.pk,
@@ -473,7 +473,7 @@ def test_maj_beneficiaire__en_cours_d_annee(client):
     assert utilisation_tps.nom == "MARTIN"
     assert utilisation_tps.commentaire_de_mise_a_jour == "Parce que"
     assert utilisation_tps.etp_utilises == round(
-        (Decimal(20) + Decimal(14 / 60)) / Decimal(35), settings.PRECISION_ETP
+        (Decimal(15) + Decimal(14 / 60)) / Decimal(35), settings.PRECISION_ETP
     )
     document = pandas.read_excel(response.content, dtype="string")
     assert len(list(document.iterrows())) == 1
@@ -481,7 +481,7 @@ def test_maj_beneficiaire__en_cours_d_annee(client):
     assert list(document.iterrows())[0][1]["M. Mme"] == "Mme"
     assert list(document.iterrows())[0][1]["Prénom"] == "Michelle"
     assert list(document.iterrows())[0][1]["Nom"] == "MARTIN"
-    assert list(document.iterrows())[0][1]["Heures décharges"] == "20"
+    assert list(document.iterrows())[0][1]["Heures décharges"] == "15"
     assert list(document.iterrows())[0][1]["Minutes décharges"] == "14"
     assert list(document.iterrows())[0][1]["Heures ORS"] == "35"
     assert list(document.iterrows())[0][1]["Minutes ORS"] == "0"
@@ -630,3 +630,200 @@ def test_ajouter_beneficiaire__pas_assez_de_quota(client):
         == "Vous dépassez le quota du syndicat, il reste 0.000 ETP attribuable et vous essayez d'ajouter 0.292 ETP"
     )
     assert UtilisationTempsDecharge.objects.count() == 0
+
+
+def test_ajouter_beneficiaire__depasse_quota_individuel(client):
+    federation = Syndicat.objects.create(
+        is_superuser=True, email="admin@example.com", username="Fédération"
+    )
+    ParametresDApplication.objects.create(
+        annee_en_cours=2020,
+        corps_annexe=SimpleUploadedFile("file.pdf", b"random data"),
+    )
+    syndicat = Syndicat.objects.create(
+        email="syndicat1@example.com", username="Syndicat 1"
+    )
+    syndicat2 = Syndicat.objects.create(
+        email="syndicat2@example.com", username="Syndicat 2"
+    )
+    corps = Corps.objects.create(code_corps="123")
+    UtilisationTempsDecharge.objects.create(
+        civilite="MME",
+        prenom="Michelle",
+        nom="MARTIN",
+        heures_de_decharges=10,
+        heures_d_obligation_de_service=35,
+        corps=corps,
+        code_etablissement_rne="1234567A",
+        syndicat=syndicat2,
+        annee=2020,
+    )
+    TempsDeDecharge.objects.create(
+        syndicat_beneficiaire=syndicat,
+        syndicat_donateur=federation,
+        annee=2020,
+        temps_de_decharge_etp=10,
+    )
+    client.force_login(syndicat)
+    response = client.post(
+        reverse("decharge:ajouter_beneficiaire"),
+        {
+            "civilite": "MME",
+            "prenom": "Michelle",
+            "nom": "MARTIN",
+            "heures_de_decharges": 10,
+            "minutes_de_decharges": 14,
+            "heures_d_obligation_de_service": 35,
+            "corps": corps.pk,
+            "code_etablissement_rne": "1234567A",
+        },
+    )
+    assert response.status_code == 200
+    assert (
+        response.context["form"].errors["__all__"][0]
+        == "Vous dépassez le quota du bénéficiaire, il lui reste au maximum 0.214 ETP à consommer et vous essayez de lui ajouter 0.292 ETP"
+    )
+
+
+def test_ajouter_beneficiaire__depasse_8_annees_consecutives(client):
+    federation = Syndicat.objects.create(
+        is_superuser=True, email="admin@example.com", username="Fédération"
+    )
+    ParametresDApplication.objects.create(
+        annee_en_cours=2020,
+        corps_annexe=SimpleUploadedFile("file.pdf", b"random data"),
+    )
+    syndicat = Syndicat.objects.create(
+        email="syndicat1@example.com", username="Syndicat 1"
+    )
+    syndicat2 = Syndicat.objects.create(
+        email="syndicat2@example.com", username="Syndicat 2"
+    )
+    corps = Corps.objects.create(code_corps="123")
+    for i in range(4):
+        UtilisationTempsDecharge.objects.create(
+            civilite="MME",
+            prenom="Michelle",
+            nom="MARTIN",
+            heures_de_decharges=0.1,
+            heures_d_obligation_de_service=35,
+            corps=corps,
+            code_etablissement_rne="1234567A",
+            syndicat=syndicat2,
+            annee=2009 + i,
+        )
+    for i in range(3):
+        UtilisationTempsDecharge.objects.create(
+            civilite="MME",
+            prenom="Michelle",
+            nom="MARTIN",
+            heures_de_decharges=0.1,
+            heures_d_obligation_de_service=35,
+            corps=corps,
+            code_etablissement_rne="1234567A",
+            syndicat=syndicat2,
+            annee=2014 + i,
+        )
+
+    UtilisationTempsDecharge.objects.create(
+        civilite="MME",
+        prenom="Michelle",
+        nom="MARTIN",
+        heures_de_decharges=0.1,
+        heures_d_obligation_de_service=35,
+        corps=corps,
+        code_etablissement_rne="1234567A",
+        syndicat=syndicat2,
+        annee=2018,
+    )
+    TempsDeDecharge.objects.create(
+        syndicat_beneficiaire=syndicat,
+        syndicat_donateur=federation,
+        annee=2020,
+        temps_de_decharge_etp=10,
+    )
+    client.force_login(syndicat)
+    response = client.post(
+        reverse("decharge:ajouter_beneficiaire"),
+        {
+            "civilite": "MME",
+            "prenom": "Michelle",
+            "nom": "MARTIN",
+            "heures_de_decharges": 10,
+            "minutes_de_decharges": 14,
+            "heures_d_obligation_de_service": 35,
+            "corps": corps.pk,
+            "code_etablissement_rne": "1234567A",
+        },
+    )
+    assert response.status_code == 200
+    assert (
+        response.context["form"].errors["__all__"][0]
+        == "La ou le bénéficiaire cumule déjà 8 années consécutives de décharges, il ou elle ne peut donc pas bénéficier de décharges cette année"
+    )
+
+
+def test_ajouter_beneficiaire__depasse_3_etp_consecutifs(client):
+    federation = Syndicat.objects.create(
+        is_superuser=True, email="admin@example.com", username="Fédération"
+    )
+    ParametresDApplication.objects.create(
+        annee_en_cours=2020,
+        corps_annexe=SimpleUploadedFile("file.pdf", b"random data"),
+    )
+    syndicat = Syndicat.objects.create(
+        email="syndicat1@example.com", username="Syndicat 1"
+    )
+    syndicat2 = Syndicat.objects.create(
+        email="syndicat2@example.com", username="Syndicat 2"
+    )
+    corps = Corps.objects.create(code_corps="123")
+    for i in range(4):
+        UtilisationTempsDecharge.objects.create(
+            civilite="MME",
+            prenom="Michelle",
+            nom="MARTIN",
+            heures_de_decharges=1,
+            heures_d_obligation_de_service=35,
+            corps=corps,
+            code_etablissement_rne="1234567A",
+            syndicat=syndicat2,
+            annee=2008 + i,
+        )  # le compteur est remis à 0 après ces annees
+    for i in range(5):
+        UtilisationTempsDecharge.objects.create(
+            civilite="MME",
+            prenom="Michelle",
+            nom="MARTIN",
+            heures_de_decharges=110,
+            heures_d_obligation_de_service=200,
+            corps=corps,
+            code_etablissement_rne="1234567A",
+            syndicat=syndicat2,
+            annee=2014 + i,
+        )
+    TempsDeDecharge.objects.create(
+        syndicat_beneficiaire=syndicat,
+        syndicat_donateur=federation,
+        annee=2020,
+        temps_de_decharge_etp=10,
+    )
+    client.force_login(syndicat)
+    response = client.post(
+        reverse("decharge:ajouter_beneficiaire"),
+        {
+            "civilite": "MME",
+            "prenom": "Michelle",
+            "nom": "MARTIN",
+            "heures_de_decharges": 10,
+            "minutes_de_decharges": 0,
+            "heures_d_obligation_de_service": 35,
+            "corps": corps.pk,
+            "code_etablissement_rne": "1234567A",
+        },
+    )
+    assert response.status_code == 200
+    assert (
+        response.context["form"].errors["__all__"][0]
+        == "La ou le bénéficiaire cumule déjà 2.750ETP consécutifs de décharges sur les dernières années (+l'année en cours) et vous essayez de rajouter 0.286ETP"
+    )

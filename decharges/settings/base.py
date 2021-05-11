@@ -9,6 +9,7 @@ https://docs.djangoproject.com/en/3.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
+import decimal
 import os
 from pathlib import Path
 from secrets import token_hex
@@ -190,8 +191,9 @@ CHOIX_ORS = [
     (384, "384h"),
     (1607, "1607h"),
 ]
-MAX_ETP_CONSECUTIFS = 3
+MAX_ETP_CONSECUTIFS = decimal.Decimal(3)
 ALERT_ETP_CONSECUTIFS = 2.5
 MAX_ANNEES_CONSECUTIVES = 8
 ALERT_ANNEES_CONSECUTIVES = 7
 NB_ANNEES_POUR_REINITIALISER_LES_COMPTEURS = 2
+MAX_ETP_EN_UNE_ANNEE = decimal.Decimal(0.5)
