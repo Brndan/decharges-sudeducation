@@ -6,7 +6,7 @@ from django.conf import settings
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 
-from decharges.decharge.models import Corps, UtilisationTempsDecharge
+from decharges.decharge.models import Corps, TempsDeDecharge, UtilisationTempsDecharge
 from decharges.parametre.models import ParametresDApplication
 from decharges.user_manager.models import Syndicat
 
@@ -14,7 +14,7 @@ pytestmark = pytest.mark.django_db
 
 
 def test_ajouter_beneficiaire(client):
-    Syndicat.objects.create(
+    federation = Syndicat.objects.create(
         is_superuser=True, email="admin@example.com", username="Fédération"
     )
     ParametresDApplication.objects.create(
@@ -24,11 +24,18 @@ def test_ajouter_beneficiaire(client):
     syndicat = Syndicat.objects.create(
         email="syndicat1@example.com", username="Syndicat 1"
     )
+    TempsDeDecharge.objects.create(
+        syndicat_beneficiaire=syndicat,
+        syndicat_donateur=federation,
+        annee=2020,
+        temps_de_decharge_etp=10,
+    )
     client.force_login(syndicat)
     corps = Corps.objects.create(code_corps="123")
     response = client.get(reverse("decharge:ajouter_beneficiaire"))
     assert response.status_code == 200
     assert response.context["form"].fields["corps"].help_text is not None
+    assert "est_une_decharge_solidaires" not in response.context["form"].fields
     response = client.post(
         reverse("decharge:ajouter_beneficiaire"),
         {
@@ -53,8 +60,133 @@ def test_ajouter_beneficiaire(client):
     )
 
 
+def test_ajouter_beneficiaire__unique_together(client):
+    federation = Syndicat.objects.create(
+        is_superuser=True, email="admin@example.com", username="Fédération"
+    )
+    ParametresDApplication.objects.create(
+        annee_en_cours=2020,
+        corps_annexe=SimpleUploadedFile("file.pdf", b"random data"),
+    )
+    syndicat = Syndicat.objects.create(
+        email="syndicat1@example.com", username="Syndicat 1"
+    )
+    client.force_login(syndicat)
+    TempsDeDecharge.objects.create(
+        syndicat_beneficiaire=syndicat,
+        syndicat_donateur=federation,
+        annee=2020,
+        temps_de_decharge_etp=10,
+    )
+    corps = Corps.objects.create(code_corps="123")
+    response = client.get(reverse("decharge:ajouter_beneficiaire"))
+    assert response.status_code == 200
+    assert response.context["form"].fields["corps"].help_text is not None
+    assert "est_une_decharge_solidaires" not in response.context["form"].fields
+    response = client.post(
+        reverse("decharge:ajouter_beneficiaire"),
+        {
+            "civilite": "MME",
+            "prenom": "Michelle",
+            "nom": "MARTIN",
+            "heures_de_decharges": 10,
+            "minutes_de_decharges": 14,
+            "heures_d_obligation_de_service": 35,
+            "corps": corps.pk,
+            "code_etablissement_rne": "1234567A",
+        },
+    )
+    assert response.status_code == 302
+    response = client.post(
+        reverse("decharge:ajouter_beneficiaire"),
+        {
+            "civilite": "MME",
+            "prenom": "Michelle",
+            "nom": "MARTIN",
+            "heures_de_decharges": 10,
+            "minutes_de_decharges": 14,
+            "heures_d_obligation_de_service": 35,
+            "corps": corps.pk,
+            "code_etablissement_rne": "1234567A",
+        },
+    )
+    assert response.status_code == 200
+    assert (
+        response.context["form"].errors["__all__"][0]
+        == "Une décharge pour cette ou ce bénéficiaire existe déjà, veuillez plutôt la mettre à jour"
+    )
+    assert UtilisationTempsDecharge.objects.count() == 1
+
+
+def test_ajouter_beneficiaire__decharge_solidaires(client):
+    federation = Syndicat.objects.create(
+        is_superuser=True, email="admin@example.com", username="Fédération"
+    )
+    ParametresDApplication.objects.create(
+        annee_en_cours=2020,
+        corps_annexe=SimpleUploadedFile("file.pdf", b"random data"),
+        decharges_editables=False,
+    )
+    syndicat = Syndicat.objects.create(
+        email="syndicat1@example.com", username="Syndicat 1"
+    )
+    client.force_login(federation)
+    corps = Corps.objects.create(code_corps="123")
+    response = client.get(reverse("decharge:ajouter_beneficiaire"))
+    assert response.status_code == 200
+    assert response.context["form"].fields["corps"].help_text is not None
+    assert (
+        response.context["form"].fields["est_une_decharge_solidaires"].initial is False
+    )
+    response = client.post(
+        reverse("decharge:ajouter_beneficiaire"),
+        {
+            "civilite": "MME",
+            "prenom": "Michelle",
+            "nom": "MARTIN",
+            "heures_de_decharges": 10,
+            "minutes_de_decharges": 14,
+            "heures_d_obligation_de_service": 35,
+            "corps": corps.pk,
+            "code_etablissement_rne": "1234567A",
+            "est_une_decharge_solidaires": True,
+            "syndicat": syndicat.pk,
+        },
+    )
+    assert (
+        response.context["form"].errors["est_une_decharge_solidaires"][0]
+        == "La décharge ne peut provenir d'un autre syndicat uniquement pour les décharges fédérales"
+    )
+    response = client.post(
+        reverse("decharge:ajouter_beneficiaire"),
+        {
+            "civilite": "MME",
+            "prenom": "Michelle",
+            "nom": "MARTIN",
+            "heures_de_decharges": 10,
+            "minutes_de_decharges": 14,
+            "heures_d_obligation_de_service": 35,
+            "corps": corps.pk,
+            "code_etablissement_rne": "1234567A",
+            "est_une_decharge_solidaires": True,
+            "syndicat": federation.pk,
+            "commentaire_de_mise_a_jour": "C'est un test",
+        },
+    )
+    assert response.status_code == 302
+    assert UtilisationTempsDecharge.objects.count() == 1
+    utilisation_tps = UtilisationTempsDecharge.objects.first()
+    assert utilisation_tps.syndicat == federation
+    assert utilisation_tps.annee == 2020
+    assert utilisation_tps.nom == "MARTIN"
+    assert utilisation_tps.etp_utilises == round(
+        (Decimal(10) + Decimal(14 / 60)) / Decimal(35), settings.PRECISION_ETP
+    )
+    assert utilisation_tps.est_une_decharge_solidaires
+
+
 def test_maj_beneficiaire(client):
-    Syndicat.objects.create(
+    federation = Syndicat.objects.create(
         is_superuser=True, email="admin@example.com", username="Fédération"
     )
     ParametresDApplication.objects.create(annee_en_cours=2021)
@@ -65,6 +197,12 @@ def test_maj_beneficiaire(client):
         email="syndicat2@example.com", username="Syndicat 2"
     )
     client.force_login(syndicat2)
+    TempsDeDecharge.objects.create(
+        syndicat_beneficiaire=syndicat,
+        syndicat_donateur=federation,
+        annee=2020,
+        temps_de_decharge_etp=10,
+    )
     corps = Corps.objects.create(code_corps="123")
     utilisation_tps = UtilisationTempsDecharge.objects.create(
         civilite="MME",
@@ -92,7 +230,7 @@ def test_maj_beneficiaire(client):
             "civilite": "MME",
             "prenom": "Michelle",
             "nom": "MARTIN",
-            "heures_de_decharges": 20,
+            "heures_de_decharges": 15,
             "minutes_de_decharges": 14,
             "heures_d_obligation_de_service": 35,
             "corps": corps.pk,
@@ -106,7 +244,7 @@ def test_maj_beneficiaire(client):
     assert utilisation_tps.annee == 2020
     assert utilisation_tps.nom == "MARTIN"
     assert utilisation_tps.etp_utilises == round(
-        (Decimal(20) + Decimal(14 / 60)) / Decimal(35), settings.PRECISION_ETP
+        (Decimal(15) + Decimal(14 / 60)) / Decimal(35), settings.PRECISION_ETP
     )
 
 
@@ -139,6 +277,41 @@ def test_suppression_beneficiaire(client):
     )
     assert response.status_code == 404  # check permission
     client.force_login(syndicat)
+    response = client.get(
+        reverse("decharge:supprimer_beneficiaire", kwargs={"pk": utilisation_tps.pk})
+    )
+    assert response.status_code == 200
+    response = client.post(
+        reverse("decharge:supprimer_beneficiaire", kwargs={"pk": utilisation_tps.pk})
+    )
+    assert response.status_code == 302
+    assert UtilisationTempsDecharge.objects.count() == 0
+
+
+def test_suppression_beneficiaire__en_cours_d_annee__decharge_solidaires(client):
+    federation = Syndicat.objects.create(
+        is_superuser=True, email="admin@example.com", username="Fédération"
+    )
+    ParametresDApplication.objects.create(
+        annee_en_cours=2021, decharges_editables=False
+    )
+    syndicat = Syndicat.objects.create(
+        email="syndicat1@example.com", username="Syndicat 1"
+    )
+    client.force_login(federation)
+    corps = Corps.objects.create(code_corps="123")
+    utilisation_tps = UtilisationTempsDecharge.objects.create(
+        civilite="MME",
+        prenom="Michelle",
+        nom="MARTIN",
+        heures_de_decharges=10,
+        heures_d_obligation_de_service=35,
+        corps=corps,
+        code_etablissement_rne="1234567A",
+        syndicat=syndicat,
+        annee=2020,
+        est_une_decharge_solidaires=True,
+    )
     response = client.get(
         reverse("decharge:supprimer_beneficiaire", kwargs={"pk": utilisation_tps.pk})
     )
@@ -190,6 +363,12 @@ def test_ajouter_beneficiaire__en_cours_d_annee(client):
         syndicat=syndicat2,
         annee=2020,
     )
+    TempsDeDecharge.objects.create(
+        syndicat_beneficiaire=syndicat,
+        syndicat_donateur=federation,
+        annee=2020,
+        temps_de_decharge_etp=10,
+    )
     client.force_login(federation)
     response = client.get(
         reverse("decharge:ajouter_beneficiaire") + "?syndicat=Syndicat%201"
@@ -202,7 +381,7 @@ def test_ajouter_beneficiaire__en_cours_d_annee(client):
             "civilite": "MME",
             "prenom": "Michelle",
             "nom": "MARTIN",
-            "heures_de_decharges": 10,
+            "heures_de_decharges": 5,
             "minutes_de_decharges": 14,
             "heures_d_obligation_de_service": 35,
             "corps": corps.pk,
@@ -221,7 +400,7 @@ def test_ajouter_beneficiaire__en_cours_d_annee(client):
     assert utilisation_tps.nom == "MARTIN"
     assert utilisation_tps.commentaire_de_mise_a_jour == "Parce que"
     assert utilisation_tps.etp_utilises == round(
-        (Decimal(10) + Decimal(14 / 60)) / Decimal(35), settings.PRECISION_ETP
+        (Decimal(5) + Decimal(14 / 60)) / Decimal(35), settings.PRECISION_ETP
     )
     document = pandas.read_excel(response.content, dtype="string")
     assert len(list(document.iterrows())) == 1
@@ -229,7 +408,7 @@ def test_ajouter_beneficiaire__en_cours_d_annee(client):
     assert list(document.iterrows())[0][1]["M. Mme"] == "Mme"
     assert list(document.iterrows())[0][1]["Prénom"] == "Michelle"
     assert list(document.iterrows())[0][1]["Nom"] == "MARTIN"
-    assert list(document.iterrows())[0][1]["Heures décharges"] == "20"
+    assert list(document.iterrows())[0][1]["Heures décharges"] == "15"
     assert list(document.iterrows())[0][1]["Minutes décharges"] == "14"
     assert list(document.iterrows())[0][1]["Heures ORS"] == "35"
     assert list(document.iterrows())[0][1]["Minutes ORS"] == "0"
@@ -249,11 +428,17 @@ def test_maj_beneficiaire__en_cours_d_annee(client):
         email="syndicat1@example.com", username="Syndicat 1"
     )
     client.force_login(federation)
+    TempsDeDecharge.objects.create(
+        syndicat_beneficiaire=syndicat,
+        syndicat_donateur=federation,
+        annee=2021,
+        temps_de_decharge_etp=10,
+    )
     corps = Corps.objects.create(code_corps="123")
     utilisation_tps = UtilisationTempsDecharge.objects.create(
         civilite="MME",
         prenom="Michelle",
-        nom="MARTIN",
+        nom="MARTINE",
         heures_de_decharges=10,
         heures_d_obligation_de_service=35,
         corps=corps,
@@ -271,7 +456,7 @@ def test_maj_beneficiaire__en_cours_d_annee(client):
             "civilite": "MME",
             "prenom": "Michelle",
             "nom": "MARTIN",
-            "heures_de_decharges": 20,
+            "heures_de_decharges": 15,
             "minutes_de_decharges": 14,
             "heures_d_obligation_de_service": 35,
             "corps": corps.pk,
@@ -288,7 +473,7 @@ def test_maj_beneficiaire__en_cours_d_annee(client):
     assert utilisation_tps.nom == "MARTIN"
     assert utilisation_tps.commentaire_de_mise_a_jour == "Parce que"
     assert utilisation_tps.etp_utilises == round(
-        (Decimal(20) + Decimal(14 / 60)) / Decimal(35), settings.PRECISION_ETP
+        (Decimal(15) + Decimal(14 / 60)) / Decimal(35), settings.PRECISION_ETP
     )
     document = pandas.read_excel(response.content, dtype="string")
     assert len(list(document.iterrows())) == 1
@@ -296,7 +481,7 @@ def test_maj_beneficiaire__en_cours_d_annee(client):
     assert list(document.iterrows())[0][1]["M. Mme"] == "Mme"
     assert list(document.iterrows())[0][1]["Prénom"] == "Michelle"
     assert list(document.iterrows())[0][1]["Nom"] == "MARTIN"
-    assert list(document.iterrows())[0][1]["Heures décharges"] == "20"
+    assert list(document.iterrows())[0][1]["Heures décharges"] == "15"
     assert list(document.iterrows())[0][1]["Minutes décharges"] == "14"
     assert list(document.iterrows())[0][1]["Heures ORS"] == "35"
     assert list(document.iterrows())[0][1]["Minutes ORS"] == "0"
@@ -411,3 +596,234 @@ def test_suppression_beneficiaire__en_cours_d_annee__modification(client):
     assert list(document.iterrows())[0][1]["AIRE"] == "2"
     assert list(document.iterrows())[0][1]["Corps"] == "123"
     assert list(document.iterrows())[0][1]["RNE"] == "1234567A"
+
+
+def test_ajouter_beneficiaire__pas_assez_de_quota(client):
+    Syndicat.objects.create(
+        is_superuser=True, email="admin@example.com", username="Fédération"
+    )
+    ParametresDApplication.objects.create(
+        annee_en_cours=2020,
+        corps_annexe=SimpleUploadedFile("file.pdf", b"random data"),
+    )
+    syndicat = Syndicat.objects.create(
+        email="syndicat1@example.com", username="Syndicat 1"
+    )
+    client.force_login(syndicat)
+    corps = Corps.objects.create(code_corps="123")
+    response = client.post(
+        reverse("decharge:ajouter_beneficiaire"),
+        {
+            "civilite": "MME",
+            "prenom": "Michelle",
+            "nom": "MARTIN",
+            "heures_de_decharges": 10,
+            "minutes_de_decharges": 14,
+            "heures_d_obligation_de_service": 35,
+            "corps": corps.pk,
+            "code_etablissement_rne": "1234567A",
+        },
+    )
+    assert response.status_code == 200
+    assert (
+        response.context["form"].errors["__all__"][0]
+        == "Vous dépassez le quota du syndicat, il reste 0.000 ETP attribuable et vous essayez d'ajouter 0.292 ETP"
+    )
+    assert UtilisationTempsDecharge.objects.count() == 0
+
+
+def test_ajouter_beneficiaire__depasse_quota_individuel(client):
+    federation = Syndicat.objects.create(
+        is_superuser=True, email="admin@example.com", username="Fédération"
+    )
+    ParametresDApplication.objects.create(
+        annee_en_cours=2020,
+        corps_annexe=SimpleUploadedFile("file.pdf", b"random data"),
+    )
+    syndicat = Syndicat.objects.create(
+        email="syndicat1@example.com", username="Syndicat 1"
+    )
+    syndicat2 = Syndicat.objects.create(
+        email="syndicat2@example.com", username="Syndicat 2"
+    )
+    corps = Corps.objects.create(code_corps="123")
+    UtilisationTempsDecharge.objects.create(
+        civilite="MME",
+        prenom="Michelle",
+        nom="MARTIN",
+        heures_de_decharges=10,
+        heures_d_obligation_de_service=35,
+        corps=corps,
+        code_etablissement_rne="1234567A",
+        syndicat=syndicat2,
+        annee=2020,
+    )
+    TempsDeDecharge.objects.create(
+        syndicat_beneficiaire=syndicat,
+        syndicat_donateur=federation,
+        annee=2020,
+        temps_de_decharge_etp=10,
+    )
+    client.force_login(syndicat)
+    response = client.post(
+        reverse("decharge:ajouter_beneficiaire"),
+        {
+            "civilite": "MME",
+            "prenom": "Michelle",
+            "nom": "MARTIN",
+            "heures_de_decharges": 10,
+            "minutes_de_decharges": 14,
+            "heures_d_obligation_de_service": 35,
+            "corps": corps.pk,
+            "code_etablissement_rne": "1234567A",
+        },
+    )
+    assert response.status_code == 200
+    assert (
+        response.context["form"].errors["__all__"][0]
+        == "Vous dépassez le quota du bénéficiaire, il lui reste au maximum 0.214 ETP à consommer et vous essayez de lui ajouter 0.292 ETP"
+    )
+
+
+def test_ajouter_beneficiaire__depasse_8_annees_consecutives(client):
+    federation = Syndicat.objects.create(
+        is_superuser=True, email="admin@example.com", username="Fédération"
+    )
+    ParametresDApplication.objects.create(
+        annee_en_cours=2020,
+        corps_annexe=SimpleUploadedFile("file.pdf", b"random data"),
+    )
+    syndicat = Syndicat.objects.create(
+        email="syndicat1@example.com", username="Syndicat 1"
+    )
+    syndicat2 = Syndicat.objects.create(
+        email="syndicat2@example.com", username="Syndicat 2"
+    )
+    corps = Corps.objects.create(code_corps="123")
+    for i in range(4):
+        UtilisationTempsDecharge.objects.create(
+            civilite="MME",
+            prenom="Michelle",
+            nom="MARTIN",
+            heures_de_decharges=0.1,
+            heures_d_obligation_de_service=35,
+            corps=corps,
+            code_etablissement_rne="1234567A",
+            syndicat=syndicat2,
+            annee=2009 + i,
+        )
+    for i in range(3):
+        UtilisationTempsDecharge.objects.create(
+            civilite="MME",
+            prenom="Michelle",
+            nom="MARTIN",
+            heures_de_decharges=0.1,
+            heures_d_obligation_de_service=35,
+            corps=corps,
+            code_etablissement_rne="1234567A",
+            syndicat=syndicat2,
+            annee=2014 + i,
+        )
+
+    UtilisationTempsDecharge.objects.create(
+        civilite="MME",
+        prenom="Michelle",
+        nom="MARTIN",
+        heures_de_decharges=0.1,
+        heures_d_obligation_de_service=35,
+        corps=corps,
+        code_etablissement_rne="1234567A",
+        syndicat=syndicat2,
+        annee=2018,
+    )
+    TempsDeDecharge.objects.create(
+        syndicat_beneficiaire=syndicat,
+        syndicat_donateur=federation,
+        annee=2020,
+        temps_de_decharge_etp=10,
+    )
+    client.force_login(syndicat)
+    response = client.post(
+        reverse("decharge:ajouter_beneficiaire"),
+        {
+            "civilite": "MME",
+            "prenom": "Michelle",
+            "nom": "MARTIN",
+            "heures_de_decharges": 10,
+            "minutes_de_decharges": 14,
+            "heures_d_obligation_de_service": 35,
+            "corps": corps.pk,
+            "code_etablissement_rne": "1234567A",
+        },
+    )
+    assert response.status_code == 200
+    assert (
+        response.context["form"].errors["__all__"][0]
+        == "La ou le bénéficiaire cumule déjà 8 années consécutives de décharges, il ou elle ne peut donc pas bénéficier de décharges cette année"
+    )
+
+
+def test_ajouter_beneficiaire__depasse_3_etp_consecutifs(client):
+    federation = Syndicat.objects.create(
+        is_superuser=True, email="admin@example.com", username="Fédération"
+    )
+    ParametresDApplication.objects.create(
+        annee_en_cours=2020,
+        corps_annexe=SimpleUploadedFile("file.pdf", b"random data"),
+    )
+    syndicat = Syndicat.objects.create(
+        email="syndicat1@example.com", username="Syndicat 1"
+    )
+    syndicat2 = Syndicat.objects.create(
+        email="syndicat2@example.com", username="Syndicat 2"
+    )
+    corps = Corps.objects.create(code_corps="123")
+    for i in range(4):
+        UtilisationTempsDecharge.objects.create(
+            civilite="MME",
+            prenom="Michelle",
+            nom="MARTIN",
+            heures_de_decharges=1,
+            heures_d_obligation_de_service=35,
+            corps=corps,
+            code_etablissement_rne="1234567A",
+            syndicat=syndicat2,
+            annee=2008 + i,
+        )  # le compteur est remis à 0 après ces annees
+    for i in range(5):
+        UtilisationTempsDecharge.objects.create(
+            civilite="MME",
+            prenom="Michelle",
+            nom="MARTIN",
+            heures_de_decharges=110,
+            heures_d_obligation_de_service=200,
+            corps=corps,
+            code_etablissement_rne="1234567A",
+            syndicat=syndicat2,
+            annee=2014 + i,
+        )
+    TempsDeDecharge.objects.create(
+        syndicat_beneficiaire=syndicat,
+        syndicat_donateur=federation,
+        annee=2020,
+        temps_de_decharge_etp=10,
+    )
+    client.force_login(syndicat)
+    response = client.post(
+        reverse("decharge:ajouter_beneficiaire"),
+        {
+            "civilite": "MME",
+            "prenom": "Michelle",
+            "nom": "MARTIN",
+            "heures_de_decharges": 10,
+            "minutes_de_decharges": 0,
+            "heures_d_obligation_de_service": 35,
+            "corps": corps.pk,
+            "code_etablissement_rne": "1234567A",
+        },
+    )
+    assert response.status_code == 200
+    assert (
+        response.context["form"].errors["__all__"][0]
+        == "La ou le bénéficiaire cumule déjà 2.750ETP consécutifs de décharges sur les dernières années (+l'année en cours) et vous essayez de rajouter 0.286ETP"
+    )

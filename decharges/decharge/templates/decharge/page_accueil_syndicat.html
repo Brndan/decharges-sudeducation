@@ -34,6 +34,8 @@
           <li><b>Temps de décharge consommé&nbsp;:</b> {{ temps_utilises_total|floatformat:3 }} ETP</li>
           <li>
             <b>CTS ponctuel consommé&nbsp;:</b> {% if cts_consommes %}{{ cts_consommes.etp_utilises|floatformat:3 }}{% else %}0{% endif %} ETP
+            {% if cts_consommes %}({{ cts_consommes.demi_journees_de_decharges }} demi-journées){% endif %}
+
             {% if decharges_editables or request.user.is_federation %}
             {% if cts_consommes %}
               <a href="{% url 'decharge:modifier_cts' cts_consommes.pk %}" class="button is-info icon"><span class="fa fa-edit"></span></a>
@@ -76,7 +78,7 @@
               <th>Civilité</th>
               <th>Prénom</th>
               <th>Nom</th>
-              <th>Heures de décharge</th>
+              <th>Temps de décharge</th>
               <th><abbr title="Heures d'obligation de service">ORS</abbr></th>
               <th><abbr title="Code Corps">Corps</abbr></th>
               <th><abbr title="Code établissement">RNE</abbr></th>
@@ -92,11 +94,15 @@
               <td>{{ temps_utilise.civilite }}</td>
               <td>{{ temps_utilise.prenom }}</td>
               <td>{{ temps_utilise.nom }}</td>
-              <td>{{ temps_utilise.heures_de_decharges|floatformat:2 }}</td>
+              <td>
+                {{ temps_utilise.heures_pleines_de_decharges }} h
+                {% if temps_utilise.minutes_de_decharges > 0 %}{{ temps_utilise.minutes_de_decharges }}
+                {% endif %}
+              </td>
               <td>{{ temps_utilise.heures_d_obligation_de_service }}</td>
               <td>{{ temps_utilise.corps.code_corps }}</td>
               <td>{{ temps_utilise.code_etablissement_rne }}</td>
-              <td>{{ temps_utilise.etp_utilises|floatformat:3 }}</td>
+              <td>{{ temps_utilise.etp_utilises|floatformat:3 }} {% if temps_utilise.est_une_decharge_solidaires %}(décharge solidaires){% endif %}</td>
               {% if decharges_editables or request.user.is_federation %}
               <td>
                 <a class="button is-info icon" href="{% url 'decharge:modifier_beneficiaire' temps_utilise.pk %}"><span class="fa fa-edit"></span></a>
@@ -114,7 +120,7 @@
     <div class="card mt-6">
       <header class="card-header is-align-items-center">
         <h2 class="card-header-title">Bénéficiaires du syndicat : {{ syndicat }}</h2>
-        <a class="button is-small is-success mr-2" href="{% url 'decharge:ajouter_beneficiaire' %}?syndicat={{ syndicat }}">
+        <a class="button is-small is-success mr-2" href="{% url 'decharge:ajouter_beneficiaire' %}?syndicat={{ syndicat|urlencode }}">
           <span class="fa fa-sm fa-plus mr-2"></span>Ajout d'un·e bénéficiaire
         </a>
       </header>
@@ -125,7 +131,7 @@
               <th>Civilité</th>
               <th>Prénom</th>
               <th>Nom</th>
-              <th>Heures de décharge</th>
+              <th>Temps de décharge</th>
               <th><abbr title="Heures d'obligation de service">ORS</abbr></th>
               <th><abbr title="Code Corps">Corps</abbr></th>
               <th><abbr title="Code établissement">RNE</abbr></th>
@@ -139,7 +145,12 @@
               <td>{{ temps_utilise.civilite }}</td>
               <td>{{ temps_utilise.prenom }}</td>
               <td>{{ temps_utilise.nom }}</td>
-              <td>{{ temps_utilise.heures_de_decharges|floatformat:2 }}</td>
+              <td>
+                {{ temps_utilise.heures_pleines_de_decharges }} h
+                {% if temps_utilise.minutes_de_decharges > 0 %}
+                  {{ temps_utilise.minutes_de_decharges }}
+                {% endif %}
+              </td>
               <td>{{ temps_utilise.heures_d_obligation_de_service }}</td>
               <td>{{ temps_utilise.corps.code_corps }}</td>
               <td>{{ temps_utilise.code_etablissement_rne }}</td>

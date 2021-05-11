@@ -12,7 +12,7 @@ from decharges.user_manager.models import Syndicat
 pytestmark = pytest.mark.django_db
 
 
-def test_synthese_cts(client):
+def test_syndicats_a_relancer(client):
     federation = Syndicat.objects.create(
         is_superuser=True, email="admin@example.com", username="Fédération"
     )
@@ -31,6 +31,18 @@ def test_synthese_cts(client):
     )
     syndicat4 = Syndicat.objects.create(
         email="syndicat4@example.com", username="Syndicat 4"
+    )
+    TempsDeDecharge.objects.create(
+        syndicat_beneficiaire=syndicat2,
+        syndicat_donateur=federation,
+        temps_de_decharge_etp=0.01,
+        annee=2021,
+    )
+    TempsDeDecharge.objects.create(
+        syndicat_beneficiaire=syndicat3,
+        syndicat_donateur=federation,
+        temps_de_decharge_etp=0.1,
+        annee=2021,
     )
     UtilisationTempsDecharge.objects.create(
         prenom="Foo",
@@ -56,7 +68,10 @@ def test_synthese_cts(client):
     )
 
     client.force_login(federation)
-    response = client.get(reverse("decharge:syndicats_en_retard"))
+    response = client.get(reverse("decharge:syndicats_a_relancer"))
     assert response.status_code == 200
-    assert response.context["syndicats_a_relancer"].count() == 1
-    assert response.context["syndicats_a_relancer"].first() == syndicat4
+    assert response.context["syndicats_n_ayant_rien_rempli"].count() == 1
+    assert response.context["syndicats_n_ayant_rien_rempli"].first() == syndicat4
+    assert len(response.context["syndicats_depassant_leur_quota"]) == 2
+    assert response.context["syndicats_depassant_leur_quota"][0][0] == syndicat1
+    assert response.context["syndicats_depassant_leur_quota"][1][0] == syndicat2

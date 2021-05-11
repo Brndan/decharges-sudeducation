@@ -54,6 +54,9 @@ class TempsDeDecharge(models.Model):
             f"en {self.annee}"
         )
 
+    class Meta:
+        unique_together = ("annee", "syndicat_donateur", "syndicat_beneficiaire")
+
 
 class Corps(models.Model):
     code_corps = models.CharField(
@@ -179,6 +182,12 @@ class UtilisationTempsDecharge(models.Model):
         verbose_name="Historique des modifications",
         help_text="Décrivez factuellement la modification apportée",
     )
+    est_une_decharge_solidaires = models.BooleanField(
+        default=False,
+        verbose_name="Est une décharge solidaires",
+        help_text="Cocher cette case uniquement si la décharge "
+        "vient d'un autre syndicat que SUD éducation",
+    )
 
     # données importées de l'historique
     etp = models.DecimalField(
@@ -204,6 +213,16 @@ class UtilisationTempsDecharge(models.Model):
             settings.PRECISION_ETP,
         )
 
+    @property
+    def heures_pleines_de_decharges(self) -> int:
+        return int(self.heures_de_decharges)
+
+    @property
+    def minutes_de_decharges(self) -> int:
+        return int(
+            round((self.heures_de_decharges - self.heures_pleines_de_decharges) * 60)
+        )
+
     class Meta:
         unique_together = (
             "nom",
@@ -211,6 +230,7 @@ class UtilisationTempsDecharge(models.Model):
             "annee",
             "code_etablissement_rne",
             "syndicat",
+            "est_une_decharge_solidaires",
         )
 
 
@@ -219,7 +239,7 @@ class UtilisationCreditDeTempsSyndicalPonctuel(models.Model):
     Utilisation des CTS (ou CHS), sur une année donnée, par syndicat
     """
 
-    demi_journees_de_decharges = models.IntegerField(
+    demi_journees_de_decharges = models.PositiveIntegerField(
         verbose_name="Demi-journées de décharges utilisées",
         default=0,
     )

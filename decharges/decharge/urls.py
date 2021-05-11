@@ -14,7 +14,7 @@ from decharges.decharge.views import (
     PageAccueilSyndicatView,
     SuppressionTempsDeDecharge,
     SuppressionUtilisationTempsDecharge,
-    SyndicatsEnRetard,
+    SyndicatsARelancer,
     SyntheseCTS,
     UpdateQuotaETPFederation,
     UpdateTempsDeDecharge,
@@ -82,6 +82,8 @@ urlpatterns = [
         name="modifier_quota_federation",
     ),
     path(
-        "syndicats-en-retard/", SyndicatsEnRetard.as_view(), name="syndicats_en_retard"
+        "syndicats-a-relancer/",
+        SyndicatsARelancer.as_view(),
+        name="syndicats_a_relancer",
     ),
 ]

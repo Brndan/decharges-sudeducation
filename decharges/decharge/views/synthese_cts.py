@@ -56,7 +56,8 @@ class SyntheseCTS(CheckConfigurationMixin, FederationRequiredMixin, TemplateView
             total_etp_consommes += cts_utilise.etp_utilises
 
         for temps_utilise in UtilisationTempsDecharge.objects.filter(
-            annee=self.params.annee_en_cours
+            annee=self.params.annee_en_cours,
+            est_une_decharge_solidaires=False,
         ):
             total_etp_consommes += temps_utilise.etp_utilises
 

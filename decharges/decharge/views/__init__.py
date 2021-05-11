@@ -7,7 +7,7 @@ from decharges.decharge.views.historique import (
     HistoriqueTelecharger,
 )
 from decharges.decharge.views.import_temps_syndicats import ImportTempsSyndicats
-from decharges.decharge.views.syndicats_en_retard import SyndicatsEnRetard
+from decharges.decharge.views.syndicats_a_relancer import SyndicatsARelancer
 from decharges.decharge.views.synthese_cts import SyntheseCTS
 from decharges.decharge.views.temps_de_decharge import (
     CreateQuotaETPFederation,
@@ -36,7 +36,7 @@ __all__ = [
     "PageAccueilSyndicatView",
     "SuppressionTempsDeDecharge",
     "SuppressionUtilisationTempsDecharge",
-    "SyndicatsEnRetard",
+    "SyndicatsARelancer",
     "SyntheseCTS",
     "UpdateQuotaETPFederation",
     "UpdateTempsDeDecharge",

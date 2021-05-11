@@ -1,15 +1,12 @@
 # Gestion des décharges syndicales
 
-[![pipeline status](https://gitlab.com/hashbangfr/sudeducation/badges/master/pipeline.svg)](https://gitlab.com/hashbangfr/sudeducation/-/commits/master)
-[![coverage report](https://gitlab.com/hashbangfr/sudeducation/badges/master/coverage.svg)](https://gitlab.com/hashbangfr/sudeducation/-/commits/master)
-
 Ce projet a pour objectif de gérer les décharges syndicales de SUD éducation (https://www.sudeducation.org/)
 
 ## Développement
 
 ### Gestion des dépendences
 
-Les dépendances sont listées dans `setup.cfg`, sous la section `[options]`, soit dans `install_requires` (si c'est un requirement de production), ou dans `tests_require` (si c'est un requirement uniquement pour le dev ou les tests).
+Les dépendances sont listées dans `setup.cfg`, sous la section `[options]`, soit dans `install_requires` (si c'est un requirement de production), ou dans `tests_require` (si c'est un requirement uniquement pour le developpement ou les tests).
 
 Ces 2 listes (`install_requires` et `tests_require`) sont utilisées pour générer 2 fichiers de requirements : celui utilisé en production (`requirements.txt`) et celui utilisé pour le développement et les tests (`requirements-tests.txt`)
 
@@ -28,7 +25,7 @@ Les fichiers de requirements contiennent toutes les dépendances (directes ou in
 Lancer ceci (après avoir créé un environement virtuel python et l'avoir activé) :
 
 ```bash
-(venv-decharges) $ pip install -r requirements-tests.txt
+(venv-decharges) $ pip install -Ur requirements-tests.txt
 ```
 
 ### Préparer la BDD
@@ -145,13 +142,14 @@ $ ./manage.py import_historique --csv-file=imports/historique/historique.csv
 
 Contient toutes les variables de l'application Django.
 
-- NB_HOURS_IN_A_YEAR : à changer si le nombre d'heure d'un temps plein en une année n'est plus 1607
-- CHOIX_ORS : les nombre d'heures d'obligation de services possibles dans le formulaire
-- MAX_ETP_CONSECUTIFS : le nombre maximum d'ETP consécutifs dans les statuts (3 ETP au moment d'écriture de cette doc)
-- ALERT_ETP_CONSECUTIFS : le nombre d'ETP consécutif à partir duquel on alerte que cette personne approche les limites
-- MAX_ANNEES_CONSECUTIVES : le nombre maximum d'années de délégation consécutives dans les statuts (8 ans au moment d'écriture de cette doc)
-- ALERT_ANNEES_CONSECUTIVES : le nombre d'années de délégation consécutives à partir duquel on alerte que cette personne approche les limites
-- NB_ANNEES_POUR_REINITIALISER_LES_COMPTEURS : le nombre d'années nécessaires pour réinitialiser les compteurs ci-dessus (ETPs cumulés + années de décharge consécutives)
+- `NB_HOURS_IN_A_YEAR` : à changer si le nombre d'heure d'un temps plein en une année n'est plus 1607
+- `CHOIX_ORS` : les heures d'obligation de service possibles dans le formulaire
+- `MAX_ETP_CONSECUTIFS` : le nombre maximum d'ETP consécutifs dans les statuts (3 ETP au moment d'écriture de cette doc)
+- `ALERT_ETP_CONSECUTIFS` : le nombre d'ETP consécutif à partir duquel on alerte que cette personne approche les limites
+- `MAX_ANNEES_CONSECUTIVES` : le nombre maximum d'années de délégation consécutives dans les statuts (8 ans au moment d'écriture de cette doc)
+- `ALERT_ANNEES_CONSECUTIVES` : le nombre d'années de délégation consécutives à partir duquel on alerte que cette personne approche les limites
+- `NB_ANNEES_POUR_REINITIALISER_LES_COMPTEURS` : le nombre d'années nécessaires pour réinitialiser les compteurs ci-dessus (ETPs cumulés et années de décharge consécutives)
+- `MAX_ETP_EN_UNE_ANNEE` : le nombre d'ETP maximum pour un·e bénéficiaire en une année (0.5 à l'heure d'ecriture de la documentation)
 
 ### `decharges/decharge`
 
@@ -173,6 +171,7 @@ Une petite application permettant de gérer les paramètres du site via l'interf
 
 - l'année en cours, pour savoir quelles données afficher
 - si oui ou non les syndicats peuvent accéder à l'édition des décharges
+- téléverser le fichier annexe des Corps
 
 ### `decharges/user_manager`
 
@@ -181,3 +180,33 @@ L'application permettant de gérer les utilisateurs. Vous y trouverez notamment 
 - le modèle de `Syndicat` (qui hérite du modèle User de django)
 - le modèle `Academie` qui regroupe les syndicats
 - les templates (decharges/user_manager/templates/registration) qui surchargent les templates de base de la gestion d'utilisateurs de django
+
+## Logiques spécifiques
+
+### Nom/Prénom/RNE
+
+Dans l'application un·e bénéficiaire est identifié·e de manière via trois données : son nom, son prénom et son RNE (identifiant d'établissement).
+
+Ce qui signifie que si deux syndicats souhaitent donner du temps de décharge à une même personne, les syndicats doivent faire
+attention à bien renseigner le nom/prénom/RNE de la personne sans faute de frappe.
+
+### Attribution de temps et partage académique
+
+Dans decharges/decharge/models.py quatre modèles sont présents (au moment de l'ecriture de la documentation):
+
+- Corps
+- UtilisationTempsDecharge
+- UtilisationCreditDeTempsSyndicalPonctuel
+- TempsDeDecharge
+
+Le `Corps` représente le Corps d'enseignement est est juste constitué d'un code.
+
+Une instance de `UtilisationTempsDecharge` décrit le temps de décharge utilisé par un·e bénéficiaire (nom/prénom/RNE) pour une année donnée (ex: 2020-2021) dans un syndicat donné.
+
+Une instance de `UtilisationCreditDeTempsSyndicalPonctuel` décrit le temps de décharge en CTS utilisé par un syndicat pour une année donnée (ex: 2020-2021)
+
+Une instance de `TempsDeDecharge` représente un "échange" de temps de décharge pour une année donnée. Une instance de `TempsDeDecharge` peut donc représenter plusieurs choses différentes :
+
+- si le `syndicat_donateur` n'est pas spécifié (ou est le syndicat de la Fédération), cette instance représente le quota d'ETP attribué par la fédération au `syndicat_beneficiaire` pour une année donnée
+- si le `syndicat_donateur` est spécifié (et différent de la fédération), alors l'instance représente une mutualisation académique : le `syndicat_donateur` donne `temps_de_decharge_etp` au `syndicat_beneficiaire` à une année donnée
+- enfin si le `syndicat_beneficiaire` est la Fédération, l'instance représente le quota en ETP donné à SUD par le ministère pour une année donnée

@@ -51,6 +51,18 @@ def test_export_ministere(client):
         nom="BAR",
         heures_de_decharges=10,
         heures_d_obligation_de_service=1607,
+        code_etablissement_rne="0234567A",
+        annee=2021,
+        syndicat=syndicat2,
+        corps=corps,
+        est_une_decharge_solidaires=True,
+    )
+    UtilisationTempsDecharge.objects.create(
+        civilite="M.",
+        prenom="Foo",
+        nom="BAR",
+        heures_de_decharges=10,
+        heures_d_obligation_de_service=1607,
         code_etablissement_rne="0234567B",
         annee=2021,
         syndicat=syndicat,
