@@ -54,6 +54,9 @@ class TempsDeDecharge(models.Model):
             f"en {self.annee}"
         )
 
+    class Meta:
+        unique_together = ("annee", "syndicat_donateur", "syndicat_beneficiaire")
+
 
 class Corps(models.Model):
     code_corps = models.CharField(
@@ -236,7 +239,7 @@ class UtilisationCreditDeTempsSyndicalPonctuel(models.Model):
     Utilisation des CTS (ou CHS), sur une année donnée, par syndicat
     """
 
-    demi_journees_de_decharges = models.IntegerField(
+    demi_journees_de_decharges = models.PositiveIntegerField(
         verbose_name="Demi-journées de décharges utilisées",
         default=0,
     )

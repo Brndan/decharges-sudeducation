@@ -98,26 +98,15 @@ class UtilisationTempsDechargeForm(forms.ModelForm):
             * 60
         )
 
-    def clean(self):
-        cleaned_data = super().clean()
-        if cleaned_data.get(
-            "est_une_decharge_solidaires"
-        ) and self.federation != cleaned_data.get("syndicat", self.syndicat):
-            self.add_error(
-                "est_une_decharge_solidaires",
-                "La décharge ne peut provenir d'un autre syndicat uniquement pour les décharges fédérales",
-            )
-        return cleaned_data
-
-    def save(self, commit=True):
+    def _populate_instance(self):
         if self.decharges_editables:
             self.instance.syndicat = self.syndicat
         else:
             # la fédération peut choisir le syndicat qui utilise la décharge dans le formulaire
             self.instance.syndicat = self.cleaned_data["syndicat"]
-            self.instance.commentaire_de_mise_a_jour = self.cleaned_data[
+            self.instance.commentaire_de_mise_a_jour = self.cleaned_data.get(
                 "commentaire_de_mise_a_jour"
-            ]
+            )
         self.instance.annee = self.annee
         self.instance.heures_de_decharges = self.cleaned_data["heures_de_decharges"]
         self.instance.est_une_decharge_solidaires = self.cleaned_data.get(
@@ -127,7 +116,40 @@ class UtilisationTempsDechargeForm(forms.ModelForm):
             self.instance.heures_de_decharges += (
                 self.cleaned_data["minutes_de_decharges"] / 60
             )
-        return super().save(commit=commit)
+
+    def validate_unique(self):
+        exclude = self._get_validation_exclusions()
+        exclude = set(exclude) - {
+            "id",
+            "annee",
+            "syndicat",
+            "est_une_decharge_solidaires",
+            "nom",
+            "prenom",
+            "code_etablissement_rne",
+        }
+        try:
+            self.instance.validate_unique(exclude=exclude)
+        except forms.ValidationError:
+            self._update_errors(
+                forms.ValidationError(
+                    "Une décharge pour cette ou ce bénéficiaire existe déjà, "
+                    "veuillez plutôt la mettre à jour"
+                )
+            )
+
+    def clean(self):
+        self._populate_instance()
+        cleaned_data = super().clean()
+        if cleaned_data.get(
+            "est_une_decharge_solidaires"
+        ) and self.federation != cleaned_data.get("syndicat", self.syndicat):
+            self.add_error(
+                "est_une_decharge_solidaires",
+                "La décharge ne peut provenir d'un autre syndicat uniquement pour les décharges fédérales",
+            )
+
+        return cleaned_data
 
     class Meta:
         model = UtilisationTempsDecharge

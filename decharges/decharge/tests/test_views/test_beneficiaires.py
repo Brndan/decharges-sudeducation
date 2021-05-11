@@ -54,6 +54,58 @@ def test_ajouter_beneficiaire(client):
     )
 
 
+def test_ajouter_beneficiaire__unique_together(client):
+    Syndicat.objects.create(
+        is_superuser=True, email="admin@example.com", username="Fédération"
+    )
+    ParametresDApplication.objects.create(
+        annee_en_cours=2020,
+        corps_annexe=SimpleUploadedFile("file.pdf", b"random data"),
+    )
+    syndicat = Syndicat.objects.create(
+        email="syndicat1@example.com", username="Syndicat 1"
+    )
+    client.force_login(syndicat)
+    corps = Corps.objects.create(code_corps="123")
+    response = client.get(reverse("decharge:ajouter_beneficiaire"))
+    assert response.status_code == 200
+    assert response.context["form"].fields["corps"].help_text is not None
+    assert "est_une_decharge_solidaires" not in response.context["form"].fields
+    response = client.post(
+        reverse("decharge:ajouter_beneficiaire"),
+        {
+            "civilite": "MME",
+            "prenom": "Michelle",
+            "nom": "MARTIN",
+            "heures_de_decharges": 10,
+            "minutes_de_decharges": 14,
+            "heures_d_obligation_de_service": 35,
+            "corps": corps.pk,
+            "code_etablissement_rne": "1234567A",
+        },
+    )
+    assert response.status_code == 302
+    response = client.post(
+        reverse("decharge:ajouter_beneficiaire"),
+        {
+            "civilite": "MME",
+            "prenom": "Michelle",
+            "nom": "MARTIN",
+            "heures_de_decharges": 10,
+            "minutes_de_decharges": 14,
+            "heures_d_obligation_de_service": 35,
+            "corps": corps.pk,
+            "code_etablissement_rne": "1234567A",
+        },
+    )
+    assert response.status_code == 200
+    assert (
+        response.context["form"].errors["__all__"][0]
+        == "Une décharge pour cette ou ce bénéficiaire existe déjà, veuillez plutôt la mettre à jour"
+    )
+    assert UtilisationTempsDecharge.objects.count() == 1
+
+
 def test_ajouter_beneficiaire__decharge_solidaires(client):
     federation = Syndicat.objects.create(
         is_superuser=True, email="admin@example.com", username="Fédération"

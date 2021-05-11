@@ -44,6 +44,44 @@ def test_ajouter_mutualisation_academique(client):
     )
 
 
+def test_ajouter_mutualisation_academique__unique_together(client):
+    Syndicat.objects.create(
+        is_superuser=True, email="admin@example.com", username="Fédération"
+    )
+    ParametresDApplication.objects.create(annee_en_cours=2020)
+    academie = Academie.objects.create(nom="Academie1")
+    syndicat = Syndicat.objects.create(
+        email="syndicat1@example.com", username="Syndicat 1", academie=academie
+    )
+    syndicat2 = Syndicat.objects.create(
+        email="syndicat2@example.com", username="Syndicat 2", academie=academie
+    )
+    client.force_login(syndicat)
+    response = client.get(reverse("decharge:ajouter_mutualisation_academique"))
+    assert response.status_code == 200
+    response = client.post(
+        reverse("decharge:ajouter_mutualisation_academique"),
+        {
+            "syndicat_beneficiaire": syndicat2.pk,
+            "temps_de_decharge_etp": 0.1,
+        },
+    )
+    assert response.status_code == 302
+    response = client.post(
+        reverse("decharge:ajouter_mutualisation_academique"),
+        {
+            "syndicat_beneficiaire": syndicat2.pk,
+            "temps_de_decharge_etp": 0.1,
+        },
+    )
+    assert response.status_code == 200
+    assert (
+        response.context["form"].errors["__all__"][0]
+        == "Un partage de temps pour ce syndicat existe déjà, veuillez plutôt le mettre à jour"
+    )
+    assert TempsDeDecharge.objects.count() == 1
+
+
 def test_ajouter_mutualisation_academique__federation(client):
     federation = Syndicat.objects.create(
         is_superuser=True, email="admin@example.com", username="Fédération"
