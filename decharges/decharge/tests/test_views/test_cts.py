@@ -16,12 +16,18 @@ pytestmark = pytest.mark.django_db
 
 
 def test_add_cts(client):
-    Syndicat.objects.create(
+    federation = Syndicat.objects.create(
         is_superuser=True, email="admin@example.com", username="Fédération"
     )
     ParametresDApplication.objects.create(annee_en_cours=2021)
     syndicat = Syndicat.objects.create(
         email="syndicat1@example.com", username="Syndicat 1"
+    )
+    TempsDeDecharge.objects.create(
+        syndicat_beneficiaire=syndicat,
+        syndicat_donateur=federation,
+        annee=2021,
+        temps_de_decharge_etp=10,
     )
     client.force_login(syndicat)
     response = client.get(reverse("decharge:ajouter_cts"))
@@ -39,7 +45,7 @@ def test_add_cts(client):
 
 
 def test_update_cts(client):
-    Syndicat.objects.create(
+    federation = Syndicat.objects.create(
         is_superuser=True, email="admin@example.com", username="Fédération"
     )
     ParametresDApplication.objects.create(annee_en_cours=2021)
@@ -48,6 +54,12 @@ def test_update_cts(client):
     )
     syndicat2 = Syndicat.objects.create(
         email="syndicat2@example.com", username="Syndicat 2"
+    )
+    TempsDeDecharge.objects.create(
+        syndicat_beneficiaire=syndicat,
+        syndicat_donateur=federation,
+        annee=2021,
+        temps_de_decharge_etp=10,
     )
     client.force_login(syndicat2)
     cts = UtilisationCreditDeTempsSyndicalPonctuel.objects.create(
@@ -127,3 +139,23 @@ def test_synthese_cts(client):
         Decimal(10) - cts_consomme_academie - temps_consomme_syndicat1,
         settings.PRECISION_ETP,
     )
+
+
+def test_add_cts__pas_assez_de_quota(client):
+    Syndicat.objects.create(
+        is_superuser=True, email="admin@example.com", username="Fédération"
+    )
+    ParametresDApplication.objects.create(annee_en_cours=2021)
+    syndicat = Syndicat.objects.create(
+        email="syndicat1@example.com", username="Syndicat 1"
+    )
+    client.force_login(syndicat)
+    response = client.post(
+        reverse("decharge:ajouter_cts"), {"demi_journees_de_decharges": 5}
+    )
+    assert response.status_code == 200
+    assert (
+        response.context["form"].errors["__all__"][0]
+        == "Vous dépassez le quota du syndicat, il reste 0.000 ETP attribuable et vous essayez d'ajouter 0.011 ETP"
+    )
+    assert UtilisationCreditDeTempsSyndicalPonctuel.objects.count() == 0

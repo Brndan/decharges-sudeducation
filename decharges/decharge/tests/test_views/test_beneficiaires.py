@@ -6,7 +6,7 @@ from django.conf import settings
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 
-from decharges.decharge.models import Corps, UtilisationTempsDecharge
+from decharges.decharge.models import Corps, TempsDeDecharge, UtilisationTempsDecharge
 from decharges.parametre.models import ParametresDApplication
 from decharges.user_manager.models import Syndicat
 
@@ -14,7 +14,7 @@ pytestmark = pytest.mark.django_db
 
 
 def test_ajouter_beneficiaire(client):
-    Syndicat.objects.create(
+    federation = Syndicat.objects.create(
         is_superuser=True, email="admin@example.com", username="Fédération"
     )
     ParametresDApplication.objects.create(
@@ -23,6 +23,12 @@ def test_ajouter_beneficiaire(client):
     )
     syndicat = Syndicat.objects.create(
         email="syndicat1@example.com", username="Syndicat 1"
+    )
+    TempsDeDecharge.objects.create(
+        syndicat_beneficiaire=syndicat,
+        syndicat_donateur=federation,
+        annee=2020,
+        temps_de_decharge_etp=10,
     )
     client.force_login(syndicat)
     corps = Corps.objects.create(code_corps="123")
@@ -55,7 +61,7 @@ def test_ajouter_beneficiaire(client):
 
 
 def test_ajouter_beneficiaire__unique_together(client):
-    Syndicat.objects.create(
+    federation = Syndicat.objects.create(
         is_superuser=True, email="admin@example.com", username="Fédération"
     )
     ParametresDApplication.objects.create(
@@ -66,6 +72,12 @@ def test_ajouter_beneficiaire__unique_together(client):
         email="syndicat1@example.com", username="Syndicat 1"
     )
     client.force_login(syndicat)
+    TempsDeDecharge.objects.create(
+        syndicat_beneficiaire=syndicat,
+        syndicat_donateur=federation,
+        annee=2020,
+        temps_de_decharge_etp=10,
+    )
     corps = Corps.objects.create(code_corps="123")
     response = client.get(reverse("decharge:ajouter_beneficiaire"))
     assert response.status_code == 200
@@ -174,7 +186,7 @@ def test_ajouter_beneficiaire__decharge_solidaires(client):
 
 
 def test_maj_beneficiaire(client):
-    Syndicat.objects.create(
+    federation = Syndicat.objects.create(
         is_superuser=True, email="admin@example.com", username="Fédération"
     )
     ParametresDApplication.objects.create(annee_en_cours=2021)
@@ -185,6 +197,12 @@ def test_maj_beneficiaire(client):
         email="syndicat2@example.com", username="Syndicat 2"
     )
     client.force_login(syndicat2)
+    TempsDeDecharge.objects.create(
+        syndicat_beneficiaire=syndicat,
+        syndicat_donateur=federation,
+        annee=2020,
+        temps_de_decharge_etp=10,
+    )
     corps = Corps.objects.create(code_corps="123")
     utilisation_tps = UtilisationTempsDecharge.objects.create(
         civilite="MME",
@@ -345,6 +363,12 @@ def test_ajouter_beneficiaire__en_cours_d_annee(client):
         syndicat=syndicat2,
         annee=2020,
     )
+    TempsDeDecharge.objects.create(
+        syndicat_beneficiaire=syndicat,
+        syndicat_donateur=federation,
+        annee=2020,
+        temps_de_decharge_etp=10,
+    )
     client.force_login(federation)
     response = client.get(
         reverse("decharge:ajouter_beneficiaire") + "?syndicat=Syndicat%201"
@@ -404,11 +428,17 @@ def test_maj_beneficiaire__en_cours_d_annee(client):
         email="syndicat1@example.com", username="Syndicat 1"
     )
     client.force_login(federation)
+    TempsDeDecharge.objects.create(
+        syndicat_beneficiaire=syndicat,
+        syndicat_donateur=federation,
+        annee=2021,
+        temps_de_decharge_etp=10,
+    )
     corps = Corps.objects.create(code_corps="123")
     utilisation_tps = UtilisationTempsDecharge.objects.create(
         civilite="MME",
         prenom="Michelle",
-        nom="MARTIN",
+        nom="MARTINE",
         heures_de_decharges=10,
         heures_d_obligation_de_service=35,
         corps=corps,
@@ -566,3 +596,37 @@ def test_suppression_beneficiaire__en_cours_d_annee__modification(client):
     assert list(document.iterrows())[0][1]["AIRE"] == "2"
     assert list(document.iterrows())[0][1]["Corps"] == "123"
     assert list(document.iterrows())[0][1]["RNE"] == "1234567A"
+
+
+def test_ajouter_beneficiaire__pas_assez_de_quota(client):
+    Syndicat.objects.create(
+        is_superuser=True, email="admin@example.com", username="Fédération"
+    )
+    ParametresDApplication.objects.create(
+        annee_en_cours=2020,
+        corps_annexe=SimpleUploadedFile("file.pdf", b"random data"),
+    )
+    syndicat = Syndicat.objects.create(
+        email="syndicat1@example.com", username="Syndicat 1"
+    )
+    client.force_login(syndicat)
+    corps = Corps.objects.create(code_corps="123")
+    response = client.post(
+        reverse("decharge:ajouter_beneficiaire"),
+        {
+            "civilite": "MME",
+            "prenom": "Michelle",
+            "nom": "MARTIN",
+            "heures_de_decharges": 10,
+            "minutes_de_decharges": 14,
+            "heures_d_obligation_de_service": 35,
+            "corps": corps.pk,
+            "code_etablissement_rne": "1234567A",
+        },
+    )
+    assert response.status_code == 200
+    assert (
+        response.context["form"].errors["__all__"][0]
+        == "Vous dépassez le quota du syndicat, il reste 0.000 ETP attribuable et vous essayez d'ajouter 0.292 ETP"
+    )
+    assert UtilisationTempsDecharge.objects.count() == 0

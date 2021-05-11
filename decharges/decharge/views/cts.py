@@ -23,6 +23,7 @@ class CTSCreate(
         form_kwargs = super().get_form_kwargs()
         form_kwargs["syndicat"] = self.request.user
         form_kwargs["annee"] = self.params.annee_en_cours
+        form_kwargs["federation"] = self.federation
         return form_kwargs
 
 
@@ -49,4 +50,5 @@ class CTSUpdate(
         form_kwargs = super().get_form_kwargs()
         form_kwargs["syndicat"] = self.object.syndicat
         form_kwargs["annee"] = self.object.annee
+        form_kwargs["federation"] = self.federation
         return form_kwargs

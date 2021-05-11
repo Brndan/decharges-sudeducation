@@ -5,6 +5,7 @@ from django.core.validators import MinValueValidator
 from django.db.models import QuerySet
 
 from decharges.decharge.models import TempsDeDecharge
+from decharges.decharge.views.utils import calcul_repartition_temps
 from decharges.user_manager.models import Syndicat
 
 
@@ -12,6 +13,7 @@ class TempsDeDechargeForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.syndicat = kwargs.pop("syndicat")
         self.annee = kwargs.pop("annee")
+        self.federation = kwargs.pop("federation")
         super().__init__(*args, **kwargs)
         self.fields["syndicat_beneficiaire"].queryset = QuerySet()
         self.fields["temps_de_decharge_etp"].min_value = decimal.Decimal(0)
@@ -51,6 +53,25 @@ class TempsDeDechargeForm(forms.ModelForm):
                     "Un partage de temps pour ce syndicat existe déjà, "
                     "veuillez plutôt le mettre à jour"
                 )
+            )
+
+    def full_clean(self):
+        super().full_clean()
+        (_, _, _, _, _, _, temps_restant, _, _,) = calcul_repartition_temps(
+            self.annee,
+            self.federation,
+            self.syndicat,
+            excluded_temps_de_decharge_donne_pk=self.instance.pk,
+        )
+
+        if temps_restant - self.instance.temps_de_decharge_etp < 0 and hasattr(
+            self, "cleaned_data"
+        ):
+            self.add_error(
+                None,
+                f"Vous dépassez le quota du syndicat, il reste {temps_restant:.3f} ETP "
+                "attribuable et vous essayez d'ajouter "
+                f"{self.instance.temps_de_decharge_etp:.3f} ETP",
             )
 
     def clean(self):

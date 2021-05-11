@@ -4,6 +4,7 @@ from django import forms
 from django.conf import settings
 
 from decharges.decharge.models import UtilisationTempsDecharge
+from decharges.decharge.views.utils import calcul_repartition_temps
 from decharges.user_manager.models import Syndicat
 
 
@@ -136,6 +137,26 @@ class UtilisationTempsDechargeForm(forms.ModelForm):
                     "Une décharge pour cette ou ce bénéficiaire existe déjà, "
                     "veuillez plutôt la mettre à jour"
                 )
+            )
+
+    def full_clean(self):
+        super().full_clean()
+        (_, _, _, _, _, _, temps_restant, _, _,) = calcul_repartition_temps(
+            self.annee,
+            self.federation,
+            self.instance.syndicat,
+            excluded_utilisation_temps_de_decharge_pk=self.instance.pk,
+        )
+
+        if (
+            not self.instance.est_une_decharge_solidaires
+            and temps_restant - self.instance.etp_utilises < 0
+            and hasattr(self, "cleaned_data")
+        ):
+            self.add_error(
+                None,
+                f"Vous dépassez le quota du syndicat, il reste {temps_restant:.3f} ETP "
+                f"attribuable et vous essayez d'ajouter {self.instance.etp_utilises:.3f} ETP",
             )
 
     def clean(self):
