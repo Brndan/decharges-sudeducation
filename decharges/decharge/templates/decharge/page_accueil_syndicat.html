@@ -102,7 +102,7 @@
               <td>{{ temps_utilise.heures_d_obligation_de_service }}</td>
               <td>{{ temps_utilise.corps.code_corps }}</td>
               <td>{{ temps_utilise.code_etablissement_rne }}</td>
-              <td>{{ temps_utilise.etp_utilises|floatformat:3 }}</td>
+              <td>{{ temps_utilise.etp_utilises|floatformat:3 }} {% if temps_utilise.est_une_decharge_solidaires %}(décharge solidaires){% endif %}</td>
               {% if decharges_editables or request.user.is_federation %}
               <td>
                 <a class="button is-info icon" href="{% url 'decharge:modifier_beneficiaire' temps_utilise.pk %}"><span class="fa fa-edit"></span></a>

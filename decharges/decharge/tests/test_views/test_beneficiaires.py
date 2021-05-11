@@ -29,6 +29,7 @@ def test_ajouter_beneficiaire(client):
     response = client.get(reverse("decharge:ajouter_beneficiaire"))
     assert response.status_code == 200
     assert response.context["form"].fields["corps"].help_text is not None
+    assert "est_une_decharge_solidaires" not in response.context["form"].fields
     response = client.post(
         reverse("decharge:ajouter_beneficiaire"),
         {
@@ -51,6 +52,73 @@ def test_ajouter_beneficiaire(client):
     assert utilisation_tps.etp_utilises == round(
         (Decimal(10) + Decimal(14 / 60)) / Decimal(35), settings.PRECISION_ETP
     )
+
+
+def test_ajouter_beneficiaire__decharge_solidaires(client):
+    federation = Syndicat.objects.create(
+        is_superuser=True, email="admin@example.com", username="Fédération"
+    )
+    ParametresDApplication.objects.create(
+        annee_en_cours=2020,
+        corps_annexe=SimpleUploadedFile("file.pdf", b"random data"),
+        decharges_editables=False,
+    )
+    syndicat = Syndicat.objects.create(
+        email="syndicat1@example.com", username="Syndicat 1"
+    )
+    client.force_login(federation)
+    corps = Corps.objects.create(code_corps="123")
+    response = client.get(reverse("decharge:ajouter_beneficiaire"))
+    assert response.status_code == 200
+    assert response.context["form"].fields["corps"].help_text is not None
+    assert (
+        response.context["form"].fields["est_une_decharge_solidaires"].initial is False
+    )
+    response = client.post(
+        reverse("decharge:ajouter_beneficiaire"),
+        {
+            "civilite": "MME",
+            "prenom": "Michelle",
+            "nom": "MARTIN",
+            "heures_de_decharges": 10,
+            "minutes_de_decharges": 14,
+            "heures_d_obligation_de_service": 35,
+            "corps": corps.pk,
+            "code_etablissement_rne": "1234567A",
+            "est_une_decharge_solidaires": True,
+            "syndicat": syndicat.pk,
+        },
+    )
+    assert (
+        response.context["form"].errors["est_une_decharge_solidaires"][0]
+        == "La décharge ne peut provenir d'un autre syndicat uniquement pour les décharges fédérales"
+    )
+    response = client.post(
+        reverse("decharge:ajouter_beneficiaire"),
+        {
+            "civilite": "MME",
+            "prenom": "Michelle",
+            "nom": "MARTIN",
+            "heures_de_decharges": 10,
+            "minutes_de_decharges": 14,
+            "heures_d_obligation_de_service": 35,
+            "corps": corps.pk,
+            "code_etablissement_rne": "1234567A",
+            "est_une_decharge_solidaires": True,
+            "syndicat": federation.pk,
+            "commentaire_de_mise_a_jour": "C'est un test",
+        },
+    )
+    assert response.status_code == 302
+    assert UtilisationTempsDecharge.objects.count() == 1
+    utilisation_tps = UtilisationTempsDecharge.objects.first()
+    assert utilisation_tps.syndicat == federation
+    assert utilisation_tps.annee == 2020
+    assert utilisation_tps.nom == "MARTIN"
+    assert utilisation_tps.etp_utilises == round(
+        (Decimal(10) + Decimal(14 / 60)) / Decimal(35), settings.PRECISION_ETP
+    )
+    assert utilisation_tps.est_une_decharge_solidaires
 
 
 def test_maj_beneficiaire(client):
@@ -139,6 +207,41 @@ def test_suppression_beneficiaire(client):
     )
     assert response.status_code == 404  # check permission
     client.force_login(syndicat)
+    response = client.get(
+        reverse("decharge:supprimer_beneficiaire", kwargs={"pk": utilisation_tps.pk})
+    )
+    assert response.status_code == 200
+    response = client.post(
+        reverse("decharge:supprimer_beneficiaire", kwargs={"pk": utilisation_tps.pk})
+    )
+    assert response.status_code == 302
+    assert UtilisationTempsDecharge.objects.count() == 0
+
+
+def test_suppression_beneficiaire__en_cours_d_annee__decharge_solidaires(client):
+    federation = Syndicat.objects.create(
+        is_superuser=True, email="admin@example.com", username="Fédération"
+    )
+    ParametresDApplication.objects.create(
+        annee_en_cours=2021, decharges_editables=False
+    )
+    syndicat = Syndicat.objects.create(
+        email="syndicat1@example.com", username="Syndicat 1"
+    )
+    client.force_login(federation)
+    corps = Corps.objects.create(code_corps="123")
+    utilisation_tps = UtilisationTempsDecharge.objects.create(
+        civilite="MME",
+        prenom="Michelle",
+        nom="MARTIN",
+        heures_de_decharges=10,
+        heures_d_obligation_de_service=35,
+        corps=corps,
+        code_etablissement_rne="1234567A",
+        syndicat=syndicat,
+        annee=2020,
+        est_une_decharge_solidaires=True,
+    )
     response = client.get(
         reverse("decharge:supprimer_beneficiaire", kwargs={"pk": utilisation_tps.pk})
     )

@@ -83,7 +83,9 @@ def calcul_repartition_temps(annee_en_cours, federation, syndicat):
         supprime_a__isnull=True,
     )
     temps_utilises_total = sum(
-        temps_consomme.etp_utilises for temps_consomme in temps_utilises
+        temps_consomme.etp_utilises
+        for temps_consomme in temps_utilises
+        if not temps_consomme.est_une_decharge_solidaires
     )
     temps_donnes = syndicat.temps_de_decharges_donnes.filter(
         annee=annee_en_cours,

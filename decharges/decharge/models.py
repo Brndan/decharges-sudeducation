@@ -179,6 +179,12 @@ class UtilisationTempsDecharge(models.Model):
         verbose_name="Historique des modifications",
         help_text="Décrivez factuellement la modification apportée",
     )
+    est_une_decharge_solidaires = models.BooleanField(
+        default=False,
+        verbose_name="Est une décharge solidaires",
+        help_text="Cocher cette case uniquement si la décharge "
+        "vient d'un autre syndicat que SUD éducation",
+    )
 
     # données importées de l'historique
     etp = models.DecimalField(
@@ -221,6 +227,7 @@ class UtilisationTempsDecharge(models.Model):
             "annee",
             "code_etablissement_rne",
             "syndicat",
+            "est_une_decharge_solidaires",
         )
 
 

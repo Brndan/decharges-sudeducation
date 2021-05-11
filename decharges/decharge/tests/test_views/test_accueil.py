@@ -109,6 +109,17 @@ def test_accueil__temps_utilises(client):
         heures_d_obligation_de_service=1607,
         code_etablissement_rne="1234567A",
         annee=2021,
+        syndicat=syndicat,
+        est_une_decharge_solidaires=True,
+    )
+    UtilisationTempsDecharge.objects.create(
+        civilite="M.",
+        prenom="Foo",
+        nom="BAR",
+        heures_de_decharges=40,
+        heures_d_obligation_de_service=1607,
+        code_etablissement_rne="1234567A",
+        annee=2021,
         syndicat=syndicat_donateur,
     )
     UtilisationTempsDecharge.objects.create(
@@ -154,7 +165,7 @@ def test_accueil__temps_utilises(client):
     )
     assert res.context["cts_consommes"] == cts
     assert res.context["temps_donnes"].count() == 1
-    assert res.context["temps_utilises"].count() == 1
+    assert res.context["temps_utilises"].count() == 2
     assert res.context["temps_recus_par_la_federation"] == round(
         Decimal(3), settings.PRECISION_ETP
     )

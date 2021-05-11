@@ -95,6 +95,16 @@ def test_synthese_cts(client):
         annee=2021,
         syndicat=syndicat,
     )
+    UtilisationTempsDecharge.objects.create(
+        prenom="Foo",
+        nom="BAR",
+        heures_de_decharges=10,
+        heures_d_obligation_de_service=35,
+        code_etablissement_rne="1234567A",
+        annee=2021,
+        syndicat=syndicat,
+        est_une_decharge_solidaires=True,
+    )
     UtilisationCreditDeTempsSyndicalPonctuel.objects.create(
         demi_journees_de_decharges=5, syndicat=syndicat, annee=2021
     )

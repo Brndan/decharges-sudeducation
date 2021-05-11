@@ -39,7 +39,9 @@ class ExportMinistere(CheckConfigurationMixin, FederationRequiredMixin, View):
 
         data_frame = get_data_frame_ministere(
             UtilisationTempsDecharge.objects.filter(
-                annee=annee, supprime_a__isnull=True
+                annee=annee,
+                supprime_a__isnull=True,
+                est_une_decharge_solidaires=False,
             )
             .prefetch_related("corps")
             .order_by("nom", "prenom")

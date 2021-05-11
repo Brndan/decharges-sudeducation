@@ -27,6 +27,7 @@ class UtilisationTempsDechargeForm(forms.ModelForm):
         self.annee = kwargs.pop("annee")
         self.decharges_editables = kwargs.pop("decharges_editables")
         self.corps_annexe = kwargs.pop("corps_annexe")
+        self.federation = kwargs.pop("federation")
         super().__init__(*args, **kwargs)
         self.fields["prenom"].label = "Prénom"
         self.fields["prenom"].help_text = (
@@ -78,6 +79,14 @@ class UtilisationTempsDechargeForm(forms.ModelForm):
                 f"</a> "
             )
 
+        if self.federation == self.syndicat:
+            self.fields["est_une_decharge_solidaires"] = forms.BooleanField(
+                label="Est une décharge solidaires",
+                help_text="Cocher cette case uniquement si la décharge vient d'un autre syndicat que SUD éducation",
+                initial=self.instance.est_une_decharge_solidaires,
+                required=False,
+            )
+
         self.fields["heures_de_decharges"].initial = int(
             self.instance.heures_de_decharges
         )
@@ -88,6 +97,17 @@ class UtilisationTempsDechargeForm(forms.ModelForm):
             )
             * 60
         )
+
+    def clean(self):
+        cleaned_data = super().clean()
+        if cleaned_data.get(
+            "est_une_decharge_solidaires"
+        ) and self.federation != cleaned_data.get("syndicat", self.syndicat):
+            self.add_error(
+                "est_une_decharge_solidaires",
+                "La décharge ne peut provenir d'un autre syndicat uniquement pour les décharges fédérales",
+            )
+        return cleaned_data
 
     def save(self, commit=True):
         if self.decharges_editables:
@@ -100,6 +120,9 @@ class UtilisationTempsDechargeForm(forms.ModelForm):
             ]
         self.instance.annee = self.annee
         self.instance.heures_de_decharges = self.cleaned_data["heures_de_decharges"]
+        self.instance.est_une_decharge_solidaires = self.cleaned_data.get(
+            "est_une_decharge_solidaires", False
+        )
         if self.cleaned_data["minutes_de_decharges"]:
             self.instance.heures_de_decharges += (
                 self.cleaned_data["minutes_de_decharges"] / 60

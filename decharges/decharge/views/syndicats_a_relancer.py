@@ -45,9 +45,8 @@ class SyndicatsARelancer(
                 syndicats_depassant_leur_quota.append((syndicat, abs(temps_restant)))
 
         context["syndicats_n_ayant_rien_rempli"] = (
-            Syndicat.objects.exclude(pk=self.federation.pk).exclude(
-                temps_de_decharges_donnes__in=temps_de_decharge_mutualise
-            )
+            Syndicat.objects.exclude(pk=self.federation.pk)
+            .exclude(temps_de_decharges_donnes__in=temps_de_decharge_mutualise)
             .exclude(
                 utilisation_temps_de_decharges_par_annee__in=utilisation_temps_decharge
             )

@@ -24,7 +24,9 @@ class CreateUtilisationTempsDecharge(
         return reverse("decharge:index")
 
     def form_valid(self, form):
-        if self.params.decharges_editables:
+        if self.params.decharges_editables or form.cleaned_data.get(
+            "est_une_decharge_solidaires"
+        ):
             return super().form_valid(form)
 
         # dans ce cas, la fédération est en train de créer une décharge en cours d'année
@@ -65,6 +67,7 @@ class CreateUtilisationTempsDecharge(
         form_kwargs["annee"] = self.params.annee_en_cours
         form_kwargs["decharges_editables"] = self.params.decharges_editables
         form_kwargs["corps_annexe"] = self.params.corps_annexe
+        form_kwargs["federation"] = self.federation
         return form_kwargs
 
 
@@ -87,7 +90,9 @@ class UpdateUtilisationTempsDecharge(
         return utilisation_temps_decharge
 
     def form_valid(self, form):
-        if self.params.decharges_editables:
+        if self.params.decharges_editables or form.cleaned_data.get(
+            "est_une_decharge_solidaires"
+        ):
             return super().form_valid(form)
 
         # dans ce cas, la fédération est en train de modifier une décharge en cours d'année
@@ -124,6 +129,7 @@ class UpdateUtilisationTempsDecharge(
         form_kwargs["annee"] = self.object.annee
         form_kwargs["decharges_editables"] = self.params.decharges_editables
         form_kwargs["corps_annexe"] = self.params.corps_annexe
+        form_kwargs["federation"] = self.federation
         return form_kwargs
 
 
@@ -148,9 +154,12 @@ class SuppressionUtilisationTempsDecharge(
         if self.params.decharges_editables:
             return super().delete(request, *args, **kwargs)
 
+        self.object = self.get_object()
+        if self.object.est_une_decharge_solidaires:
+            return super().delete(request, *args, **kwargs)
+
         # dans ce cas, la fédération est en train de créer une décharge en cours d'année
         #     on doit donc faire télécharger un fichier ods contenant cet ajout
-        self.object = self.get_object()
         annee = self.params.annee_en_cours
         temps_du_beneficiaire_avant_suppression = (
             UtilisationTempsDecharge.objects.filter(
