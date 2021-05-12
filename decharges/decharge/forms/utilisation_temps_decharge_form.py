@@ -77,7 +77,7 @@ class UtilisationTempsDechargeForm(forms.ModelForm):
                 f"Voir <a href='{self.corps_annexe.url}' target='_blank'>"
                 f"{os.path.basename(self.corps_annexe.name)} "
                 f"<span class='fa fa-external-link-alt fa-xs'></span>"
-                f"</a> "
+                "</a> (cliquer sur le lien ne quitte pas la page actuelle)"
             )
 
         if self.federation == self.syndicat:
