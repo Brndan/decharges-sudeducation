@@ -1,0 +1,29 @@
+{% extends "decharges/base.html" %}
+{% load bulma_tags %}
+
+{% block title %}Renommer un·e bénéficiaire{% endblock title %}
+
+{% block maintitle %}Renommer un·e bénéficiaire{% endblock maintitle %}
+{% block subtitle %}
+  Cette page vous permet de renommer un·e bénéficiaire ou de changer son RNE. Cela peut être utile par exemple dans le cas d'un changement de nom suite à un mariage ou d'une mutation)
+{% endblock %}
+
+{% block content %}
+  <section class="container pb-6">
+    <div class="card pt-2">
+      <header class="card-header">
+        <h2 class="card-header-title">Renommer un·e bénéficiaire</h2>
+      </header>
+      <div class="card-content">
+        <p class="mb-4">Les bénéficiaires ne seront renommé·e·s si et seulement si iels correspondent <b>exactement</b> au trio nom/prénom/RNE</p>
+        <form method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          {{ form|bulma }}
+          <div class="field">
+            <button type="submit" class="button is-primary">Renommer</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+{% endblock content %}

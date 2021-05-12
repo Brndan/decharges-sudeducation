@@ -7,6 +7,7 @@ from decharges.decharge.views.historique import (
     HistoriqueTelecharger,
 )
 from decharges.decharge.views.import_temps_syndicats import ImportTempsSyndicats
+from decharges.decharge.views.renommer_beneficiaire import RenommerBeneficiaire
 from decharges.decharge.views.syndicats_a_relancer import SyndicatsARelancer
 from decharges.decharge.views.synthese_cts import SyntheseCTS
 from decharges.decharge.views.temps_de_decharge import (
@@ -34,6 +35,7 @@ __all__ = [
     "HistoriqueTelecharger",
     "ImportTempsSyndicats",
     "PageAccueilSyndicatView",
+    "RenommerBeneficiaire",
     "SuppressionTempsDeDecharge",
     "SuppressionUtilisationTempsDecharge",
     "SyndicatsARelancer",

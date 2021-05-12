@@ -3,6 +3,7 @@ from decimal import Decimal
 import pandas
 import pytest
 from django.conf import settings
+from django.contrib.messages import get_messages
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 
@@ -826,4 +827,68 @@ def test_ajouter_beneficiaire__depasse_3_etp_consecutifs(client):
     assert (
         response.context["form"].errors["__all__"][0]
         == "La ou le bénéficiaire cumule déjà 2.750ETP consécutifs de décharges sur les dernières années (+l'année en cours) et vous essayez de rajouter 0.286ETP"
+    )
+
+
+def test_renommer_beneficiaire(client):
+    federation = Syndicat.objects.create(
+        is_superuser=True, email="admin@example.com", username="Fédération"
+    )
+    ParametresDApplication.objects.create(
+        annee_en_cours=2020,
+        corps_annexe=SimpleUploadedFile("file.pdf", b"random data"),
+    )
+    syndicat = Syndicat.objects.create(
+        email="syndicat1@example.com", username="Syndicat 1"
+    )
+    corps = Corps.objects.create(code_corps="123")
+    utilisation_temps = UtilisationTempsDecharge.objects.create(
+        civilite="MME",
+        prenom="Michelle",
+        nom="MARTIN",
+        heures_de_decharges=1,
+        heures_d_obligation_de_service=35,
+        corps=corps,
+        code_etablissement_rne="1234567A",
+        syndicat=syndicat,
+        annee=2020,
+    )
+    client.force_login(federation)
+    response = client.post(
+        reverse("decharge:renommer_beneficiaire"),
+        {
+            "ancien_prenom": "Michelle",
+            "ancien_nom": "MARTIN",
+            "ancien_rne": "1234567A",
+            "nouveau_prenom": "Michel",
+            "nouveau_nom": "MARTINE",
+            "nouveau_rne": "1234567B",
+        },
+    )
+    utilisation_temps.refresh_from_db()
+    assert response.status_code == 302
+    assert (
+        str(list(get_messages(response.wsgi_request))[0])
+        == "1 déclarations de temps ont été mis à jour"
+    )
+    assert utilisation_temps.prenom == "Michel"
+    assert utilisation_temps.nom == "MARTINE"
+    assert utilisation_temps.code_etablissement_rne == "1234567B"
+
+    response = client.post(
+        reverse("decharge:renommer_beneficiaire"),
+        {
+            "ancien_prenom": "Michelle",
+            "ancien_nom": "MARTIN",
+            "ancien_rne": "1234567A",
+            "nouveau_prenom": "Michel",
+            "nouveau_nom": "MARTINE",
+            "nouveau_rne": "1234567B",
+        },
+    )
+    utilisation_temps.refresh_from_db()
+    assert response.status_code == 302
+    assert (
+        str(list(get_messages(response.wsgi_request))[1])
+        == "Aucun·e bénéficiaire ne correspondait à vos données, aucun changement n'a été effectué"
     )

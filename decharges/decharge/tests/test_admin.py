@@ -1,7 +1,8 @@
 import pytest
 
 from decharges.decharge.admin import TempsDeDechargeAdmin
-from decharges.decharge.models import TempsDeDecharge
+from decharges.decharge.models import Corps, TempsDeDecharge, UtilisationTempsDecharge
+from decharges.parametre.admin import import_corps
 from decharges.user_manager.models import Syndicat
 
 pytestmark = pytest.mark.django_db
@@ -33,3 +34,32 @@ def test_nom_syndicat_donateur():
     )
     assert TempsDeDechargeAdmin.nom_syndicat_donateur(tps_decharge1) is None
     assert "test_username" == TempsDeDechargeAdmin.nom_syndicat_donateur(tps_decharge2)
+
+
+def test_import_corps():
+    syndicat = Syndicat.objects.create()
+    corps = Corps.objects.create(code_corps="xxx")
+    Corps.objects.create(code_corps="zzz")
+    UtilisationTempsDecharge.objects.create(
+        civilite="MME",
+        prenom="Michelle",
+        nom="MARTIN",
+        heures_de_decharges=10,
+        heures_d_obligation_de_service=35,
+        corps=corps,
+        code_etablissement_rne="1234567A",
+        syndicat=syndicat,
+        annee=2020,
+    )
+    with open("decharges/decharge/tests/assets/corps_example.ods", "rb") as f:
+        import_corps(f)
+    assert Corps.objects.count() == 513
+    assert Corps.objects.filter(code_corps="zzz").count() == 0
+    assert Corps.objects.filter(code_corps="xxx").count() == 1
+
+    # test idempotency
+    with open("decharges/decharge/tests/assets/corps_example.ods", "rb") as f:
+        import_corps(f)
+    assert Corps.objects.count() == 513
+    assert Corps.objects.filter(code_corps="zzz").count() == 0
+    assert Corps.objects.filter(code_corps="xxx").count() == 1

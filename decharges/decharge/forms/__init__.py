@@ -1,6 +1,7 @@
 from decharges.decharge.forms.import_temps_syndicats_form import (
     ImportTempsSyndicatsForm,
 )
+from decharges.decharge.forms.renommer_beneficiaire_form import RenommerBeneficiaireForm
 from decharges.decharge.forms.temps_de_decharge_form import (
     QuotaETPFederationForm,
     TempsDeDechargeForm,
@@ -17,5 +18,6 @@ __all__ = [
     "UtilisationCreditDeTempsSyndicalPonctuelForm",
     "UtilisationTempsDechargeForm",
     "ImportTempsSyndicatsForm",
+    "RenommerBeneficiaireForm",
     "TempsDeDechargeForm",
 ]
