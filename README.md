@@ -40,6 +40,8 @@ MariaDB [(none)]> CREATE USER decharges@localhost IDENTIFIED BY 'decharges';
 MariaDB [(none)]> GRANT ALL PRIVILEGES ON decharges.* TO decharges@localhost;
 ```
 
+Notez que la base de données doit bien être en UTF-8, cf la documentation de django : https://docs.djangoproject.com/en/dev/ref/databases/#encoding
+
 Ensuite, lancez les migrations django :
 
 ```bash
@@ -50,6 +52,14 @@ Vous pouvez également créer un superuser si vous le souhaitez :
 
 ```bash
 (venv-decharges) $ ./manage.py createsuperuser
+```
+
+### Rassembler les statiques
+
+Cette commande permet de rassembler tous les fichiers statiques dans un même dossier, de manière à le servir efficacement avec nginx ou apache
+
+```bash
+(venv-decharges) $ ./manage.py collectstatic
 ```
 
 ### Lancer le serveur
