@@ -100,7 +100,7 @@ Variables d'environnement nécessaires au projet en production
 - **DB_HOST** : le nom de domaine ou l'adresse IP de la base de données mariadb. Peut également être le chemin vers la socket mysql, voir : https://docs.djangoproject.com/en/3.2/ref/settings/#host
 - **DB_PORT** : le port de la base de données mariadb, si non spécifié le port par défaut de mariadb est utilisé
 - **STATIC_ROOT** : le chemin des fichiers statiques, si non spécifié `./static` est utilisé
-- **MEDIA_ROOT** : le chemin des fichiers médias, si non spécifié `./media` est utilisé
+- **MEDIA_ROOT** : le chemin des fichiers médias (fichiers uploadés par exemple), si non spécifié `./media` est utilisé
 - **EMAIL_BACKEND** : la méthode django pour envoyer des mails, par défaut `django.core.mail.backends.console.EmailBackend` est utilisé ce qui permet de voir les mails envoyés dans la console django. En production il fautdra sûrement utiliser `django.core.mail.backends.smtp.EmailBackend`
 - **EMAIL_HOST** : le nom de domaine ou l'adresse IP du serveur mail SMTP
 - **EMAIL_PORT** : le port du serveur mail SMTP, si non spécifié `587` est utilisé
