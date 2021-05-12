@@ -7,3 +7,19 @@
 .logo img {
     max-height: 2rem;
 }
+
+/* Form */
+.fieldset {
+    padding: 0 12px 32px 12px;
+    border-radius: 4px;
+    border: 1px solid #d0d0d0;
+}
+
+.fieldset > legend {
+    padding: 0 8px;
+}
+
+label.label.required::after {
+    content: "*";
+    color: red;
+}

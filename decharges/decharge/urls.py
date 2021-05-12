@@ -12,6 +12,7 @@ from decharges.decharge.views import (
     HistoriqueTelecharger,
     ImportTempsSyndicats,
     PageAccueilSyndicatView,
+    RenommerBeneficiaire,
     SuppressionTempsDeDecharge,
     SuppressionUtilisationTempsDecharge,
     SyndicatsARelancer,
@@ -85,5 +86,10 @@ urlpatterns = [
         "syndicats-a-relancer/",
         SyndicatsARelancer.as_view(),
         name="syndicats_a_relancer",
+    ),
+    path(
+        "renommer-beneficiaire/",
+        RenommerBeneficiaire.as_view(),
+        name="renommer_beneficiaire",
     ),
 ]
