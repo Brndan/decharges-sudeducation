@@ -146,6 +146,18 @@ Lancez cette commande :
 $ ./manage.py import_historique --csv-file=imports/historique/historique.csv
 ```
 
+### Import des Corps
+
+Une fois que l'application est lancée en production vous pouvez vous dirigez ici : https://example.com/admin/parametre/parametresdapplication/ et éditer l'objet existant.
+
+On vous proposera alors d'ajouter un fichier "Corps annexe". Cela va avoir 3 effets :
+
+1. Les utilisatrices et utilisateurs auront accès à ce fichier dans le formulaire d'ajout d'un·e bénéficiaire
+2. La première colonne de ce fichier est utilisée pour importer les Corps dans l'application
+3. Les Corps non-utilisés (avant l'import) présents en BDD seront supprimés
+
+Un exemple d'un fichier à importer est présent ici : `decharges/decharge/tests/assets/corps_example.ods`
+
 ## Organisation du code
 
 ### `decharges/settings/base.py` :

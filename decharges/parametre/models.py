@@ -1,3 +1,4 @@
+from django.core.validators import FileExtensionValidator
 from django.db import models
 
 
@@ -18,7 +19,11 @@ class ParametresDApplication(models.Model):
         default=True,
         verbose_name="Les syndicats peuvent-ils accéder à l'édition des décharges ?",
     )
-    corps_annexe = models.FileField(upload_to="uploads", null=True)
+    corps_annexe = models.FileField(
+        upload_to="uploads",
+        null=True,
+        validators=[FileExtensionValidator(allowed_extensions=["ods"])],
+    )
 
     def __str__(self):
         return "Paramètres de l'application"
