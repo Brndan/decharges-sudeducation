@@ -138,7 +138,15 @@ $ ./manage.py shell <<< "from decharges.parametre.models import *; ParametresDAp
 Avant tout, générer un fichier historique en CSV et stockez-le dans `imports/historique/historique.csv`
 (un exemple d'un tel fichier est présent dans le dossier)
 
-Assurez-vous que la fédération a bien un compte sur le site avant de passer à la suite.
+**/!\\ /!\\ Attention :** le formattage du fichier CSV est important :
+
+- la virgule doit être utilisée comme séparateur
+- le guillement double `"` est utilisé pour délimiter les champs contenant des caractères spéciaux ('delimiter' ou 'quotechar')
+- la première ligne doit contenir les headers du CSV, à savoir : Civilité, Prénom, Nom d'usage, Structure ou affectation, Corps, [les années]
+
+Pour être sûr que le CSV est dans le bon format, un exemple est présent dans **imports/historique/historique.csv**
+
+Assurez-vous également que la fédération a bien un compte sur le site avant de passer à la suite.
 
 Lancez cette commande :
 
