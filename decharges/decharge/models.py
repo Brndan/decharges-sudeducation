@@ -89,7 +89,7 @@ MME = "MME"
 
 choix_civilite = [
     (M, "M."),
-    (MME, "Mme"),
+    (MME, "MME"),
 ]
 
 CIVILITE_AFFICHEE = {key: value for key, value in choix_civilite}

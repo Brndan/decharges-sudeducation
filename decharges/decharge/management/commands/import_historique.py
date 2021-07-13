@@ -53,7 +53,7 @@ class Command(BaseCommand):
         nb_updated = 0
         nb_created = 0
         for history_line in reader:
-            civilite = history_line[0].strip()
+            civilite = history_line[0].strip().upper()
             prenom = history_line[1].strip()
             nom = history_line[2].strip()
             rne = history_line[3].strip()

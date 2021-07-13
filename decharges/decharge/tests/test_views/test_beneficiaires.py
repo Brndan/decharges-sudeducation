@@ -406,7 +406,7 @@ def test_ajouter_beneficiaire__en_cours_d_annee(client):
     document = pandas.read_excel(response.content, dtype="string")
     assert len(list(document.iterrows())) == 1
     assert list(document.iterrows())[0][1]["Code organisation"] == "S01"
-    assert list(document.iterrows())[0][1]["M. Mme"] == "Mme"
+    assert list(document.iterrows())[0][1]["M. Mme"] == "MME"
     assert list(document.iterrows())[0][1]["Prénom"] == "Michelle"
     assert list(document.iterrows())[0][1]["Nom"] == "MARTIN"
     assert list(document.iterrows())[0][1]["Heures décharges"] == "15"
@@ -479,7 +479,7 @@ def test_maj_beneficiaire__en_cours_d_annee(client):
     document = pandas.read_excel(response.content, dtype="string")
     assert len(list(document.iterrows())) == 1
     assert list(document.iterrows())[0][1]["Code organisation"] == "S01"
-    assert list(document.iterrows())[0][1]["M. Mme"] == "Mme"
+    assert list(document.iterrows())[0][1]["M. Mme"] == "MME"
     assert list(document.iterrows())[0][1]["Prénom"] == "Michelle"
     assert list(document.iterrows())[0][1]["Nom"] == "MARTIN"
     assert list(document.iterrows())[0][1]["Heures décharges"] == "15"
@@ -526,7 +526,7 @@ def test_suppression_beneficiaire__en_cours_d_annee(client):
     document = pandas.read_excel(response.content, dtype="string")
     assert len(list(document.iterrows())) == 1
     assert list(document.iterrows())[0][1]["Code organisation"] == "S01"
-    assert list(document.iterrows())[0][1]["M. Mme"] == "Mme"
+    assert list(document.iterrows())[0][1]["M. Mme"] == "MME"
     assert list(document.iterrows())[0][1]["Prénom"] == "Michelle"
     assert list(document.iterrows())[0][1]["Nom"] == "MARTIN"
     assert list(document.iterrows())[0][1]["Heures décharges"] == "10"
@@ -587,7 +587,7 @@ def test_suppression_beneficiaire__en_cours_d_annee__modification(client):
     document = pandas.read_excel(response.content, dtype="string")
     assert len(list(document.iterrows())) == 1
     assert list(document.iterrows())[0][1]["Code organisation"] == "S01"
-    assert list(document.iterrows())[0][1]["M. Mme"] == "Mme"
+    assert list(document.iterrows())[0][1]["M. Mme"] == "MME"
     assert list(document.iterrows())[0][1]["Prénom"] == "Michelle"
     assert list(document.iterrows())[0][1]["Nom"] == "MARTIN"
     assert list(document.iterrows())[0][1]["Heures décharges"] == "40"
