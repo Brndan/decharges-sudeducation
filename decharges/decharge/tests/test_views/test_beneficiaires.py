@@ -1,4 +1,6 @@
+import datetime
 from decimal import Decimal
+from io import BytesIO
 
 import pandas
 import pytest
@@ -43,7 +45,7 @@ def test_ajouter_beneficiaire(client):
             "civilite": "MME",
             "prenom": "Michelle",
             "nom": "MARTIN",
-            "heures_de_decharges": 10,
+            "int_heures_de_decharges": 10,
             "minutes_de_decharges": 14,
             "heures_d_obligation_de_service": 35,
             "corps": corps.pk,
@@ -56,8 +58,119 @@ def test_ajouter_beneficiaire(client):
     assert utilisation_tps.syndicat == syndicat
     assert utilisation_tps.annee == 2020
     assert utilisation_tps.nom == "MARTIN"
+    assert utilisation_tps.date_debut_decharge == datetime.date(
+        year=2020, month=9, day=1
+    )
+    assert utilisation_tps.date_fin_decharge == datetime.date(
+        year=2021, month=8, day=31
+    )
     assert utilisation_tps.etp_utilises == round(
         (Decimal(10) + Decimal(14 / 60)) / Decimal(35), settings.PRECISION_ETP
+    )
+
+
+def test_ajouter_beneficiaire__prorata(client):
+    federation = Syndicat.objects.create(
+        is_superuser=True, email="admin@example.com", username="Fédération"
+    )
+    ParametresDApplication.objects.create(
+        annee_en_cours=2020,
+        corps_annexe=SimpleUploadedFile("file.pdf", b"random data"),
+    )
+    syndicat = Syndicat.objects.create(
+        email="syndicat1@example.com", username="Syndicat 1"
+    )
+    TempsDeDecharge.objects.create(
+        syndicat_beneficiaire=syndicat,
+        syndicat_donateur=federation,
+        annee=2020,
+        temps_de_decharge_etp=10,
+    )
+    client.force_login(syndicat)
+    corps = Corps.objects.create(code_corps="123")
+    response = client.get(reverse("decharge:ajouter_beneficiaire"))
+    assert response.status_code == 200
+    assert response.context["form"].fields["corps"].help_text is not None
+    assert "est_une_decharge_solidaires" not in response.context["form"].fields
+    response = client.post(
+        reverse("decharge:ajouter_beneficiaire"),
+        {
+            "civilite": "MME",
+            "prenom": "Michelle",
+            "nom": "MARTIN",
+            "int_heures_de_decharges": 10,
+            "minutes_de_decharges": 14,
+            "heures_d_obligation_de_service": 35,
+            "corps": corps.pk,
+            "code_etablissement_rne": "1234567A",
+            "decharge_applicable_uniquement_sur_une_partie_de_lannee": True,
+            "date_debut_decharge": "01/10/2020",
+            "date_fin_decharge": "01/07/2021",
+        },
+    )
+    assert response.status_code == 302
+    assert UtilisationTempsDecharge.objects.count() == 1
+    utilisation_tps = UtilisationTempsDecharge.objects.first()
+    assert utilisation_tps.syndicat == syndicat
+    assert utilisation_tps.annee == 2020
+    assert utilisation_tps.nom == "MARTIN"
+    assert utilisation_tps.date_debut_decharge == datetime.date(
+        year=2020, month=10, day=1
+    )
+    assert utilisation_tps.date_fin_decharge == datetime.date(year=2021, month=7, day=1)
+    assert utilisation_tps.etp_utilises == round(
+        Decimal(274 / 365) * (Decimal(10) + Decimal(14 / 60)) / Decimal(35),
+        settings.PRECISION_ETP,
+    )
+
+
+def test_ajouter_beneficiaire__prorata_erreur(client):
+    federation = Syndicat.objects.create(
+        is_superuser=True, email="admin@example.com", username="Fédération"
+    )
+    ParametresDApplication.objects.create(
+        annee_en_cours=2020,
+        corps_annexe=SimpleUploadedFile("file.pdf", b"random data"),
+    )
+    syndicat = Syndicat.objects.create(
+        email="syndicat1@example.com", username="Syndicat 1"
+    )
+    TempsDeDecharge.objects.create(
+        syndicat_beneficiaire=syndicat,
+        syndicat_donateur=federation,
+        annee=2020,
+        temps_de_decharge_etp=10,
+    )
+    client.force_login(syndicat)
+    corps = Corps.objects.create(code_corps="123")
+    response = client.get(reverse("decharge:ajouter_beneficiaire"))
+    assert response.status_code == 200
+    assert response.context["form"].fields["corps"].help_text is not None
+    assert "est_une_decharge_solidaires" not in response.context["form"].fields
+    response = client.post(
+        reverse("decharge:ajouter_beneficiaire"),
+        {
+            "civilite": "MME",
+            "prenom": "Michelle",
+            "nom": "MARTIN",
+            "int_heures_de_decharges": 10,
+            "minutes_de_decharges": 14,
+            "heures_d_obligation_de_service": 35,
+            "corps": corps.pk,
+            "code_etablissement_rne": "1234567A",
+            "decharge_applicable_uniquement_sur_une_partie_de_lannee": True,
+            "date_debut_decharge": "01/08/2020",
+            "date_fin_decharge": "01/09/2021",
+        },
+    )
+    assert response.status_code == 200
+    assert (
+        response.context["form"].errors["date_debut_decharge"][0]
+        == "La date de début de décharge doit être une date dans l'année inférieure à la date de fin de décharge"
+    )
+    assert (
+        response.context["form"].errors["date_fin_decharge"][0]
+        == "La date de fin de décharge doit être une date dans l'année supérieure à la date de début de décharge"
     )
 
 
@@ -90,7 +203,7 @@ def test_ajouter_beneficiaire__unique_together(client):
             "civilite": "MME",
             "prenom": "Michelle",
             "nom": "MARTIN",
-            "heures_de_decharges": 10,
+            "int_heures_de_decharges": 10,
             "minutes_de_decharges": 14,
             "heures_d_obligation_de_service": 35,
             "corps": corps.pk,
@@ -104,7 +217,7 @@ def test_ajouter_beneficiaire__unique_together(client):
             "civilite": "MME",
             "prenom": "Michelle",
             "nom": "MARTIN",
-            "heures_de_decharges": 10,
+            "int_heures_de_decharges": 10,
             "minutes_de_decharges": 14,
             "heures_d_obligation_de_service": 35,
             "corps": corps.pk,
@@ -145,7 +258,7 @@ def test_ajouter_beneficiaire__decharge_solidaires(client):
             "civilite": "MME",
             "prenom": "Michelle",
             "nom": "MARTIN",
-            "heures_de_decharges": 10,
+            "int_heures_de_decharges": 10,
             "minutes_de_decharges": 14,
             "heures_d_obligation_de_service": 35,
             "corps": corps.pk,
@@ -164,7 +277,7 @@ def test_ajouter_beneficiaire__decharge_solidaires(client):
             "civilite": "MME",
             "prenom": "Michelle",
             "nom": "MARTIN",
-            "heures_de_decharges": 10,
+            "int_heures_de_decharges": 10,
             "minutes_de_decharges": 14,
             "heures_d_obligation_de_service": 35,
             "corps": corps.pk,
@@ -231,7 +344,7 @@ def test_maj_beneficiaire(client):
             "civilite": "MME",
             "prenom": "Michelle",
             "nom": "MARTIN",
-            "heures_de_decharges": 15,
+            "int_heures_de_decharges": 15,
             "minutes_de_decharges": 14,
             "heures_d_obligation_de_service": 35,
             "corps": corps.pk,
@@ -244,8 +357,91 @@ def test_maj_beneficiaire(client):
     assert utilisation_tps.syndicat == syndicat
     assert utilisation_tps.annee == 2020
     assert utilisation_tps.nom == "MARTIN"
+    assert utilisation_tps.date_debut_decharge == datetime.date(
+        year=2020, month=9, day=1
+    )
+    assert utilisation_tps.date_fin_decharge == datetime.date(
+        year=2021, month=8, day=31
+    )
     assert utilisation_tps.etp_utilises == round(
         (Decimal(15) + Decimal(14 / 60)) / Decimal(35), settings.PRECISION_ETP
+    )
+
+
+def test_maj_beneficiaire__prorata(client):
+    federation = Syndicat.objects.create(
+        is_superuser=True, email="admin@example.com", username="Fédération"
+    )
+    ParametresDApplication.objects.create(annee_en_cours=2021)
+    syndicat = Syndicat.objects.create(
+        email="syndicat1@example.com", username="Syndicat 1"
+    )
+    syndicat2 = Syndicat.objects.create(
+        email="syndicat2@example.com", username="Syndicat 2"
+    )
+    client.force_login(syndicat2)
+    TempsDeDecharge.objects.create(
+        syndicat_beneficiaire=syndicat,
+        syndicat_donateur=federation,
+        annee=2020,
+        temps_de_decharge_etp=10,
+    )
+    corps = Corps.objects.create(code_corps="123")
+    utilisation_tps = UtilisationTempsDecharge.objects.create(
+        civilite="MME",
+        prenom="Michelle",
+        nom="MARTIN",
+        heures_de_decharges=10,
+        heures_d_obligation_de_service=35,
+        corps=corps,
+        code_etablissement_rne="1234567A",
+        syndicat=syndicat,
+        annee=2020,
+        date_debut_decharge=datetime.date(year=2020, month=11, day=5),
+    )
+    response = client.get(
+        reverse("decharge:modifier_beneficiaire", kwargs={"pk": utilisation_tps.pk})
+    )
+    assert response.status_code == 404  # check permission
+    client.force_login(syndicat)
+    response = client.get(
+        reverse("decharge:modifier_beneficiaire", kwargs={"pk": utilisation_tps.pk})
+    )
+    assert response.status_code == 200
+    assert (
+        response.context["form"]
+        .fields["decharge_applicable_uniquement_sur_une_partie_de_lannee"]
+        .initial
+    )
+    response = client.post(
+        reverse("decharge:modifier_beneficiaire", kwargs={"pk": utilisation_tps.pk}),
+        {
+            "civilite": "MME",
+            "prenom": "Michelle",
+            "nom": "MARTIN",
+            "int_heures_de_decharges": 15,
+            "minutes_de_decharges": 14,
+            "heures_d_obligation_de_service": 35,
+            "corps": corps.pk,
+            "code_etablissement_rne": "1234567A",
+            "decharge_applicable_uniquement_sur_une_partie_de_lannee": True,
+            "date_debut_decharge": "01/10/2020",
+            "date_fin_decharge": "01/07/2021",
+        },
+    )
+    assert response.status_code == 302
+
+    utilisation_tps.refresh_from_db()
+    assert utilisation_tps.syndicat == syndicat
+    assert utilisation_tps.annee == 2020
+    assert utilisation_tps.nom == "MARTIN"
+    assert utilisation_tps.date_debut_decharge == datetime.date(
+        year=2020, month=10, day=1
+    )
+    assert utilisation_tps.date_fin_decharge == datetime.date(year=2021, month=7, day=1)
+    assert utilisation_tps.etp_utilises == round(
+        Decimal(274 / 365) * (Decimal(15) + Decimal(14 / 60)) / Decimal(35),
+        settings.PRECISION_ETP,
     )
 
 
@@ -382,7 +578,7 @@ def test_ajouter_beneficiaire__en_cours_d_annee(client):
             "civilite": "MME",
             "prenom": "Michelle",
             "nom": "MARTIN",
-            "heures_de_decharges": 5,
+            "int_heures_de_decharges": 5,
             "minutes_de_decharges": 14,
             "heures_d_obligation_de_service": 35,
             "corps": corps.pk,
@@ -403,19 +599,21 @@ def test_ajouter_beneficiaire__en_cours_d_annee(client):
     assert utilisation_tps.etp_utilises == round(
         (Decimal(5) + Decimal(14 / 60)) / Decimal(35), settings.PRECISION_ETP
     )
-    document = pandas.read_excel(response.content, dtype="string")
-    assert len(list(document.iterrows())) == 1
-    assert list(document.iterrows())[0][1]["Code organisation"] == "S01"
-    assert list(document.iterrows())[0][1]["M. Mme"] == "MME"
-    assert list(document.iterrows())[0][1]["Prénom"] == "Michelle"
-    assert list(document.iterrows())[0][1]["Nom"] == "MARTIN"
-    assert list(document.iterrows())[0][1]["Heures décharges"] == "15"
-    assert list(document.iterrows())[0][1]["Minutes décharges"] == "14"
-    assert list(document.iterrows())[0][1]["Heures ORS"] == "35"
-    assert list(document.iterrows())[0][1]["Minutes ORS"] == "0"
-    assert list(document.iterrows())[0][1]["AIRE"] == "2"
-    assert list(document.iterrows())[0][1]["Corps"] == "123"
-    assert list(document.iterrows())[0][1]["RNE"] == "1234567A"
+    document = pandas.read_csv(BytesIO(response.content), dtype="string")
+    rows = list(document.iterrows())
+    assert len(rows) == 1
+    assert rows[0][1]["Code organisation"] == "S01"
+    assert rows[0][1]["Code civilité"] == "MME"
+    assert rows[0][1]["Prénom"] == "Michelle"
+    assert rows[0][1]["Nom"] == "MARTIN"
+    assert rows[0][1]["Heures de décharge"] == "15"
+    assert rows[0][1]["Minutes de décharge"] == "14"
+    assert rows[0][1]["Heures d'obligations de service"] == "35"
+    assert rows[0][1]["Aire"] == "2"
+    assert rows[0][1]["Corps"] == "123"
+    assert rows[0][1]["Etablissement"] == "1234567A"
+    assert rows[0][1]["Date d'effet"] == "01/09/2020"
+    assert rows[0][1]["Date de fin"] == "31/08/2021"
 
 
 def test_maj_beneficiaire__en_cours_d_annee(client):
@@ -457,7 +655,7 @@ def test_maj_beneficiaire__en_cours_d_annee(client):
             "civilite": "MME",
             "prenom": "Michelle",
             "nom": "MARTIN",
-            "heures_de_decharges": 15,
+            "int_heures_de_decharges": 15,
             "minutes_de_decharges": 14,
             "heures_d_obligation_de_service": 35,
             "corps": corps.pk,
@@ -476,19 +674,21 @@ def test_maj_beneficiaire__en_cours_d_annee(client):
     assert utilisation_tps.etp_utilises == round(
         (Decimal(15) + Decimal(14 / 60)) / Decimal(35), settings.PRECISION_ETP
     )
-    document = pandas.read_excel(response.content, dtype="string")
-    assert len(list(document.iterrows())) == 1
-    assert list(document.iterrows())[0][1]["Code organisation"] == "S01"
-    assert list(document.iterrows())[0][1]["M. Mme"] == "MME"
-    assert list(document.iterrows())[0][1]["Prénom"] == "Michelle"
-    assert list(document.iterrows())[0][1]["Nom"] == "MARTIN"
-    assert list(document.iterrows())[0][1]["Heures décharges"] == "15"
-    assert list(document.iterrows())[0][1]["Minutes décharges"] == "14"
-    assert list(document.iterrows())[0][1]["Heures ORS"] == "35"
-    assert list(document.iterrows())[0][1]["Minutes ORS"] == "0"
-    assert list(document.iterrows())[0][1]["AIRE"] == "2"
-    assert list(document.iterrows())[0][1]["Corps"] == "123"
-    assert list(document.iterrows())[0][1]["RNE"] == "1234567A"
+    document = pandas.read_csv(BytesIO(response.content), dtype="string")
+    rows = list(document.iterrows())
+    assert len(rows) == 1
+    assert rows[0][1]["Code organisation"] == "S01"
+    assert rows[0][1]["Code civilité"] == "MME"
+    assert rows[0][1]["Prénom"] == "Michelle"
+    assert rows[0][1]["Nom"] == "MARTIN"
+    assert rows[0][1]["Heures de décharge"] == "15"
+    assert rows[0][1]["Minutes de décharge"] == "14"
+    assert rows[0][1]["Heures d'obligations de service"] == "35"
+    assert rows[0][1]["Aire"] == "2"
+    assert rows[0][1]["Corps"] == "123"
+    assert rows[0][1]["Etablissement"] == "1234567A"
+    assert rows[0][1]["Date d'effet"] == "01/09/2021"
+    assert rows[0][1]["Date de fin"] == "31/08/2022"
 
 
 def test_suppression_beneficiaire__en_cours_d_annee(client):
@@ -523,19 +723,21 @@ def test_suppression_beneficiaire__en_cours_d_annee(client):
     )
     assert response.status_code == 200
     assert UtilisationTempsDecharge.objects.count() == 0
-    document = pandas.read_excel(response.content, dtype="string")
-    assert len(list(document.iterrows())) == 1
-    assert list(document.iterrows())[0][1]["Code organisation"] == "S01"
-    assert list(document.iterrows())[0][1]["M. Mme"] == "MME"
-    assert list(document.iterrows())[0][1]["Prénom"] == "Michelle"
-    assert list(document.iterrows())[0][1]["Nom"] == "MARTIN"
-    assert list(document.iterrows())[0][1]["Heures décharges"] == "10"
-    assert list(document.iterrows())[0][1]["Minutes décharges"] == "0"
-    assert list(document.iterrows())[0][1]["Heures ORS"] == "35"
-    assert list(document.iterrows())[0][1]["Minutes ORS"] == "0"
-    assert list(document.iterrows())[0][1]["AIRE"] == "2"
-    assert list(document.iterrows())[0][1]["Corps"] == "123"
-    assert list(document.iterrows())[0][1]["RNE"] == "1234567A"
+    document = pandas.read_csv(BytesIO(response.content), dtype="string")
+    rows = list(document.iterrows())
+    assert len(rows) == 1
+    assert rows[0][1]["Code organisation"] == "S01"
+    assert rows[0][1]["Code civilité"] == "MME"
+    assert rows[0][1]["Prénom"] == "Michelle"
+    assert rows[0][1]["Nom"] == "MARTIN"
+    assert rows[0][1]["Heures de décharge"] == "10"
+    assert rows[0][1]["Minutes de décharge"] == "0"
+    assert rows[0][1]["Heures d'obligations de service"] == "35"
+    assert rows[0][1]["Aire"] == "2"
+    assert rows[0][1]["Corps"] == "123"
+    assert rows[0][1]["Etablissement"] == "1234567A"
+    assert rows[0][1]["Date d'effet"] == "01/09/2021"
+    assert rows[0][1]["Date de fin"] == "31/08/2022"
 
 
 def test_suppression_beneficiaire__en_cours_d_annee__modification(client):
@@ -584,19 +786,21 @@ def test_suppression_beneficiaire__en_cours_d_annee__modification(client):
     )
     assert response.status_code == 200
     assert UtilisationTempsDecharge.objects.count() == 1
-    document = pandas.read_excel(response.content, dtype="string")
-    assert len(list(document.iterrows())) == 1
-    assert list(document.iterrows())[0][1]["Code organisation"] == "S01"
-    assert list(document.iterrows())[0][1]["M. Mme"] == "MME"
-    assert list(document.iterrows())[0][1]["Prénom"] == "Michelle"
-    assert list(document.iterrows())[0][1]["Nom"] == "MARTIN"
-    assert list(document.iterrows())[0][1]["Heures décharges"] == "40"
-    assert list(document.iterrows())[0][1]["Minutes décharges"] == "0"
-    assert list(document.iterrows())[0][1]["Heures ORS"] == "35"
-    assert list(document.iterrows())[0][1]["Minutes ORS"] == "0"
-    assert list(document.iterrows())[0][1]["AIRE"] == "2"
-    assert list(document.iterrows())[0][1]["Corps"] == "123"
-    assert list(document.iterrows())[0][1]["RNE"] == "1234567A"
+    document = pandas.read_csv(BytesIO(response.content), dtype="string")
+    rows = list(document.iterrows())
+    assert len(rows) == 1
+    assert rows[0][1]["Code organisation"] == "S01"
+    assert rows[0][1]["Code civilité"] == "MME"
+    assert rows[0][1]["Prénom"] == "Michelle"
+    assert rows[0][1]["Nom"] == "MARTIN"
+    assert rows[0][1]["Heures de décharge"] == "40"
+    assert rows[0][1]["Minutes de décharge"] == "0"
+    assert rows[0][1]["Heures d'obligations de service"] == "35"
+    assert rows[0][1]["Aire"] == "2"
+    assert rows[0][1]["Corps"] == "123"
+    assert rows[0][1]["Etablissement"] == "1234567A"
+    assert rows[0][1]["Date d'effet"] == "01/09/2021"
+    assert rows[0][1]["Date de fin"] == "31/08/2022"
 
 
 def test_ajouter_beneficiaire__pas_assez_de_quota(client):
@@ -618,7 +822,7 @@ def test_ajouter_beneficiaire__pas_assez_de_quota(client):
             "civilite": "MME",
             "prenom": "Michelle",
             "nom": "MARTIN",
-            "heures_de_decharges": 10,
+            "int_heures_de_decharges": 10,
             "minutes_de_decharges": 14,
             "heures_d_obligation_de_service": 35,
             "corps": corps.pk,
@@ -672,7 +876,7 @@ def test_ajouter_beneficiaire__depasse_quota_individuel(client):
             "civilite": "MME",
             "prenom": "Michelle",
             "nom": "MARTIN",
-            "heures_de_decharges": 10,
+            "int_heures_de_decharges": 10,
             "minutes_de_decharges": 14,
             "heures_d_obligation_de_service": 35,
             "corps": corps.pk,
@@ -750,7 +954,7 @@ def test_ajouter_beneficiaire__depasse_8_annees_consecutives(client):
             "civilite": "MME",
             "prenom": "Michelle",
             "nom": "MARTIN",
-            "heures_de_decharges": 10,
+            "int_heures_de_decharges": 10,
             "minutes_de_decharges": 14,
             "heures_d_obligation_de_service": 35,
             "corps": corps.pk,
@@ -816,7 +1020,7 @@ def test_ajouter_beneficiaire__depasse_3_etp_consecutifs(client):
             "civilite": "MME",
             "prenom": "Michelle",
             "nom": "MARTIN",
-            "heures_de_decharges": 10,
+            "int_heures_de_decharges": 10,
             "minutes_de_decharges": 0,
             "heures_d_obligation_de_service": 35,
             "corps": corps.pk,

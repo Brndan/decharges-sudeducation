@@ -1,3 +1,5 @@
+import datetime
+
 from decharges.decharge.models import CIVILITE_AFFICHEE, UtilisationTempsDecharge
 
 
@@ -35,31 +37,43 @@ def aggregation_par_beneficiaire(utilisation_temps_decharges):
     aires = []
     corps = []
     rnes = []
-    for temps_de_decharges_par_beneficiare in beneficiaires.values():
+    dates_debut = []
+    dates_fin = []
+    for temps_de_decharges_par_beneficiaire in beneficiaires.values():
         etp_par_annee = {annee: 0 for annee in annees}
         total_heures_decharges = 0
         for (
             temps_de_decharge
-        ) in temps_de_decharges_par_beneficiare:  # type: UtilisationTempsDecharge
+        ) in temps_de_decharges_par_beneficiaire:  # type: UtilisationTempsDecharge
             total_heures_decharges += temps_de_decharge.heures_de_decharges
             etp_par_annee[temps_de_decharge.annee] += temps_de_decharge.etp_utilises
         code_organisations.append("S01")  # le `Code organisation` est fixe
-        civilite = temps_de_decharges_par_beneficiare[0].civilite
+        temps_de_decharge = temps_de_decharges_par_beneficiaire[0]
+        civilite = temps_de_decharge.civilite
         m_mmes.append(CIVILITE_AFFICHEE.get(civilite, civilite))
-        prenoms.append(temps_de_decharges_par_beneficiare[0].prenom)
-        noms.append(temps_de_decharges_par_beneficiare[0].nom)
+        prenoms.append(temps_de_decharge.prenom)
+        noms.append(temps_de_decharge.nom)
         etps_par_annee.append(etp_par_annee)
         heures_decharges.append(int(total_heures_decharges))
         minutes_decharges.append(
             round((total_heures_decharges - int(total_heures_decharges)) * 60)
         )
-        heures_ors.append(
-            temps_de_decharges_par_beneficiare[0].heures_d_obligation_de_service
-        )
+        heures_ors.append(temps_de_decharge.heures_d_obligation_de_service)
         minutes_ors.append(0)  # aujourd'hui les `Heures ORS` sont entiers
         aires.append(2)  # le `AIRE` est fixe
-        corps.append(temps_de_decharges_par_beneficiare[0].corps.code_corps)
-        rnes.append(temps_de_decharges_par_beneficiare[0].code_etablissement_rne)
+        corps.append(
+            temps_de_decharge.corps.code_corps if temps_de_decharge.corps else ""
+        )
+        rnes.append(temps_de_decharge.code_etablissement_rne)
+        annee_courante = temps_de_decharge.annee
+        date_debut_decharge = temps_de_decharge.date_debut_decharge or datetime.date(
+            year=annee_courante, month=9, day=1
+        )
+        date_fin_decharge = temps_de_decharge.date_fin_decharge or datetime.date(
+            year=annee_courante + 1, month=8, day=31
+        )
+        dates_debut.append(date_debut_decharge.strftime("%d/%m/%Y"))
+        dates_fin.append(date_fin_decharge.strftime("%d/%m/%Y"))
 
     return {
         "code_organisations": code_organisations,
@@ -74,6 +88,8 @@ def aggregation_par_beneficiaire(utilisation_temps_decharges):
         "aires": aires,
         "corps": corps,
         "rnes": rnes,
+        "dates_debut": dates_debut,
+        "dates_fin": dates_fin,
     }
 
 

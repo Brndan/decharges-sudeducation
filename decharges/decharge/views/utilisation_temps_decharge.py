@@ -49,11 +49,11 @@ class CreateUtilisationTempsDecharge(
         super().form_valid(form)
         response = HttpResponse("", content_type="application/force-download")
         data_frame = get_data_frame_ministere(temps_du_beneficiaire)
-        data_frame.to_excel(response, engine="odf", index=False)
+        data_frame.to_csv(response, index=False)
         today = date.today()
         response[
             "Content-Disposition"
-        ] = f"attachment; filename=SUD éducation - {nom_fichier} - {today}.ods"
+        ] = f"attachment; filename=SUD éducation - {nom_fichier} - {today}.csv"
         return response
 
     def get_form_kwargs(self):
@@ -112,11 +112,11 @@ class UpdateUtilisationTempsDecharge(
             .order_by("nom", "prenom")
         )
         data_frame = get_data_frame_ministere(temps_du_beneficiaire)
-        data_frame.to_excel(response, engine="odf", index=False)
+        data_frame.to_csv(response, index=False)
         today = date.today()
         response[
             "Content-Disposition"
-        ] = f"attachment; filename=SUD éducation - modification - {today}.ods"
+        ] = f"attachment; filename=SUD éducation - modification - {today}.csv"
         return response
 
     def get_success_url(self):
@@ -193,11 +193,11 @@ class SuppressionUtilisationTempsDecharge(
                 temps_du_beneficiaire_apres_suppression
             )
 
-        data_frame.to_excel(response, engine="odf", index=False)
+        data_frame.to_csv(response, index=False)
         today = date.today()
         response[
             "Content-Disposition"
-        ] = f"attachment; filename=SUD éducation - {nom_fichier} - {today}.ods"
+        ] = f"attachment; filename=SUD éducation - {nom_fichier} - {today}.csv"
         return response
 
     def get_success_url(self):

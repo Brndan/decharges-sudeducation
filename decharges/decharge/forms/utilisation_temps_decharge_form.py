@@ -1,3 +1,4 @@
+import datetime
 import os
 
 from django import forms
@@ -12,7 +13,7 @@ class UtilisationTempsDechargeForm(forms.ModelForm):
     heures_d_obligation_de_service = forms.ChoiceField(
         label="Heures d'obligations de service", choices=settings.CHOIX_ORS
     )
-    heures_de_decharges = forms.IntegerField(
+    int_heures_de_decharges = forms.IntegerField(
         label="Heures de décharge utilisées", min_value=0, initial=0
     )
     minutes_de_decharges = forms.IntegerField(
@@ -22,14 +23,27 @@ class UtilisationTempsDechargeForm(forms.ModelForm):
         required=False,
         initial=0,
     )
+    decharge_applicable_uniquement_sur_une_partie_de_lannee = forms.BooleanField(
+        label="La décharge est-elle applicable uniquement sur une partie de l'année ?",
+        help_text="Si cette case est décochée,"
+        "la décharge s'applique pour l'ensemble de l'année scolaire",
+        required=False,
+    )
 
     def __init__(self, *args, **kwargs):
         self.syndicat = kwargs.pop("syndicat")
         self.annee = kwargs.pop("annee")
+        self.debut_de_lannee = datetime.date(year=self.annee, month=9, day=1)
+        self.fin_de_lannee = datetime.date(year=self.annee + 1, month=8, day=31)
         self.decharges_editables = kwargs.pop("decharges_editables")
         self.corps_annexe = kwargs.pop("corps_annexe")
         self.federation = kwargs.pop("federation")
         super().__init__(*args, **kwargs)
+
+        if self.instance and self.instance.etp_prorata < 1:
+            self.fields[
+                "decharge_applicable_uniquement_sur_une_partie_de_lannee"
+            ].initial = True
         self.fields["prenom"].label = "Prénom"
         self.fields["prenom"].help_text = (
             "- Doit commencer par une Majuscule <br>"
@@ -54,6 +68,32 @@ class UtilisationTempsDechargeForm(forms.ModelForm):
         self.fields["code_etablissement_rne"].widget.attrs[
             "placeholder"
         ] = "ex: 1234567A"
+        self.fields["date_debut_decharge"].widget.input_type = "date"
+        self.fields["date_debut_decharge"].widget.format = "%Y-%m-%d"
+        self.fields["date_debut_decharge"].widget.attrs.update(
+            {
+                "type": "date",
+                "min": self.debut_de_lannee,
+                "max": self.fin_de_lannee,
+                "value": self.instance.date_debut_decharge or self.debut_de_lannee,
+            }
+        )
+        self.fields["date_debut_decharge"].widget.attrs[
+            "wrapper_classes"
+        ] = "column is-6 py-0"
+        self.fields["date_fin_decharge"].widget.input_type = "date"
+        self.fields["date_fin_decharge"].widget.format = "%Y-%m-%d"
+        self.fields["date_fin_decharge"].widget.attrs.update(
+            {
+                "type": "date",
+                "min": self.debut_de_lannee,
+                "max": self.fin_de_lannee,
+                "value": self.instance.date_fin_decharge or self.fin_de_lannee,
+            }
+        )
+        self.fields["date_fin_decharge"].widget.attrs[
+            "wrapper_classes"
+        ] = "column is-6 py-0"
 
         if not self.decharges_editables:
             # la fédération peut choisir le syndicat qui utilise la décharge dans le formulaire
@@ -83,21 +123,28 @@ class UtilisationTempsDechargeForm(forms.ModelForm):
         if self.federation == self.syndicat:
             self.fields["est_une_decharge_solidaires"] = forms.BooleanField(
                 label="Est une décharge solidaires",
-                help_text="Cocher cette case uniquement si la décharge vient d'un autre syndicat que SUD éducation",
+                help_text="Cocher cette case uniquement si la décharge vient d'un autre "
+                "syndicat que SUD éducation",
                 initial=self.instance.est_une_decharge_solidaires,
                 required=False,
             )
 
-        self.fields["heures_de_decharges"].initial = int(
+        self.fields["int_heures_de_decharges"].initial = int(
             self.instance.heures_de_decharges
         )
+        self.fields["int_heures_de_decharges"].widget.attrs[
+            "wrapper_classes"
+        ] = "column is-6 py-0"
         self.fields["minutes_de_decharges"].initial = round(
             (
                 self.instance.heures_de_decharges
-                - self.fields["heures_de_decharges"].initial
+                - self.fields["int_heures_de_decharges"].initial
             )
             * 60
         )
+        self.fields["minutes_de_decharges"].widget.attrs[
+            "wrapper_classes"
+        ] = "column is-6 py-0"
 
     def _populate_instance(self):
         if self.decharges_editables:
@@ -109,7 +156,7 @@ class UtilisationTempsDechargeForm(forms.ModelForm):
                 "commentaire_de_mise_a_jour"
             )
         self.instance.annee = self.annee
-        self.instance.heures_de_decharges = self.cleaned_data["heures_de_decharges"]
+        self.instance.heures_de_decharges = self.cleaned_data["int_heures_de_decharges"]
         self.instance.est_une_decharge_solidaires = self.cleaned_data.get(
             "est_une_decharge_solidaires", False
         )
@@ -141,6 +188,8 @@ class UtilisationTempsDechargeForm(forms.ModelForm):
 
     def full_clean(self):
         super().full_clean()
+        if not hasattr(self, "cleaned_data"):
+            return
         (_, _, _, _, _, _, temps_restant, _, _,) = calcul_repartition_temps(
             self.annee,
             self.federation,
@@ -231,7 +280,39 @@ class UtilisationTempsDechargeForm(forms.ModelForm):
         ) and self.federation != cleaned_data.get("syndicat", self.syndicat):
             self.add_error(
                 "est_une_decharge_solidaires",
-                "La décharge ne peut provenir d'un autre syndicat uniquement pour les décharges fédérales",
+                "La décharge ne peut provenir d'un autre syndicat uniquement "
+                "pour les décharges fédérales",
+            )
+
+        if (
+            cleaned_data.get("decharge_applicable_uniquement_sur_une_partie_de_lannee")
+            is False
+        ):
+            cleaned_data["date_debut_decharge"] = self.debut_de_lannee
+            cleaned_data["date_fin_decharge"] = self.fin_de_lannee
+
+        date_debut_decharge = cleaned_data.get("date_debut_decharge")
+        date_fin_decharge = cleaned_data.get("date_fin_decharge")
+        if date_debut_decharge and (
+            date_debut_decharge > date_fin_decharge
+            or date_debut_decharge > self.fin_de_lannee
+            or date_debut_decharge < self.debut_de_lannee
+        ):
+            self.add_error(
+                "date_debut_decharge",
+                "La date de début de décharge doit être une date dans l'année "
+                "inférieure à la date de fin de décharge",
+            )
+
+        if date_fin_decharge and (
+            date_fin_decharge < date_debut_decharge
+            or date_fin_decharge > self.fin_de_lannee
+            or date_fin_decharge < self.debut_de_lannee
+        ):
+            self.add_error(
+                "date_fin_decharge",
+                "La date de fin de décharge doit être une date dans l'année "
+                "supérieure à la date de début de décharge",
             )
 
         return cleaned_data
@@ -245,4 +326,9 @@ class UtilisationTempsDechargeForm(forms.ModelForm):
             "heures_d_obligation_de_service",
             "corps",
             "code_etablissement_rne",
+            "int_heures_de_decharges",
+            "minutes_de_decharges",
+            "decharge_applicable_uniquement_sur_une_partie_de_lannee",
+            "date_debut_decharge",
+            "date_fin_decharge",
         ]

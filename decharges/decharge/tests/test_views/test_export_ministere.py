@@ -1,3 +1,6 @@
+import datetime
+from io import BytesIO
+
 import pandas
 import pytest
 from django.urls import reverse
@@ -33,6 +36,7 @@ def test_export_ministere(client):
         annee=2021,
         syndicat=syndicat,
         corps=corps,
+        date_debut_decharge=datetime.date(year=2021, month=10, day=9),
     )
     UtilisationTempsDecharge.objects.create(
         civilite="M.",
@@ -44,6 +48,7 @@ def test_export_ministere(client):
         annee=2021,
         syndicat=syndicat2,
         corps=corps,
+        date_debut_decharge=datetime.date(year=2021, month=10, day=9),
     )
     UtilisationTempsDecharge.objects.create(
         civilite="M.",
@@ -56,6 +61,7 @@ def test_export_ministere(client):
         syndicat=syndicat2,
         corps=corps,
         est_une_decharge_solidaires=True,
+        date_debut_decharge=datetime.date(year=2021, month=10, day=9),
     )
     UtilisationTempsDecharge.objects.create(
         civilite="M.",
@@ -92,28 +98,31 @@ def test_export_ministere(client):
         corps=corps,
     )
     res = client.get(reverse("decharge:export_ministere"))
-    document = pandas.read_excel(res.content, dtype="string")
-    assert len(list(document.iterrows())) == 2
-    assert list(document.iterrows())[0][1]["Code organisation"] == "S01"
-    assert list(document.iterrows())[0][1]["M. Mme"] == "M."
-    assert list(document.iterrows())[0][1]["Prénom"] == "Foo"
-    assert list(document.iterrows())[0][1]["Nom"] == "BAR"
-    assert list(document.iterrows())[0][1]["Heures décharges"] == "50"
-    assert list(document.iterrows())[0][1]["Minutes décharges"] == "15"
-    assert list(document.iterrows())[0][1]["Heures ORS"] == "1607"
-    assert list(document.iterrows())[0][1]["Minutes ORS"] == "0"
-    assert list(document.iterrows())[0][1]["AIRE"] == "2"
-    assert list(document.iterrows())[0][1]["Corps"] == "023"
-    assert list(document.iterrows())[0][1]["RNE"] == "0234567A"
+    document = pandas.read_csv(BytesIO(res.content), dtype="string")
+    rows = list(document.iterrows())
+    assert len(rows) == 2
+    assert rows[0][1]["Code organisation"] == "S01"
+    assert rows[0][1]["Code civilité"] == "M."
+    assert rows[0][1]["Prénom"] == "Foo"
+    assert rows[0][1]["Nom"] == "BAR"
+    assert rows[0][1]["Heures de décharge"] == "50"
+    assert rows[0][1]["Minutes de décharge"] == "15"
+    assert rows[0][1]["Heures d'obligations de service"] == "1607"
+    assert rows[0][1]["Aire"] == "2"
+    assert rows[0][1]["Corps"] == "023"
+    assert rows[0][1]["Etablissement"] == "0234567A"
+    assert rows[0][1]["Date d'effet"] == "09/10/2021"
+    assert rows[0][1]["Date de fin"] == "31/08/2022"
 
-    assert list(document.iterrows())[1][1]["Code organisation"] == "S01"
-    assert list(document.iterrows())[1][1]["M. Mme"] == "M."
-    assert list(document.iterrows())[1][1]["Prénom"] == "Foo"
-    assert list(document.iterrows())[1][1]["Nom"] == "BAR"
-    assert list(document.iterrows())[1][1]["Heures décharges"] == "10"
-    assert list(document.iterrows())[1][1]["Minutes décharges"] == "0"
-    assert list(document.iterrows())[1][1]["Heures ORS"] == "1607"
-    assert list(document.iterrows())[1][1]["Minutes ORS"] == "0"
-    assert list(document.iterrows())[1][1]["AIRE"] == "2"
-    assert list(document.iterrows())[1][1]["Corps"] == "023"
-    assert list(document.iterrows())[1][1]["RNE"] == "0234567B"
+    assert rows[1][1]["Code organisation"] == "S01"
+    assert rows[1][1]["Code civilité"] == "M."
+    assert rows[1][1]["Prénom"] == "Foo"
+    assert rows[1][1]["Nom"] == "BAR"
+    assert rows[1][1]["Heures de décharge"] == "10"
+    assert rows[1][1]["Minutes de décharge"] == "0"
+    assert rows[1][1]["Heures d'obligations de service"] == "1607"
+    assert rows[1][1]["Aire"] == "2"
+    assert rows[1][1]["Corps"] == "023"
+    assert rows[1][1]["Etablissement"] == "0234567B"
+    assert rows[1][1]["Date d'effet"] == "01/09/2021"
+    assert rows[1][1]["Date de fin"] == "31/08/2022"

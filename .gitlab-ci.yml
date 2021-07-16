@@ -73,16 +73,16 @@ build_docker_and_publish:
     - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN registry.gitlab.com
     - docker push registry.gitlab.com/hashbangfr/sudeducation:latest
     - docker push registry.gitlab.com/hashbangfr/sudeducation:$CI_COMMIT_SHORT_SHA
-
-ansible-preprod:
-  only:
-    refs:
-      - master
-  stage: deploy
-  image: registry.gitlab.com/hashbangfr/docker_archlinux:ansible
-  dependencies:
-    - build_docker_and_publish
-  tags:
-    - ansible
-  script:
-    - cd /srv/ansible/ && ansible-playbook ./playbooks/sudeducation/play.yml -vvv --extra-vars="tag=$CI_COMMIT_SHORT_SHA"
+#
+#ansible-preprod:
+#  only:
+#    refs:
+#      - master
+#  stage: deploy
+#  image: registry.gitlab.com/hashbangfr/docker_archlinux:ansible
+#  dependencies:
+#    - build_docker_and_publish
+#  tags:
+#    - ansible
+#  script:
+#    - cd /srv/ansible/ && ansible-playbook ./playbooks/sudeducation/play.yml -vvv --extra-vars="tag=$CI_COMMIT_SHORT_SHA"

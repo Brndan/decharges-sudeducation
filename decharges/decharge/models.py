@@ -1,3 +1,4 @@
+import datetime
 import decimal
 
 from django.conf import settings
@@ -159,6 +160,16 @@ class UtilisationTempsDecharge(models.Model):
         default=2021,
         db_index=True,
     )
+    date_debut_decharge = models.DateField(
+        verbose_name="Date à laquelle la décharge commence",
+        null=True,
+        blank=True,
+    )
+    date_fin_decharge = models.DateField(
+        verbose_name="Date à laquelle la décharge se termine",
+        null=True,
+        blank=True,
+    )
     syndicat = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         verbose_name="Syndicat qui utilise ce temps",
@@ -209,7 +220,8 @@ class UtilisationTempsDecharge(models.Model):
         return round(
             decimal.Decimal(
                 self.heures_de_decharges / self.heures_d_obligation_de_service
-            ),
+            )
+            * self.etp_prorata,
             settings.PRECISION_ETP,
         )
 
@@ -222,6 +234,18 @@ class UtilisationTempsDecharge(models.Model):
         return int(
             round((self.heures_de_decharges - self.heures_pleines_de_decharges) * 60)
         )
+
+    @property
+    def etp_prorata(self) -> decimal.Decimal:
+        debut_de_lannee = datetime.date(year=self.annee, month=9, day=1)
+        fin_de_lannee = datetime.date(year=self.annee + 1, month=8, day=31)
+        date_fin_decharge = self.date_fin_decharge or fin_de_lannee
+        date_debut_decharge = self.date_debut_decharge or debut_de_lannee
+        nb_jours_annee = fin_de_lannee - debut_de_lannee + datetime.timedelta(days=1)
+        nb_jours_decharge = (
+            date_fin_decharge - date_debut_decharge + datetime.timedelta(days=1)
+        )
+        return decimal.Decimal(nb_jours_decharge / nb_jours_annee)
 
     class Meta:
         unique_together = (

@@ -17,18 +17,23 @@ def get_data_frame_ministere(utilisations_temps_decharges):
             "Code organisation": pandas.Series(
                 columns["code_organisations"], dtype="string"
             ),
-            "M. Mme": pandas.Series(columns["m_mmes"], dtype="string"),
+            "Code civilité": pandas.Series(columns["m_mmes"], dtype="string"),
             "Prénom": pandas.Series(columns["prenoms"], dtype="string"),
             "Nom": pandas.Series(columns["noms"], dtype="string"),
-            "Heures décharges": pandas.Series(columns["heures_decharges"], dtype="int"),
-            "Minutes décharges": pandas.Series(
+            "Heures de décharge": pandas.Series(
+                columns["heures_decharges"], dtype="int"
+            ),
+            "Minutes de décharge": pandas.Series(
                 columns["minutes_decharges"], dtype="int"
             ),
-            "Heures ORS": pandas.Series(columns["heures_ors"], dtype="int"),
-            "Minutes ORS": pandas.Series(columns["minutes_ors"], dtype="int"),
-            "AIRE": pandas.Series(columns["aires"], dtype="int"),
+            "Heures d'obligations de service": pandas.Series(
+                columns["heures_ors"], dtype="int"
+            ),
+            "Aire": pandas.Series(columns["aires"], dtype="int"),
             "Corps": pandas.Series(columns["corps"], dtype="string"),
-            "RNE": pandas.Series(columns["rnes"], dtype="string"),
+            "Etablissement": pandas.Series(columns["rnes"], dtype="string"),
+            "Date d'effet": pandas.Series(columns["dates_debut"], dtype="string"),
+            "Date de fin": pandas.Series(columns["dates_fin"], dtype="string"),
         }
     )
 
@@ -47,10 +52,10 @@ class ExportMinistere(CheckConfigurationMixin, FederationRequiredMixin, View):
             .order_by("nom", "prenom")
         )
         response = HttpResponse("", content_type="application/force-download")
-        data_frame.to_excel(response, engine="odf", index=False)
+        data_frame.to_csv(response, index=False)
         today = date.today()
         response["Content-Disposition"] = (
             "attachment; filename=SUD éducation - déclaration initiale "
-            f"{annee}-{annee+1} - {today}.ods"
+            f"{annee}-{annee+1} - {today}.csv"
         )
         return response
