@@ -215,7 +215,7 @@ class UtilisationTempsDecharge(models.Model):
         if self.etp:
             # self.etp peut être renseigné dans le cas où l'objet vient de
             # l'import de l'historique des décharges
-            return self.etp
+            return round(self.etp * self.etp_prorata, settings.PRECISION_ETP)
         # heures_de_decharges only has 5 decimal places, so we round it up to 5 too
         return round(
             decimal.Decimal(
