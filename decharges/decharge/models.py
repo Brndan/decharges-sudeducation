@@ -212,18 +212,19 @@ class UtilisationTempsDecharge(models.Model):
 
     @property
     def etp_utilises(self) -> decimal.Decimal:
-        if self.etp:
-            # self.etp peut être renseigné dans le cas où l'objet vient de
-            # l'import de l'historique des décharges
-            return round(self.etp * self.etp_prorata, settings.PRECISION_ETP)
-        # heures_de_decharges only has 5 decimal places, so we round it up to 5 too
-        return round(
-            decimal.Decimal(
-                self.heures_de_decharges / self.heures_d_obligation_de_service
+        if self.heures_de_decharges != 0 and self.heures_d_obligation_de_service != 0:
+            # heures_de_decharges only has 5 decimal places, so we round it up to 5 too
+            return round(
+                decimal.Decimal(
+                    self.heures_de_decharges / self.heures_d_obligation_de_service
+                )
+                * self.etp_prorata,
+                settings.PRECISION_ETP,
             )
-            * self.etp_prorata,
-            settings.PRECISION_ETP,
-        )
+
+        # self.etp peut être renseigné dans le cas où l'objet vient de
+        # l'import de l'historique des décharges
+        return round(self.etp * self.etp_prorata, settings.PRECISION_ETP)
 
     @property
     def heures_pleines_de_decharges(self) -> int:

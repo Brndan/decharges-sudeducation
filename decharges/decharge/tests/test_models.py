@@ -40,20 +40,20 @@ def test_instanciate_utilisation_temps_decharge():
     tps_decharge = UtilisationTempsDecharge.objects.create(
         prenom="Foo",
         nom="BAR",
-        heures_de_decharges=10,
-        heures_d_obligation_de_service=35,
+        etp=Decimal(7 / 35),
         corps=corps,
         code_etablissement_rne="1234567A",
         annee=2021,
         syndicat=syndicat,
     )
     assert UtilisationTempsDecharge.objects.first().etp_utilises == round(
-        Decimal(10 / 35), settings.PRECISION_ETP
+        Decimal(7 / 35), settings.PRECISION_ETP
     )
-    tps_decharge.etp = Decimal(7 / 35)
+    tps_decharge.heures_de_decharges = 10
+    tps_decharge.heures_d_obligation_de_service = 35
     tps_decharge.save()
     assert UtilisationTempsDecharge.objects.first().etp_utilises == round(
-        Decimal(7 / 35), settings.PRECISION_ETP
+        Decimal(10 / 35), settings.PRECISION_ETP
     )
 
     corps2 = Corps.objects.create(code_corps="456")
