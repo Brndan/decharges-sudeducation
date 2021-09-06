@@ -224,7 +224,7 @@ class UtilisationTempsDecharge(models.Model):
 
         # self.etp peut être renseigné dans le cas où l'objet vient de
         # l'import de l'historique des décharges
-        return round(self.etp * self.etp_prorata, settings.PRECISION_ETP)
+        return self.etp
 
     @property
     def heures_pleines_de_decharges(self) -> int:
